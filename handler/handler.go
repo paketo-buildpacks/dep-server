@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type Handler struct {
@@ -22,7 +23,7 @@ func (h Handler) DependencyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadataFileURL := fmt.Sprintf("%s/pivotal-buildpacks/metadata/%s.json", h.S3URL, dependencyName)
+	metadataFileURL := fmt.Sprintf("%s/pivotal-buildpacks/metadata/%s.json", h.S3URL, strings.ToLower(dependencyName))
 	resp, err := http.Get(metadataFileURL)
 	if err != nil {
 		h.handlerError(w, http.StatusInternalServerError,

@@ -48,6 +48,18 @@ func testHandler(t *testing.T, when spec.G, it spec.S) {
 		assert.JSONEq(`[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`, string(body))
 	})
 
+	it("converts all dep-names to lowercase before making a request to s3", func() {
+		req := httptest.NewRequest("GET", "http://some-url.com/some-endpoint?name=some-DEP", nil)
+		w := httptest.NewRecorder()
+		handler.DependencyHandler(w, req)
+
+		resp := w.Result()
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(err)
+
+		assert.JSONEq(`[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`, string(body))
+	})
+
 	when("the request is not a GET", func() {
 		it("returns a 405", func() {
 			req := httptest.NewRequest("POST", "http://some-url.com/some-endpoint?name=some-dep", nil)
