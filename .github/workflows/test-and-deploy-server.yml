@@ -30,8 +30,8 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         version: '270.0.0'
-        service_account_email: ${{ secrets.GKE_EMAIL }}
-        service_account_key: ${{ secrets.GKE_KEY }}
+        service_account_email: ${{ secrets.GAE_EMAIL }}
+        service_account_key: ${{ secrets.GAE_KEY }}
 
     - name: Deploy Server
       run: gcloud app deploy
