@@ -3,6 +3,25 @@
 ## Usage
 `curl https://cf-buildpacks-releng.ue.r.appspot.com/api/v1/dependency?name=<DEP-NAME>`
 
+## Supported Dependencies
+* bundler
+* CAAPM
+* composer
+* dotnet-aspnetcore
+* dotnet-runtime
+* dotnet-sdk
+* go
+* httpd
+* icu
+* nginx
+* node
+* php
+* pip
+* pipenv
+* python
+* ruby
+* yarn
+
 ## Example
 
 **Request:**
