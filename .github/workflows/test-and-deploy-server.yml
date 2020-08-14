@@ -7,6 +7,7 @@ on:
 env:
   GAE_EMAIL: ${{ secrets.GAE_EMAIL }}
   GAE_KEY: ${{ secrets.GAE_KEY }}
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
 
 jobs:
 
@@ -30,8 +31,9 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         version: '270.0.0'
-        service_account_email: ${{ secrets.GAE_EMAIL }}
-        service_account_key: ${{ secrets.GAE_KEY }}
+        service_account_email: ${GAE_EMAIL}
+        service_account_key: ${GAE_KEY}
+        project_id: ${GCP_PROJECT}
 
     - name: Deploy Server
       run: gcloud app deploy
