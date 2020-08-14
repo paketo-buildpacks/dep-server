@@ -35,4 +35,4 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT }}
 
     - name: Deploy Server
-      run: gcloud app deploy
+      run: gcloud app deploy --quiet
