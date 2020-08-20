@@ -54,7 +54,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 		_ = os.Remove(serverPath)
 	})
 
-	when("/api/v1/metadata", func() {
+	when("/v1/metadata", func() {
 		it("returns the metadata file for the given dependency", func() {
 			addr, err := GetFreeAddr()
 			require.NoError(err)
@@ -70,7 +70,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 			err = WaitForServerToBeAvailable(addr, 10*time.Second)
 			require.NoError(err)
 
-			resp, err := http.Get(fmt.Sprintf("http://%s/api/v1/dependency?name=some-dep", addr))
+			resp, err := http.Get(fmt.Sprintf("http://%s/v1/dependency?name=some-dep", addr))
 			require.NoError(err)
 
 			defer resp.Body.Close()

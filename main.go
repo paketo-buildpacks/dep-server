@@ -19,7 +19,7 @@ func main() {
 	h := handler.Handler{S3URL: s3URL}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/dependency", h.DependencyHandler)
+	mux.HandleFunc("/v1/dependency", h.DependencyHandler)
 
 	err := http.ListenAndServe(addr, mux)
 	if err != nil {
