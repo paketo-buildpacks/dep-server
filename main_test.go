@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 	"time"
 )
@@ -56,21 +57,19 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 
 	when("/v1/metadata", func() {
 		it("returns the metadata file for the given dependency", func() {
-			addr, err := GetFreeAddr()
+			port, err := GetFreePort()
 			require.NoError(err)
 
 			go func() {
-				output, err := exec.Command(
-					serverPath,
-					"--addr", addr,
-					"--s3-url", testS3Server.URL,
-				).CombinedOutput()
+				cmd := exec.Command(serverPath, "--s3-url", testS3Server.URL)
+				cmd.Env = append(cmd.Env, "PORT="+port)
+				output, err := cmd.CombinedOutput()
 				require.NoError(err, string(output))
 			}()
-			err = WaitForServerToBeAvailable(addr, 10*time.Second)
+			err = WaitForServerToBeAvailable(port, 10*time.Second)
 			require.NoError(err)
 
-			resp, err := http.Get(fmt.Sprintf("http://%s/v1/dependency?name=some-dep", addr))
+			resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%s/v1/dependency?name=some-dep", port))
 			require.NoError(err)
 
 			defer resp.Body.Close()
@@ -83,18 +82,18 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 	})
 }
 
-func GetFreeAddr() (string, error) {
+func GetFreePort() (string, error) {
 	conn, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return "", err
 	}
 	defer conn.Close()
 
-	return conn.Addr().String(), nil
+	return strings.Split(conn.Addr().String(), ":")[1], nil
 }
 
-func ServerIsAvailable(address string) bool {
-	conn, err := net.Dial("tcp", address)
+func ServerIsAvailable(port string) bool {
+	conn, err := net.Dial("tcp", "127.0.0.1:"+port)
 	if err == nil {
 		_ = tls.Client(conn, &tls.Config{InsecureSkipVerify: true}).Handshake()
 		_ = conn.Close()
