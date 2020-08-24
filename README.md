@@ -1,7 +1,7 @@
 # Dep Server
 
 ## Usage
-`curl https://cf-buildpacks-releng.ue.r.appspot.com/api/v1/dependency?name=<DEP-NAME>`
+`curl https://api.deps.paketo.io/v1/dependency?name=<DEP-NAME>`
 
 ## Supported Dependencies
 * bundler
@@ -26,38 +26,44 @@
 
 **Request:**
 
-`curl https://cf-buildpacks-releng.ue.r.appspot.com/api/v1/dependency?name=bundler`
+`curl https://api.deps.paketo.io/v1/dependency?name=go`
 
 **Response:**
 
 ```
 [
   {
-    "name": "bundler",
-    "version": "2.1.4",
-    "sha256": "7e7c0a43afe379322b01d62383a760c3d6ed1d633742c3ae5362aa754ffe34c0",
-    "uri": "https://pivotal-buildpacks.s3.amazonaws.com/deps/bundler/bundler_2.1.4_linux_noarch_bionic_7e7c0a43.tgz",
+    "name": "go",
+    "version": "1.15",
+    "sha256": "29d4ae84b0cb970442becfe70ee76ce9df67341d15da81b370690fac18111e63",
+    "uri": "https://deps.paketo.io/go/go_1.15_linux_x64_bionic_29d4ae84.tgz",
     "stacks": [
       {
         "id": "io.buildpacks.stacks.bionic"
+      },
+      {
+        "id": "io.paketo.stacks.tiny"
       }
     ],
-    "source": "https://github.com/bundler/bundler/tree/v2.1.4",
-    "source_sha256": "50014d21d6712079da4d6464de12bb93c278f87c9200d0b60ba99f32c25af489",
+    "source": "https://dl.google.com/go/go1.15.src.tar.gz",
+    "source_sha256": "69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a",
     "deprecation_date": ""
   },
   {
-    "name": "bundler",
-    "version": "1.1.2",
-    "sha256": "8jasdfja43afe379322b01d62383a760c3d6ed1d633742c3ae5362aa754ffe3h89",
-    "uri": "https://pivotal-buildpacks.s3.amazonaws.com/deps/bundler/bundler_1.1.2_linux_noarch_bionic_8jasdfja.tgz",
+    "name": "go",
+    "version": "1.13.15",
+    "sha256": "b4ff131749bea80121374747424f2f02bb7dbdabc69b5aad8cff185f15e1aec9",
+    "uri": "https://deps.paketo.io/go/go_1.13.15_linux_x64_bionic_b4ff1317.tgz",
     "stacks": [
       {
         "id": "io.buildpacks.stacks.bionic"
+      },
+      {
+        "id": "io.paketo.stacks.tiny"
       }
     ],
-    "source": "https://github.com/bundler/bundler/tree/v1.1.2",
-    "source_sha256": "20634d21d6712079da4d6464de12bb93c278f87c9200d0b60ba99f32c25au891",
+    "source": "https://dl.google.com/go/go1.13.15.src.tar.gz",
+    "source_sha256": "5fb43171046cf8784325e67913d55f88a683435071eef8e9da1aa8a1588fcf5d",
     "deprecation_date": ""
   }
 ]

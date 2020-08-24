@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
-	"github.com/pivotal/dep-server/handler"
 	"net/http"
 	"os"
+
+	"github.com/pivotal/dep-server/handler"
 )
 
 func main() {
-	var s3URL string
+	var bucketURL string
 
-	flag.StringVar(&s3URL, "s3-url", "https://s3.amazonaws.com", "URL of AWS")
+	flag.StringVar(&bucketURL, "bucket-url", "https://deps.paketo.io", "URL of Metadata Bucket")
 	flag.Parse()
 
 	port := os.Getenv("PORT")
@@ -18,7 +19,7 @@ func main() {
 		port = "8080"
 	}
 
-	h := handler.Handler{S3URL: s3URL}
+	h := handler.Handler{BucketURL: bucketURL}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/dependency", h.DependencyHandler)

@@ -3,10 +3,6 @@ package main_test
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/sclevine/spec"
-	"github.com/sclevine/spec/report"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -16,6 +12,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/sclevine/spec"
+	"github.com/sclevine/spec/report"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServer(t *testing.T) {
@@ -24,15 +25,15 @@ func TestServer(t *testing.T) {
 
 func testServer(t *testing.T, when spec.G, it spec.S) {
 	var (
-		serverPath   string
-		testS3Server *httptest.Server
-		assert       = assert.New(t)
-		require      = require.New(t)
+		serverPath       string
+		testBucketServer *httptest.Server
+		assert           = assert.New(t)
+		require          = require.New(t)
 	)
 
 	it.Before(func() {
-		testS3Server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.String() == "/pivotal-buildpacks/metadata/some-dep.json" {
+		testBucketServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.String() == "/metadata/some-dep.json" {
 				_, _ = fmt.Fprintln(w, `[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`)
 			} else {
 				w.WriteHeader(http.StatusNotFound)
@@ -51,7 +52,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	it.After(func() {
-		testS3Server.Close()
+		testBucketServer.Close()
 		_ = os.Remove(serverPath)
 	})
 
@@ -61,7 +62,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 			require.NoError(err)
 
 			go func() {
-				cmd := exec.Command(serverPath, "--s3-url", testS3Server.URL)
+				cmd := exec.Command(serverPath, "--bucket-url", testBucketServer.URL)
 				cmd.Env = append(cmd.Env, "PORT="+port)
 				output, err := cmd.CombinedOutput()
 				require.NoError(err, string(output))

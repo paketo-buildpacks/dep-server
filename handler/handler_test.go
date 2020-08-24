@@ -2,15 +2,16 @@ package handler_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	h "github.com/pivotal/dep-server/handler"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestHandler(t *testing.T) {
@@ -19,24 +20,24 @@ func TestHandler(t *testing.T) {
 
 func testHandler(t *testing.T, when spec.G, it spec.S) {
 	var (
-		handler      h.Handler
-		testS3Server *httptest.Server
-		assert       = assert.New(t)
-		require      = require.New(t)
+		handler          h.Handler
+		testBucketServer *httptest.Server
+		assert           = assert.New(t)
+		require          = require.New(t)
 	)
 
 	it.Before(func() {
-		testS3Server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.String() == "/pivotal-buildpacks/metadata/some-dep.json" {
+		testBucketServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.String() == "/metadata/some-dep.json" {
 				_, _ = fmt.Fprintln(w, `[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`)
 			} else {
 				w.WriteHeader(http.StatusNotFound)
 			}
 		}))
-		handler = h.Handler{S3URL: testS3Server.URL}
+		handler = h.Handler{BucketURL: testBucketServer.URL}
 	})
 
-	it("returns the contents of the file in s3", func() {
+	it("returns the contents of the file in the bucket", func() {
 		req := httptest.NewRequest("GET", "http://some-url.com/some-endpoint?name=some-dep", nil)
 		w := httptest.NewRecorder()
 		handler.DependencyHandler(w, req)
@@ -48,7 +49,7 @@ func testHandler(t *testing.T, when spec.G, it spec.S) {
 		assert.JSONEq(`[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`, string(body))
 	})
 
-	it("converts all dep-names to lowercase before making a request to s3", func() {
+	it("converts all dep-names to lowercase before making a request to the bucket", func() {
 		req := httptest.NewRequest("GET", "http://some-url.com/some-endpoint?name=some-DEP", nil)
 		w := httptest.NewRecorder()
 		handler.DependencyHandler(w, req)
@@ -82,7 +83,7 @@ func testHandler(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when("the s3 server responds with a non-200", func() {
+	when("the bucket server responds with a non-200", func() {
 		it("returns a 500", func() {
 			req := httptest.NewRequest("GET", "http://some-url.com/some-endpoint?name=some-non-existent-dep", nil)
 			w := httptest.NewRecorder()
