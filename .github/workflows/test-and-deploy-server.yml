@@ -1,11 +1,11 @@
 name: Test and Deploy Dep-Server
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [ main ]
 
 env:
-  GAE_EMAIL: ${{ secrets.GAE_EMAIL }}
   GAE_KEY: ${{ secrets.GAE_KEY }}
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
 
