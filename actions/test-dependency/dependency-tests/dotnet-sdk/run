@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -euo pipefail
+
+extract_tarball() {
+  rm -rf dotnet-sdk
+  mkdir dotnet-sdk
+  tar -xf dependency/*.tar.xz -C dotnet-sdk
+}
+
+check_version() {
+  expected_version="$1"
+  actual_version="$(./dotnet-sdk/dotnet --list-sdks | cut -d' ' -f1)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarball
+  check_version "$1"
+
+  echo "All tests passed!"
+}
+
+main "$@"

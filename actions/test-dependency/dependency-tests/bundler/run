@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -euo pipefail
+
+extract_tarball() {
+  rm -rf bundler
+  mkdir bundler
+  tar -xf dependency/*.tgz -C bundler
+}
+
+extract_tarball_ruby() {
+  rm -rf ruby
+  mkdir ruby
+  tar -xf required_dependency/*.tgz -C ruby
+}
+
+set_ruby_location() {
+  dir="$(echo "${PWD}" | sed 's/\//\\\//g')"
+  sed -i "s/\/usr\/bin\/env ruby/${dir}\/ruby\/bin\/ruby/" ./bundler/bin/bundler
+}
+
+check_version() {
+  expected_version="$1"
+  actual_version="$(GEM_PATH="${PWD}/bundler" ./bundler/bin/bundler --version | cut -d' ' -f3)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarball
+  extract_tarball_ruby
+  set_ruby_location
+  check_version "$1"
+
+  echo "All tests passed!"
+}
+
+main "$@"

@@ -1,0 +1,63 @@
+name: 'Upload Dependency Metadata'
+description: |
+  Upload dependency metadata to AWS s3
+
+inputs:
+  bucket-name:
+    description: AWS s3 bucket
+    required: true
+  dependency-name:
+    description: Dependency name
+    required: true
+  version:
+    description: Dependency version
+    required: true
+  sha256:
+    description: Compiled dependency sha256
+    required: true
+  uri:
+    description: Compiled dependency uri
+    required: true
+  stacks:
+    description: Compatible stacks
+    required: true
+  source-uri:
+    description: Source dependency uri
+    required: true
+  source-sha256:
+    description: Source dependency sha256
+    required: true
+  deprecation-date:
+    description: Deprecation date
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - id: upload
+      shell: bash
+      run: |
+        #!/usr/bin/inputs bash
+        set -euo pipefail
+
+        aws s3 cp "s3://${{ inputs.bucket-name }}/metadata/${{ inputs.dependency-name }}.json" metadata.json
+
+        metadata="$(cat << EOF
+        {
+          "name": "${{ inputs.dependency-name }}",
+          "version": "${{ inputs.version }}",
+          "sha256": "${{ inputs.sha256 }}",
+          "uri": "${{ inputs.uri }}",
+          "stacks": ${{ inputs.stacks }},
+          "source": "${{ inputs.source-uri }}",
+          "source_sha256": "${{ inputs.source-sha256 }}",
+          "deprecation_date": "${{ inputs.deprecation-date }}"
+        }
+        EOF
+        )"
+
+        updated_metadata="$(jq --argjson metadata "${metadata}" --arg version "${{ inputs.version }}" -r 'del(.[] | select(.version == $version)) | [$metadata] + .' metadata.json)"
+
+        echo "${updated_metadata}" > metadata.json
+
+        aws s3 cp metadata.json "s3://${{ inputs.bucket-name }}/metadata/${{ inputs.dependency-name }}.json"

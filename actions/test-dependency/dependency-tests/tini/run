@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -euo pipefail
+
+extract_tarball() {
+  rm -rf tini
+  mkdir tini
+  tar -xf dependency/*.tgz -C tini
+}
+
+check_version() {
+  expected_version=${1#v}
+  actual_version="$(./tini/bin/tini --version | awk '{ print $3 }')"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+check_spawn() {
+  output="$(./tini/bin/tini -- echo -n 'hello world' 2>/dev/null)"
+  if [[ "${output}" != "hello world" ]]; then
+    echo "Expected 'hello world' but got '${output}':"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarball
+  check_version "$1"
+  check_spawn
+
+  echo "All tests passed!"
+}
+
+main "$@"

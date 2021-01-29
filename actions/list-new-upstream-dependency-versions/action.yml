@@ -1,0 +1,57 @@
+name: 'List New Upstream Dependency Versions'
+description: |
+  List new versions of upstream dependency
+
+inputs:
+  github-token:
+    description: github access token
+    required: false
+  name:
+    description: dependency name
+    required: true
+  known-versions:
+    description: JSON array of known versions
+    required: true
+
+outputs:
+  new-versions:
+    description: JSON array of new versions
+    value: ${{ steps.new-versions.outputs.new-versions }}
+  upstream-versions:
+    description: JSON array of upstream versions
+    value: ${{ steps.new-versions.outputs.upstream-versions }}
+
+runs:
+  using: 'composite'
+  steps:
+
+    - id: new-versions
+      shell: bash
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        cd "${{ github.action_path }}/entrypoint"
+
+        go build -o ./entrypoint
+
+        upstream_versions="$(./entrypoint \
+          --github-token "${{ inputs.github-token }}" \
+          --name "${{ inputs.name }}"
+        )"
+
+        new_versions="$(jq -n --argjson upstream_versions "${upstream_versions}" \
+          --argjson known_versions '${{ inputs.known-versions }}' '$upstream_versions-$known_versions')"
+
+        upstream_versions="${upstream_versions//'%'/'%25'}"
+        upstream_versions="${upstream_versions//$'\n'/'%0A'}"
+        upstream_versions="${upstream_versions//$'\r'/'%0D'}"
+
+        new_versions="${new_versions//'%'/'%25'}"
+        new_versions="${new_versions//$'\n'/'%0A'}"
+        new_versions="${new_versions//$'\r'/'%0D'}"
+
+        echo "::set-output name=upstream-versions::${upstream_versions}"
+        echo "::set-output name=new-versions::${new_versions}"
+
+        rm -f ./entrypoint

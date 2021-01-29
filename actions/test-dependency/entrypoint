@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+name=
+version=
+dependency_url=
+mixins=
+required_dependency=
+
+while test $# -gt 0; do
+  case $1 in
+    --name)
+      name=$2
+      shift
+      ;;
+    --version)
+      version=$2
+      shift
+      ;;
+    --dependency-url)
+      dependency_url=$2
+      shift
+      ;;
+    --mixins)
+      mixins=$2
+      shift
+      ;;
+    --required-dependency)
+      required_dependency=$2
+      shift
+      ;;
+    *)
+      echo >&2 "Invalid argument: $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+if [[ "${name}" == "" || "${version}" == "" || "${dependency_url}" == "" ]]; then
+  echo "Name, version, and dependency-url must be set"
+  exit 1
+fi
+
+package_names=""
+
+for mixin in $(echo ${mixins} | jq -r .[]); do
+  if [[ $mixin = set:* ]]; then
+    echo "This action does not support 'set:' mixins"
+    exit 1
+  elif [[ $mixin = run:* ]]; then
+    continue
+  elif [[ $mixin = build:* ]]; then
+    package_names="${package_names} ${mixin#"build:"}"
+  else
+    package_names="${package_names} ${mixin}"
+  fi
+done
+
+if [[ "${package_names}" != "" ]]; then
+  apt-get -qqy update
+  # shellcheck disable=SC2086
+  apt-get -qqy install ${package_names}
+fi
+
+mkdir -p dependency
+pushd dependency > /dev/null
+  curl -s -O "${dependency_url}"
+popd > /dev/null
+
+if [[ "${required_dependency}" != "" ]]; then
+  mkdir -p required_dependency
+  pushd required_dependency > /dev/null
+    curl -s -O "${required_dependency}"
+  popd > /dev/null
+fi
+
+"/dependency-tests/${name}/run" "${version}"

@@ -1,0 +1,55 @@
+#!/bin/bash
+
+set -euo pipefail
+
+parent_dir="$(cd "$(dirname "$0")" && pwd)"
+
+extract_tarball() {
+  rm -rf node
+  mkdir node
+  tar -xf dependency/*.tgz -C node
+}
+
+check_version() {
+  expected_version="$1"
+  actual_version="$(./node/bin/node --version)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+check_server() {
+  set +e
+
+  ./node/bin/node "${parent_dir}/fixtures/server.js" 8080 &
+  server_pid=$!
+
+  succeeded=0
+  for _ in {1..5}; do
+    if curl http://localhost:8080 >/dev/null 2>&1; then
+      succeeded=1
+      break
+    fi
+    sleep 1
+  done
+
+  kill "${server_pid}"
+
+  if [[ ! "${succeeded}" ]]; then
+    echo "Failed to curl server"
+    exit 1
+  fi
+
+  set -e
+}
+
+main() {
+  extract_tarball
+  check_version "$1"
+  check_server
+
+  echo "All tests passed!"
+}
+
+main "$@"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+root_dir="$(cd "$(dirname "$0")" && cd .. && pwd)"
+
+deps_json="$(yj -yj < "${root_dir}/.github/data/dependencies.yml")"
+deps="$(echo "$deps_json" | jq -r '.[].name')"
+
+for dep in $deps; do
+  obj="$(echo "$deps_json" | jq -r ".[] | select( .name == \"$dep\")")"
+  name="$(echo "${obj}" | jq -r ".name")"
+  sed "s/<VAR_DEP_NAME>/${name}/g" "${root_dir}/.github/templates/get-new-versions.yml" \
+    > "${root_dir}/.github/workflows/${name}-get-new-versions.yml"
+done

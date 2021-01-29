@@ -1,0 +1,36 @@
+name: 'Build Dependency'
+description: |
+  Builds specified upstream dependency
+
+inputs:
+  name:
+    description: Name of dependency
+    required: true
+  version:
+    description: Version of dependency
+    required: true
+  url:
+    description: URL of source code for dependency
+    required: true
+  sha256:
+    description: SHA256 of source code
+    required: true
+
+outputs:
+  artifact-path:
+    description: Path to compiled dependency artifact
+  sha256:
+    description: SHA256 of the dependency artifact
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - "--name"
+    - ${{ inputs.name }}
+    - "--version"
+    - ${{ inputs.version }}
+    - "--url"
+    - ${{ inputs.url }}
+    - "--sha256"
+    - ${{ inputs.sha256 }}

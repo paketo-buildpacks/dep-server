@@ -1,0 +1,79 @@
+- name: bundler
+  requires: ruby
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: CAAPM
+  skip_test: true
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: composer
+  skip_test: true
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: curl
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: dotnet-aspnetcore
+  requires: dotnet-sdk
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: dotnet-runtime
+  requires: dotnet-sdk
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: dotnet-sdk
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: go
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+    - id: io.paketo.stacks.tiny
+- name: httpd
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+      mixins:
+        - libexpat1
+- name: icu
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: nginx
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: node
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: php
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+      mixins:
+        - libargon2-0
+        - libcurl4
+        - libedit2
+        - libgd3
+        - libmagickwand-6.q16-3
+        - libonig4
+        - libpq5
+        - libxml2
+        - libxslt1-dev
+        - libyaml-0-2
+- name: pip
+  requires: python
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: pipenv
+  requires: python
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: python
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: ruby
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: tini
+  stacks:
+    - id: io.buildpacks.stacks.bionic
+- name: yarn
+  requires: node
+  stacks:
+    - id: io.buildpacks.stacks.bionic

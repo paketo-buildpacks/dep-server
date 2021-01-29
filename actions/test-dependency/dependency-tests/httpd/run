@@ -1,0 +1,63 @@
+#!/bin/bash
+
+set -euo pipefail
+
+parent_dir="$(cd "$(dirname "$0")" && pwd)"
+
+extract_tarball() {
+  rm -rf httpd
+  mkdir -p httpd
+  tar -xf dependency/*.tgz -C httpd
+}
+
+set_ld_library_path() {
+  export LD_LIBRARY_PATH="$PWD/httpd/lib:${LD_LIBRARY_PATH:-}"
+}
+
+check_version() {
+  expected_version=$1
+  actual_version="$(./httpd/bin/httpd -v | head -n1 | cut -d' ' -f3 | cut -d'/' -f2)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+check_server() {
+  SERVER_ROOT="$PWD/httpd" \
+    APP_ROOT="${parent_dir}/fixtures" \
+    PORT=8080 \
+    ./httpd/bin/httpd -f "${parent_dir}/fixtures/httpd.conf" -k start
+
+  set +e
+
+  succeeded=0
+  for _ in {1..5}; do
+    response="$(curl -s http://localhost:8080)"
+    if [[ $response == *"Sample httpd app"* ]]; then
+      succeeded=1
+      break
+    fi
+    sleep 1
+  done
+
+  kill "$(cat httpd/logs/httpd.pid)"
+
+  set -e
+
+  if [[ ${succeeded} -eq 0 ]]; then
+    echo "Failed to curl server"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarball
+  set_ld_library_path
+  check_version "$1"
+  check_server
+
+  echo "All tests passed!"
+}
+
+main "$@"

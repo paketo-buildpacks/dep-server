@@ -1,0 +1,36 @@
+name: 'Test Dependency'
+description: |
+  Tests compiled dependency
+
+inputs:
+  name:
+    description: Name of dependency
+    required: true
+  version:
+    description: Version of dependency
+    required: true
+  dependency_url:
+    description: URL of dependency
+    required: true
+  mixins:
+    description: json array containing additional package names needed to test dependency
+    default: '[]'
+    required: false
+  required_dependency:
+    description: URL of additional dependency required for testing
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - "--name"
+    - ${{ inputs.name }}
+    - "--version"
+    - ${{ inputs.version }}
+    - "--dependency-url"
+    - ${{ inputs.dependency_url }}
+    - "--mixins"
+    - ${{ inputs.mixins }}
+    - "--required-dependency"
+    - ${{ inputs.required_dependency }}

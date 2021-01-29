@@ -1,0 +1,107 @@
+#!/bin/bash
+
+set -euo pipefail
+
+parent_dir="$(cd "$(dirname "$0")" && pwd)"
+
+extract_tarball_yarn() {
+  rm -rf yarn
+  mkdir yarn
+  tar -xf dependency/*.tgz -C yarn
+}
+
+
+extract_tarball_node() {
+  rm -rf node
+  mkdir node
+  tar -xf required_dependency/*.tgz -C node
+}
+
+check_version() {
+  expected_version="$1"
+
+  export PATH=./node/bin:$PATH
+
+  actual_version="$(./yarn/bin/yarn --version)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+run_and_check_exit_code(){
+  export PATH=../node/bin:$PATH
+  command=$1
+  echo $command
+  if eval $command ; then
+    echo  $2 " runs successfully"
+  else
+    echo $2 " failed"
+    exit 1
+fi
+}
+
+
+run_and_check__nonzero_exit_code(){
+  export PATH=../node/bin:$PATH
+  command=$1
+  echo $command
+  if eval $command ; then
+    echo  $2 " failed"
+    exit 1
+  else
+    echo $2 " runs successfully"
+fi
+}
+
+can_run_yarn_init(){
+  run_and_check_exit_code "../yarn/bin/yarn init -yp" "run yarn init"
+  run_and_check_exit_code "ls package.json" "running yarn init should create package.json"
+  run_and_check_exit_code "cat package.json | grep '\"name\": \"test\"'" "package.json created by yarn init contains name"
+  run_and_check_exit_code "cat package.json | grep '\"version\": \"1.0.0\"'" "package.json created by yarn init contains version"
+  run_and_check_exit_code "cat package.json | grep '\"main\": \"index.js\"'" "package.json created by yarn init contains main"
+  run_and_check_exit_code "cat package.json | grep '\"license\": \"MIT\"'" "package.json created by yarn init contains license"
+  run_and_check_exit_code "cat package.json | grep '\"private\": true'" "package.json created by yarn init contains private key"
+}
+
+can_add_package_to_yarn(){
+  run_and_check_exit_code "../yarn/bin/yarn add react" "run yarn add react"
+  run_and_check_exit_code "cat package.json | grep react" "add react to dependencies section"
+}
+
+can_install_package(){
+  run_and_check_exit_code "../yarn/bin/yarn install" "run yarn install"
+  run_and_check_exit_code "ls node_modules" "yarn install should create node_modules directory"
+  run_and_check_exit_code "cat yarn.lock | grep react" "yarn install should create yarn.lock file with added packege(react) in it"
+  run_and_check_exit_code "ls node_modules/react" "yarn install should create react directory in node_modules directory"
+}
+
+can_remove_package(){
+  run_and_check_exit_code "../yarn/bin/yarn remove react" "run yarn install"
+  run_and_check__nonzero_exit_code "ls node_modules/react" "yarn remove should remove node_modules/react directory"
+  run_and_check__nonzero_exit_code "cat yarn.lock | grep react" "yarn remove should remove react entry from yarn.lock"
+}
+
+check_yarn() {
+  set +e
+  rm -rf test
+  mkdir test
+  cd test
+  can_run_yarn_init
+  can_add_package_to_yarn
+  can_install_package
+  can_remove_package
+  rm -rf test
+  set -e
+}
+
+main() {
+  extract_tarball_yarn
+  extract_tarball_node
+  check_version "$1"
+  check_yarn
+
+  echo "All tests passed!"
+}
+
+main "$@"

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+name=
+version=
+url=
+sha256=
+
+while test $# -gt 0; do
+  case $1 in
+    --name)
+      name=$2
+      shift
+      ;;
+    --version)
+      version=$2
+      shift
+      ;;
+    --url)
+      url=$2
+      shift
+      ;;
+    --sha256)
+      sha256=$2
+      shift
+      ;;
+    *)
+      echo >&2 "Invalid argument: $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+if [[ "${name}" == "" || "${version}" == "" || "${url}" == "" || "${sha256}" == "" ]]; then
+  echo "Name, version, and url must be set"
+  exit 1
+fi
+
+git clone https://github.com/cloudfoundry/buildpacks-ci
+git clone https://github.com/cloudfoundry/binary-builder
+
+mkdir -p source
+echo "{\"name\":\"${name}\", \"version\":\"${version}\", \"source_uri\":\"${url}\", \"source_sha\":\"${sha256}\"}" > source/data.json
+pushd source
+  curl -s -LO "${url}"
+  source_file="$(ls | grep -v "data.json")"
+  downloaded_sha="$(sha256sum "${source_file}" | cut -d " " -f 1)"
+  if [[ "${downloaded_sha}" != "${sha256}" ]]; then
+    echo "Downloaded source file sha: ${downloaded_sha} does not match expected sha: ${sha256}"
+    exit 1
+  fi
+popd
+
+
+mkdir -p artifacts
+mkdir -p dep-metadata
+
+STACK="bionic" SKIP_COMMIT=true \
+  ./buildpacks-ci/tasks/build-binary-new/build.rb
+
+sha256="$(cat dep-metadata/*.json | jq -r .sha256)"
+echo "::set-output name=sha256::${sha256}"
+
+artifact_path="$(ls artifacts/*)"
+echo "::set-output name=artifact-path::${artifact_path}"

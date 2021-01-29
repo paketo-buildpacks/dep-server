@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -euo pipefail
+
+parent_dir="$(cd "$(dirname "$0")" && pwd)"
+
+extract_tarball() {
+  rm -rf ruby
+  mkdir ruby
+  tar -xf dependency/*.tgz -C ruby
+}
+
+check_version() {
+  expected_version="$1"
+  actual_version="$(./ruby/bin/ruby --version | cut -d' ' -f2 | sed 's/p.*//')"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+check_server() {
+  set +e
+
+  ./ruby/bin/ruby "${parent_dir}/fixtures/run.rb" &
+  server_pid=$!
+
+  succeeded=0
+  for _ in {1..5}; do
+    response="$(curl -s http://localhost:8080)"
+    if [[ $response == *"Hello from Ruby"* ]]; then
+      succeeded=1
+      break
+    fi
+    sleep 1
+  done
+
+  kill "${server_pid}"
+
+  if [[ ${succeeded} -eq 0 ]]; then
+    echo "Failed to curl server"
+    exit 1
+  fi
+
+  set -e
+}
+
+main() {
+  extract_tarball
+  check_version "$1"
+  check_server
+
+  echo "All tests passed!"
+}
+
+main "$@"

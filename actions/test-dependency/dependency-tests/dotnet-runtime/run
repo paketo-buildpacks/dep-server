@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -euo pipefail
+
+extract_tarballs() {
+  rm -rf dotnet-root
+  mkdir dotnet-root
+  tar -xf dependency/*.tar.xz -C dotnet-root
+  tar -xf required_dependency/*.tar.xz -C dotnet-root
+}
+
+check_version() {
+  expected_runtime="Microsoft.NETCore.App $1"
+  actual_runtimes="$(./dotnet-root/dotnet --list-runtimes)"
+  if ! [[ "${actual_runtimes}" =~ ${expected_runtime} ]]; then
+    echo -e "Did not find expected runtime '${expected_runtime}' in runtimes:\n${actual_runtimes}"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarballs
+  check_version "$1"
+
+  echo "All tests passed!"
+}
+
+main "$@"

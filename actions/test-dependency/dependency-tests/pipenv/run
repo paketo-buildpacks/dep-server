@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -euo pipefail
+
+parent_dir="$(cd "$(dirname "$0")" && pwd)"
+
+extract_tarball_pipenv() {
+  rm -rf pipenv
+  mkdir pipenv
+  tar -xf dependency/*.tgz -C pipenv --wildcards ./pipenv*.tar.gz
+  tar -xf pipenv/pipenv*.tar.gz -C pipenv
+}
+
+extract_tarball_python() {
+  rm -rf python
+  mkdir python
+  tar -xf required_dependency/*.tgz -C python
+}
+
+set_ld_library_path() {
+  export LD_LIBRARY_PATH="$PWD/python/lib:${LD_LIBRARY_PATH:-}"
+}
+
+check_version() {
+  expected_version="$1"
+  actual_version="$(./python/bin/python ./pipenv/pipenv-*/setup.py --version)"
+  if [[ "${actual_version}" != "${expected_version}" ]]; then
+    echo "Version ${actual_version} does not match expected version ${expected_version}"
+    exit 1
+  fi
+}
+
+main() {
+  extract_tarball_pipenv
+  extract_tarball_python
+  set_ld_library_path
+  check_version "$1"
+
+  echo "All tests passed!"
+}
+
+main "$@"
