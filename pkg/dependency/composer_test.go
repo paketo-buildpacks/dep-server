@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestComposer(t *testing.T) {
@@ -119,6 +120,30 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 
 				assert.Contains(err.Error(), "could not get SHA from file")
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct composer release date", func() {
+			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+				{
+					TagName:       "3.0.0",
+					PublishedDate: "2020-06-30T00:00:00Z",
+				},
+				{
+					TagName:       "1.0.1",
+					PublishedDate: "2020-06-29T00:00:00Z",
+				},
+				{
+					TagName:       "2.0.0",
+					PublishedDate: "2020-06-28T00:00:00Z",
+				},
+			}, nil)
+
+			releaseDate, err := composer.GetReleaseDate("1.0.1")
+			require.NoError(err)
+
+			assert.Equal("2020-06-29T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

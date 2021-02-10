@@ -78,9 +78,18 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:         version,
 		URI:             dependencyURL,
 		SHA:             dependencySHA,
-		ReleaseDate:     releaseDate,
+		ReleaseDate:     releaseDate.Format(time.RFC3339),
 		DeprecationDate: deprecationDate,
 	}, nil
+}
+
+func (p Php) GetReleaseDate(version string) (time.Time, error) {
+	release, err := p.getRelease(version)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get release: %w", err)
+	}
+
+	return p.getReleaseDate(release)
 }
 
 func (p Php) getPhpReleases() ([]PhpRelease, error) {
@@ -172,22 +181,28 @@ func (p Php) getDependencySHA(release PhpRawRelease, version string) (string, er
 	return "", fmt.Errorf("could not find .tar.gz file for %s", version)
 }
 
-func (p Php) getReleaseDate(release PhpRawRelease) (string, error) {
-	releaseDate, err := p.parseReleaseDate(release.Date)
-	if err != nil {
-		return "", fmt.Errorf("could not parse release date: %w", err)
+func (p Php) getReleaseDate(release PhpRawRelease) (time.Time, error) {
+	if parsedDate, err := time.Parse("02 Jan 2006", release.Date); err == nil {
+		return parsedDate, nil
 	}
 
-	return releaseDate.Format(time.RFC3339), nil
+	if parsedDate, err := time.Parse("2 Jan 2006", release.Date); err == nil {
+		return parsedDate, nil
+	}
+
+	if parsedDate, err := time.Parse("02 January 2006", release.Date); err == nil {
+		return parsedDate, nil
+	}
+
+	if parsedDate, err := time.Parse("2 January 2006", release.Date); err == nil {
+		return parsedDate, nil
+	}
+
+	return time.Time{}, fmt.Errorf("release date '%s' did not match any expected patterns", release.Date)
 }
 
-func (p Php) calculateDeprecationDate(releaseDate string) string {
-	releaseDateTimeStamp, err := time.Parse(time.RFC3339, releaseDate)
-	if err != nil {
-		return ""
-	}
-
-	deprecationDate := time.Date(releaseDateTimeStamp.Year()+3, releaseDateTimeStamp.Month(), releaseDateTimeStamp.Day(),
+func (p Php) calculateDeprecationDate(releaseDate time.Time) string {
+	deprecationDate := time.Date(releaseDate.Year()+3, releaseDate.Month(), releaseDate.Day(),
 		0, 0, 0, 0, time.UTC)
 
 	return deprecationDate.Format(time.RFC3339)

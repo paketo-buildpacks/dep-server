@@ -65,6 +65,25 @@ func (n Node) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
+func (n Node) GetReleaseDate(version string) (time.Time, error) {
+	nodeReleases, err := n.getAllReleases()
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range nodeReleases {
+		if release.Version == version {
+			releaseDate, err := time.Parse("2006-01-02", release.Date)
+			if err != nil {
+				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return releaseDate, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+}
+
 func (n Node) getAllReleases() ([]NodeRelease, error) {
 	body, err := n.webClient.Get("https://nodejs.org/dist/index.json")
 	if err != nil {

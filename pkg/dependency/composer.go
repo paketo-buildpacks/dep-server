@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"strings"
+	"time"
 )
 
 type Composer struct {
@@ -43,6 +44,25 @@ func (c Composer) GetDependencyVersion(version string) (DepVersion, error) {
 	}
 
 	return DepVersion{}, fmt.Errorf("could not find composer version %s", version)
+}
+
+func (c Composer) GetReleaseDate(version string) (time.Time, error) {
+	releases, err := c.githubClient.GetReleaseTags("composer", "composer")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range releases {
+		if release.TagName == version {
+			releaseDate, err := time.Parse(time.RFC3339, release.PublishedDate)
+			if err != nil {
+				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return releaseDate, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVersion, error) {

@@ -48,15 +48,16 @@ func (fake *FakeWebClient) Download(arg1 string, arg2 string, arg3 ...internal.R
 		arg2 string
 		arg3 []internal.RequestOption
 	}{arg1, arg2, arg3})
+	stub := fake.DownloadStub
+	fakeReturns := fake.downloadReturns
 	fake.recordInvocation("Download", []interface{}{arg1, arg2, arg3})
 	fake.downloadMutex.Unlock()
-	if fake.DownloadStub != nil {
-		return fake.DownloadStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.downloadReturns
 	return fakeReturns.result1
 }
 
@@ -109,15 +110,16 @@ func (fake *FakeWebClient) Get(arg1 string, arg2 ...internal.RequestOption) ([]b
 		arg1 string
 		arg2 []internal.RequestOption
 	}{arg1, arg2})
+	stub := fake.GetStub
+	fakeReturns := fake.getReturns
 	fake.recordInvocation("Get", []interface{}{arg1, arg2})
 	fake.getMutex.Unlock()
-	if fake.GetStub != nil {
-		return fake.GetStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

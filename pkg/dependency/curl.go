@@ -61,6 +61,21 @@ func (c Curl) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
+func (c Curl) GetReleaseDate(version string) (time.Time, error) {
+	curlReleases, err := c.getAllReleases()
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range curlReleases {
+		if release.Version == version {
+			return release.Date, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+}
+
 func (c Curl) getAllReleases() ([]CurlRelease, error) {
 	body, err := c.webClient.Get("https://curl.se/docs/releases.csv")
 	if err != nil {

@@ -88,4 +88,12 @@ func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("https://ca.bintray.com/apm-agents/CA-APM-PHPAgent-20.1.0_linux.tar.gz", dependencyURLArg)
 		})
 	})
+
+	when("GetReleaseDate", func() {
+		it("returns an error", func() {
+			_, err := caapm.GetReleaseDate("20.1.0")
+			require.Error(err)
+			assert.Equal("cannot determine release dates for CAAPM", err.Error())
+		})
+	})
 }

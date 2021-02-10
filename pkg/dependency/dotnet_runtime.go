@@ -1,6 +1,9 @@
 package dependency
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 type DotnetRuntime struct {
 	checksummer Checksummer
@@ -23,6 +26,14 @@ func (d DotnetRuntime) GetDependencyVersion(version string) (DepVersion, error) 
 		checksummer: d.checksummer,
 		webClient:   d.webClient,
 	}.GetDependencyVersion(version)
+}
+
+func (d DotnetRuntime) GetReleaseDate(version string) (time.Time, error) {
+	return dotnet{
+		dotnetType:  dotnetRuntimeType{},
+		checksummer: d.checksummer,
+		webClient:   d.webClient,
+	}.GetReleaseDate(version)
 }
 
 func (d dotnetRuntimeType) getChannelVersion(version string) string {

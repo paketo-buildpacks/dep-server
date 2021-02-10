@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestNginx(t *testing.T) {
@@ -90,6 +91,21 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			releaseAssetSignatureArg, _, nginxGPGKeyArg := fakeChecksummer.VerifyASCArgsForCall(0)
 			assert.Equal("some-signature", releaseAssetSignatureArg)
 			assert.Equal([]string{"some-gpg-key"}, nginxGPGKeyArg)
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct nginx release date", func() {
+			fakeGithubClient.GetTagCommitReturns(internal.GithubTagCommit{
+				Tag:  "release-1.0.0",
+				SHA:  "dddddddddddddddddddddddddddddddddddddddd",
+				Date: "2020-06-17T00:00:00Z",
+			}, nil)
+
+			releaseDate, err := nginx.GetReleaseDate("1.0.0")
+			require.NoError(err)
+
+			assert.Equal("2020-06-17T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

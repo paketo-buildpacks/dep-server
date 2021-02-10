@@ -103,15 +103,16 @@ func (fake *FakeChecksummer) GetSHA256(arg1 string) (string, error) {
 	fake.getSHA256ArgsForCall = append(fake.getSHA256ArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetSHA256Stub
+	fakeReturns := fake.getSHA256Returns
 	fake.recordInvocation("GetSHA256", []interface{}{arg1})
 	fake.getSHA256Mutex.Unlock()
-	if fake.GetSHA256Stub != nil {
-		return fake.GetSHA256Stub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSHA256Returns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -166,15 +167,16 @@ func (fake *FakeChecksummer) SplitPGPKeys(arg1 string) []string {
 	fake.splitPGPKeysArgsForCall = append(fake.splitPGPKeysArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.SplitPGPKeysStub
+	fakeReturns := fake.splitPGPKeysReturns
 	fake.recordInvocation("SplitPGPKeys", []interface{}{arg1})
 	fake.splitPGPKeysMutex.Unlock()
-	if fake.SplitPGPKeysStub != nil {
-		return fake.SplitPGPKeysStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.splitPGPKeysReturns
 	return fakeReturns.result1
 }
 
@@ -228,15 +230,16 @@ func (fake *FakeChecksummer) VerifyASC(arg1 string, arg2 string, arg3 ...string)
 		arg2 string
 		arg3 []string
 	}{arg1, arg2, arg3})
+	stub := fake.VerifyASCStub
+	fakeReturns := fake.verifyASCReturns
 	fake.recordInvocation("VerifyASC", []interface{}{arg1, arg2, arg3})
 	fake.verifyASCMutex.Unlock()
-	if fake.VerifyASCStub != nil {
-		return fake.VerifyASCStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.verifyASCReturns
 	return fakeReturns.result1
 }
 
@@ -289,15 +292,16 @@ func (fake *FakeChecksummer) VerifyMD5(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.VerifyMD5Stub
+	fakeReturns := fake.verifyMD5Returns
 	fake.recordInvocation("VerifyMD5", []interface{}{arg1, arg2})
 	fake.verifyMD5Mutex.Unlock()
-	if fake.VerifyMD5Stub != nil {
-		return fake.VerifyMD5Stub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.verifyMD5Returns
 	return fakeReturns.result1
 }
 
@@ -350,15 +354,16 @@ func (fake *FakeChecksummer) VerifySHA1(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.VerifySHA1Stub
+	fakeReturns := fake.verifySHA1Returns
 	fake.recordInvocation("VerifySHA1", []interface{}{arg1, arg2})
 	fake.verifySHA1Mutex.Unlock()
-	if fake.VerifySHA1Stub != nil {
-		return fake.VerifySHA1Stub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.verifySHA1Returns
 	return fakeReturns.result1
 }
 
@@ -411,15 +416,16 @@ func (fake *FakeChecksummer) VerifySHA256(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.VerifySHA256Stub
+	fakeReturns := fake.verifySHA256Returns
 	fake.recordInvocation("VerifySHA256", []interface{}{arg1, arg2})
 	fake.verifySHA256Mutex.Unlock()
-	if fake.VerifySHA256Stub != nil {
-		return fake.VerifySHA256Stub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.verifySHA256Returns
 	return fakeReturns.result1
 }
 
@@ -472,15 +478,16 @@ func (fake *FakeChecksummer) VerifySHA512(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.VerifySHA512Stub
+	fakeReturns := fake.verifySHA512Returns
 	fake.recordInvocation("VerifySHA512", []interface{}{arg1, arg2})
 	fake.verifySHA512Mutex.Unlock()
-	if fake.VerifySHA512Stub != nil {
-		return fake.VerifySHA512Stub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.verifySHA512Returns
 	return fakeReturns.result1
 }
 

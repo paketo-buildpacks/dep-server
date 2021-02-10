@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 type ICU struct {
@@ -61,6 +62,25 @@ func (i ICU) GetDependencyVersion(version string) (DepVersion, error) {
 		}
 	}
 	return DepVersion{}, fmt.Errorf("could not find ICU version %s", version)
+}
+
+func (i ICU) GetReleaseDate(version string) (time.Time, error) {
+	releases, err := i.githubClient.GetReleaseTags("unicode-org", "icu")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range releases {
+		if tagToVersion(release.TagName) == version {
+			releaseDate, err := time.Parse(time.RFC3339, release.CreatedDate)
+			if err != nil {
+				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return releaseDate, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find ICU version %s", version)
 }
 
 func (i ICU) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {

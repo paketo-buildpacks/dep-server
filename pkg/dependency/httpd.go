@@ -66,6 +66,14 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 	}, nil
 }
 
+func (h Httpd) GetReleaseDate(version string) (time.Time, error) {
+	release, err := h.getRelease(version)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get release: %w", err)
+	}
+	return release.releaseDate, nil
+}
+
 func (h Httpd) getRelease(version string) (HttpdRelease, error) {
 	releases, err := h.getReleases(version)
 	if err != nil {

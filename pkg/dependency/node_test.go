@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestNode(t *testing.T) {
@@ -116,15 +117,14 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 			urlArg, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://nodejs.org/dist/index.json", urlArg)
 		})
-	})
 
-	when("the major version is 0", func() {
-		it("pulls the correct release schedule", func() {
-			fakeWebClient.GetReturnsOnCall(0, []byte(`
+		when("the major version is 0", func() {
+			it("pulls the correct release schedule", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 		[
 		 {"version": "v0.8.0", "date": "2015-01-30"}
 		]`), nil)
-			fakeWebClient.GetReturnsOnCall(1, []byte(`
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
  "v0.8": {
    "start": "2015-01-30",
@@ -133,33 +133,33 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
  }
 }`), nil)
 
-			fakeWebClient.GetReturnsOnCall(2, []byte(`
+				fakeWebClient.GetReturnsOnCall(2, []byte(`
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.tar.gz
 `), nil)
 
-			actualDep, err := node.GetDependencyVersion("v0.8.0")
+				actualDep, err := node.GetDependencyVersion("v0.8.0")
 
-			require.NoError(err)
+				require.NoError(err)
 
-			expectedDep := dependency.DepVersion{
-				Version:         "v0.8.0",
-				URI:             "https://nodejs.org/dist/v0.8.0/node-v0.8.0.tar.gz",
-				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				ReleaseDate:     "2015-01-30T00:00:00Z",
-				DeprecationDate: "2016-06-01T00:00:00Z",
-			}
+				expectedDep := dependency.DepVersion{
+					Version:         "v0.8.0",
+					URI:             "https://nodejs.org/dist/v0.8.0/node-v0.8.0.tar.gz",
+					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					ReleaseDate:     "2015-01-30T00:00:00Z",
+					DeprecationDate: "2016-06-01T00:00:00Z",
+				}
 
-			assert.Equal(expectedDep, actualDep)
+				assert.Equal(expectedDep, actualDep)
+			})
 		})
-	})
 
-	when("the deprecation date cannot be found", func() {
-		it("returns the dependency with an empty deprecation date", func() {
-			fakeWebClient.GetReturnsOnCall(0, []byte(`
+		when("the deprecation date cannot be found", func() {
+			it("returns the dependency with an empty deprecation date", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 		[
 		 {"version": "v13.9.0", "date": "2020-01-30"}
 		]`), nil)
-			fakeWebClient.GetReturnsOnCall(1, []byte(`
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
  "v0.8": {
    "start": "2015-01-30",
@@ -168,47 +168,47 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.ta
  }
 }`), nil)
 
-			fakeWebClient.GetReturnsOnCall(2, []byte(`
+				fakeWebClient.GetReturnsOnCall(2, []byte(`
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.tar.gz
 `), nil)
 
-			actualDep, err := node.GetDependencyVersion("v13.9.0")
+				actualDep, err := node.GetDependencyVersion("v13.9.0")
 
-			require.NoError(err)
+				require.NoError(err)
 
-			expectedDep := dependency.DepVersion{
-				Version:         "v13.9.0",
-				URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
-				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				ReleaseDate:     "2020-01-30T00:00:00Z",
-				DeprecationDate: "",
-			}
+				expectedDep := dependency.DepVersion{
+					Version:         "v13.9.0",
+					URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
+					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					ReleaseDate:     "2020-01-30T00:00:00Z",
+					DeprecationDate: "",
+				}
 
-			assert.Equal(expectedDep, actualDep)
+				assert.Equal(expectedDep, actualDep)
+			})
 		})
-	})
 
-	when("the release schedule cannot be found", func() {
-		it("returns an error", func() {
-			fakeWebClient.GetReturnsOnCall(0, []byte(`
+		when("the release schedule cannot be found", func() {
+			it("returns an error", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 		[
 		 {"version": "v14.0.0", "date": "2020-01-30"}
 		]`), nil)
-			fakeWebClient.GetReturnsOnCall(1, nil, nil)
+				fakeWebClient.GetReturnsOnCall(1, nil, nil)
 
-			_, err := node.GetDependencyVersion("v14.0.0")
-			assert.Error(err)
-			assert.Contains(err.Error(), "could not unmarshal release schedule:")
+				_, err := node.GetDependencyVersion("v14.0.0")
+				assert.Error(err)
+				assert.Contains(err.Error(), "could not unmarshal release schedule:")
+			})
 		})
-	})
 
-	when("the SHA cannot be found", func() {
-		it("returns an error", func() {
-			fakeWebClient.GetReturnsOnCall(0, []byte(`
+		when("the SHA cannot be found", func() {
+			it("returns an error", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 		[
 		 {"version": "v14.0.0", "date": "2020-01-30"}
 		]`), nil)
-			fakeWebClient.GetReturnsOnCall(1, []byte(`
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
 		{
 		 "v14": {
 		   "start": "2020-04-21",
@@ -218,10 +218,27 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 		   "codename": ""
 		 }
 		}`), nil)
-			fakeWebClient.GetReturnsOnCall(2, nil, nil)
-			_, err := node.GetDependencyVersion("v14.0.0")
-			assert.Error(err)
-			assert.Contains(err.Error(), "could not find SHA for node-v14.0.0.tar.gz")
+				fakeWebClient.GetReturnsOnCall(2, nil, nil)
+				_, err := node.GetDependencyVersion("v14.0.0")
+				assert.Error(err)
+				assert.Contains(err.Error(), "could not find SHA for node-v14.0.0.tar.gz")
+			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct node release date", func() {
+			fakeWebClient.GetReturnsOnCall(0, []byte(`
+[
+ {"version": "v14.0.0", "date": "2020-01-30"},
+ {"version": "v13.9.0", "date": "2020-02-20"},
+ {"version": "v13.8.0", "date": "2020-02-20"}
+]`), nil)
+
+			releaseDate, err := node.GetReleaseDate("v13.9.0")
+			require.NoError(err)
+
+			assert.Equal("2020-02-20T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

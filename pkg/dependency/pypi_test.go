@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestPyPi(t *testing.T) {
@@ -144,6 +145,37 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 				assert.Error(err)
 				assert.Contains(err.Error(), "could not find sha256 for version 2.0.0")
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct release date", func() {
+			fakeWebClient.GetReturns([]byte(`{
+"releases": {
+  "1.0.0": [
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-01-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ],
+  "2.0.0": [
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
+    {
+      "packagetype": "sdist",
+      "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z",
+      "digests": {
+        "md5": "some-md5",
+        "sha256": "some-sha256"
+      },
+      "url": "some-url"
+    }
+  ],
+  "3.0.0": [
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ]
+}}`), nil)
+
+			releaseDate, err := pypi.GetReleaseDate("2.0.0")
+			require.NoError(err)
+
+			assert.Equal("2010-05-01T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

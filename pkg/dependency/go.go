@@ -57,7 +57,7 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, err
 	}
 
-	releaseDate, err := g.getReleaseDate(version)
+	releaseDate, err := g.GetReleaseDate(version)
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not find tag for go version %s: %w", version, err)
 	}
@@ -76,7 +76,7 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 	}, nil
 }
 
-func (g Go) getReleaseDate(version string) (time.Time, error) {
+func (g Go) GetReleaseDate(version string) (time.Time, error) {
 	body, err := g.webClient.Get("https://golang.org/doc/devel/release.html")
 	if err != nil {
 		return time.Time{}, fmt.Errorf("could not hit golang.org: %w", err)
@@ -84,6 +84,10 @@ func (g Go) getReleaseDate(version string) (time.Time, error) {
 
 	re := regexp.MustCompile(fmt.Sprintf(`%s\s*\(released\s*(.*?)\)`, version))
 	match := re.FindStringSubmatch(string(body))
+
+	if len(match) < 2 {
+		return time.Time{}, fmt.Errorf("could not find release date")
+	}
 
 	releaseDate, err := time.Parse("2006/01/02", match[1])
 	if err != nil {

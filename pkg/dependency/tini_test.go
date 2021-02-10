@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestTini(t *testing.T) {
@@ -98,6 +99,26 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("krallin", orgArg)
 			assert.Equal("tini", repoArg)
 			assert.Equal("v1.0.0", versionArg)
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct tini release date", func() {
+			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+				{
+					TagName:       "v2.0.0",
+					PublishedDate: "2020-06-28T00:00:00Z",
+				},
+				{
+					TagName:       "v1.0.0",
+					PublishedDate: "2020-06-27T00:00:00Z",
+				},
+			}, nil)
+
+			releaseDate, err := tini.GetReleaseDate("v1.0.0")
+			require.NoError(err)
+
+			assert.Equal("2020-06-27T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

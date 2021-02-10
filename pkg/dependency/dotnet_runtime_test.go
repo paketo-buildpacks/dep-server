@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestDotnetRuntime(t *testing.T) {
@@ -479,6 +480,78 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 				}
 				assert.Equal(expectedDep, actualDep)
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct dotnet runtime release date", func() {
+			fakeWebClient.GetReturns([]byte(`
+{
+  "eol-date": "2050-02-20",
+  "releases": [
+    {
+      "release-date": "2020-02-22",
+      "runtime": {
+        "version": "2.0.2",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-2.0.2",
+            "hash": "sha512-for-linux-x64-2.0.2"
+          }
+        ]
+      }
+    },
+    {
+      "release-date": "2020-02-20",
+      "runtime": {
+        "version": "2.0.1",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-arm.tar.gz",
+            "rid": "linux-arm",
+            "url": "url-for-linux-arm-2.0.1",
+            "hash": "sha512-for-linux-arm-2.0.1"
+          },
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-2.0.1",
+            "hash": "SHA512-FOR-LINUX-X64-2.0.1"
+          },
+          {
+            "name": "dotnet-runtime-osx-64.tar.gz",
+            "rid": "osx-64",
+            "url": "url-for-osx-64-2.0.1",
+            "hash": "sha512-for-osx-64-2.0.1"
+          }
+        ]
+      }
+    },
+    {
+      "release-date": "2020-02-10",
+      "runtime": {
+        "version": "2.0.0",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-2.0.0",
+            "hash": "sha512-for-linux-x64-2.0.0"
+          }
+        ]
+      }
+    }
+  ]
+}
+`), nil)
+			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+
+			releaseDate, err := dotnetRuntime.GetReleaseDate("2.0.1")
+			require.NoError(err)
+
+			assert.Equal("2020-02-20T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

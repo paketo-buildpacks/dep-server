@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestDotnetSDK(t *testing.T) {
@@ -587,6 +588,99 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 				}
 				assert.Equal(expectedDep, actualDep)
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct dotnet SDK release date", func() {
+			fakeWebClient.GetReturns([]byte(`
+{
+  "eol-date": "2050-02-20",
+  "releases": [
+    {
+      "release-date": "2020-02-22",
+      "sdk": {
+        "version": "2.0.202",
+        "files": [
+          {
+            "name": "dotnet-sdk-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-2.0.202",
+            "hash": "sha512-for-linux-x64-2.0.202"
+          }
+        ]
+      },
+      "sdks": [
+        {
+          "version": "2.0.202",
+          "files": [
+            {
+              "name": "dotnet-sdk-linux-x64.tar.gz",
+              "rid": "linux-x64",
+              "url": "url-for-linux-x64-2.0.202",
+              "hash": "sha512-for-linux-x64-2.0.202"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "release-date": "2020-02-20",
+      "sdk": {
+        "version": "2.0.301"
+      },
+      "sdks": [
+        {
+          "version": "2.0.301"
+        },
+        {
+          "version": "2.0.201",
+          "files": [
+            {
+              "name": "dotnet-sdk-linux-arm.tar.gz",
+              "rid": "linux-arm",
+              "url": "url-for-linux-arm-2.0.201",
+              "hash": "sha512-for-linux-arm-2.0.201"
+            },
+            {
+              "name": "dotnet-sdk-linux-x64.tar.gz",
+              "rid": "linux-x64",
+              "url": "url-for-linux-x64-2.0.201",
+              "hash": "SHA512-FOR-LINUX-X64-2.0.201"
+            },
+            {
+              "name": "dotnet-sdk-osx-64.tar.gz",
+              "rid": "osx-64",
+              "url": "url-for-osx-64-2.0.201",
+              "hash": "sha512-for-osx-64-2.0.201"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "release-date": "2020-02-10",
+      "sdk": {
+        "version": "2.0.200",
+        "files": [
+          {
+            "name": "dotnet-sdk-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-2.0.200",
+            "hash": "sha512-for-linux-x64-2.0.200"
+          }
+        ]
+      }
+    }
+  ]
+}
+`), nil)
+			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+
+			releaseDate, err := dotnetSDK.GetReleaseDate("2.0.201")
+			require.NoError(err)
+
+			assert.Equal("2020-02-20T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

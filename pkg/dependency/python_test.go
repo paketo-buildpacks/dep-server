@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestPython(t *testing.T) {
@@ -198,6 +199,32 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				assert.Equal("some-sha256", depVersion.SHA)
 
 				assert.Equal(0, fakeChecksummer.VerifyMD5CallCount())
+			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct python release date", func() {
+			fakeWebClient.GetReturnsOnCall(0, []byte(python378DownloadPage), nil)
+			fakeWebClient.GetReturnsOnCall(1, []byte(fullPythonIndex), nil)
+			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+
+			releaseDate, err := python.GetReleaseDate("3.7.8")
+			require.NoError(err)
+
+			assert.Equal("2020-06-27T00:00:00Z", releaseDate.Format(time.RFC3339))
+		})
+
+		when("the release date uses an abbreviated month", func() {
+			it("assumes the first day of the month", func() {
+				downloadPage := strings.ReplaceAll(python378DownloadPage, "June 27, 2020", "Sept 2, 2020")
+				fakeWebClient.GetReturnsOnCall(0, []byte(downloadPage), nil)
+				fakeWebClient.GetReturnsOnCall(1, []byte(fullPythonIndex), nil)
+
+				releaseDate, err := python.GetReleaseDate("3.7.8")
+				require.NoError(err)
+
+				assert.Equal("2020-09-02T00:00:00Z", releaseDate.Format(time.RFC3339))
 			})
 		})
 	})

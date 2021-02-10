@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Yarn struct {
@@ -56,6 +57,25 @@ func (y Yarn) GetDependencyVersion(version string) (DepVersion, error) {
 		}
 	}
 	return DepVersion{}, fmt.Errorf("could not find yarn version %s", version)
+}
+
+func (y Yarn) GetReleaseDate(version string) (time.Time, error) {
+	releases, err := y.githubClient.GetReleaseTags("yarnpkg", "yarn")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range releases {
+		if release.TagName == version {
+			releaseDate, err := time.Parse(time.RFC3339, release.PublishedDate)
+			if err != nil {
+				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return releaseDate, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (y Yarn) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestGo(t *testing.T) {
@@ -222,6 +223,49 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				assert.Error(err)
 
 				assert.True(errors.Is(err, depErrors.NoSourceCodeError{Version: "go1.14"}))
+			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it.Before(func() {
+			fakeWebClient.GetReturnsOnCall(0, []byte(`
+<!DOCTYPE html>
+<html lang="en">
+	<h2 id="go1.14">go1.14 (released 2020/02/25)</h2>
+		<p>
+		go1.14.1
+		(released 2020/03/19)
+		</p>
+	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+		<p>
+		go1.13.1
+		(released 2019/09/25)
+		</p>
+		<p>
+		go1.13.2
+		(released 2019/10/17)
+		</p>
+		<p>
+		go1.13.9
+		(released 2020/03/19)
+		</p>
+`), nil)
+		})
+
+		it("returns the correct release date", func() {
+			releaseDate, err := golang.GetReleaseDate("go1.13.1")
+			require.NoError(err)
+
+			assert.Equal("2019-09-25T00:00:00Z", releaseDate.Format(time.RFC3339))
+		})
+
+		when("the release date cannot be found", func() {
+			it("returns an error", func() {
+				_, err := golang.GetReleaseDate("go9.99.999")
+				assert.Error(err)
+
+				assert.Equal("could not find release date", err.Error())
 			})
 		})
 	})

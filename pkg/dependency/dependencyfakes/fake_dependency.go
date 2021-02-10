@@ -3,6 +3,7 @@ package dependencyfakes
 
 import (
 	"sync"
+	"time"
 
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 )
@@ -33,6 +34,19 @@ type FakeDependency struct {
 		result1 dependency.DepVersion
 		result2 error
 	}
+	GetReleaseDateStub        func(string) (time.Time, error)
+	getReleaseDateMutex       sync.RWMutex
+	getReleaseDateArgsForCall []struct {
+		arg1 string
+	}
+	getReleaseDateReturns struct {
+		result1 time.Time
+		result2 error
+	}
+	getReleaseDateReturnsOnCall map[int]struct {
+		result1 time.Time
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -42,15 +56,16 @@ func (fake *FakeDependency) GetAllVersionRefs() ([]string, error) {
 	ret, specificReturn := fake.getAllVersionRefsReturnsOnCall[len(fake.getAllVersionRefsArgsForCall)]
 	fake.getAllVersionRefsArgsForCall = append(fake.getAllVersionRefsArgsForCall, struct {
 	}{})
+	stub := fake.GetAllVersionRefsStub
+	fakeReturns := fake.getAllVersionRefsReturns
 	fake.recordInvocation("GetAllVersionRefs", []interface{}{})
 	fake.getAllVersionRefsMutex.Unlock()
-	if fake.GetAllVersionRefsStub != nil {
-		return fake.GetAllVersionRefsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAllVersionRefsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -98,15 +113,16 @@ func (fake *FakeDependency) GetDependencyVersion(arg1 string) (dependency.DepVer
 	fake.getDependencyVersionArgsForCall = append(fake.getDependencyVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetDependencyVersionStub
+	fakeReturns := fake.getDependencyVersionReturns
 	fake.recordInvocation("GetDependencyVersion", []interface{}{arg1})
 	fake.getDependencyVersionMutex.Unlock()
-	if fake.GetDependencyVersionStub != nil {
-		return fake.GetDependencyVersionStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getDependencyVersionReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -155,6 +171,70 @@ func (fake *FakeDependency) GetDependencyVersionReturnsOnCall(i int, result1 dep
 	}{result1, result2}
 }
 
+func (fake *FakeDependency) GetReleaseDate(arg1 string) (time.Time, error) {
+	fake.getReleaseDateMutex.Lock()
+	ret, specificReturn := fake.getReleaseDateReturnsOnCall[len(fake.getReleaseDateArgsForCall)]
+	fake.getReleaseDateArgsForCall = append(fake.getReleaseDateArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetReleaseDateStub
+	fakeReturns := fake.getReleaseDateReturns
+	fake.recordInvocation("GetReleaseDate", []interface{}{arg1})
+	fake.getReleaseDateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeDependency) GetReleaseDateCallCount() int {
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
+	return len(fake.getReleaseDateArgsForCall)
+}
+
+func (fake *FakeDependency) GetReleaseDateCalls(stub func(string) (time.Time, error)) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = stub
+}
+
+func (fake *FakeDependency) GetReleaseDateArgsForCall(i int) string {
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
+	argsForCall := fake.getReleaseDateArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeDependency) GetReleaseDateReturns(result1 time.Time, result2 error) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = nil
+	fake.getReleaseDateReturns = struct {
+		result1 time.Time
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeDependency) GetReleaseDateReturnsOnCall(i int, result1 time.Time, result2 error) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = nil
+	if fake.getReleaseDateReturnsOnCall == nil {
+		fake.getReleaseDateReturnsOnCall = make(map[int]struct {
+			result1 time.Time
+			result2 error
+		})
+	}
+	fake.getReleaseDateReturnsOnCall[i] = struct {
+		result1 time.Time
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeDependency) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -162,6 +242,8 @@ func (fake *FakeDependency) Invocations() map[string][][]interface{} {
 	defer fake.getAllVersionRefsMutex.RUnlock()
 	fake.getDependencyVersionMutex.RLock()
 	defer fake.getDependencyVersionMutex.RUnlock()
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

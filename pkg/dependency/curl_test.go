@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestCurl(t *testing.T) {
@@ -122,6 +123,21 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 
 				assert.Equal(0, fakeChecksummer.VerifyASCCallCount())
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct curl release date", func() {
+			fakeWebClient.GetReturnsOnCall(0, []byte(`
+0;7.74.0;0;2020-12-09;0;56;56;107;107;1;1;
+1;7.73.0;3;2020-10-14;56 days;56;112;135;242;9;10;
+2;7.72.0;3;2020-08-19;3 months;49;161;100;342;3;13;
+`), nil)
+
+			releaseDate, err := curl.GetReleaseDate("7.73.0")
+			require.NoError(err)
+
+			assert.Equal("2020-10-14T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type Nginx struct {
@@ -49,6 +50,21 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     tagCommit.Date,
 		DeprecationDate: "",
 	}, nil
+}
+
+func (n Nginx) GetReleaseDate(version string) (time.Time, error) {
+	tagName := "release-" + version
+	tagCommit, err := n.githubClient.GetTagCommit("nginx", "nginx", tagName)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get tags: %w", err)
+	}
+
+	releaseDate, err := time.Parse(time.RFC3339, tagCommit.Date)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+	}
+
+	return releaseDate, nil
 }
 
 func (n Nginx) createDependencyVersion(version string, commit internal.GithubTagCommit) (DepVersion, error) {

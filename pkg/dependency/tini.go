@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Tini struct {
@@ -42,6 +43,25 @@ func (t Tini) GetDependencyVersion(version string) (DepVersion, error) {
 		}
 	}
 	return DepVersion{}, fmt.Errorf("could not find tini version %s", version)
+}
+
+func (t Tini) GetReleaseDate(version string) (time.Time, error) {
+	releases, err := t.githubClient.GetReleaseTags("krallin", "tini")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	for _, release := range releases {
+		if release.TagName == version {
+			releaseDate, err := time.Parse(time.RFC3339, release.PublishedDate)
+			if err != nil {
+				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return releaseDate, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (t Tini) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {

@@ -62,15 +62,16 @@ func (fake *FakeGithubWebClient) Download(arg1 string, arg2 string, arg3 ...inte
 		arg2 string
 		arg3 []internal.RequestOption
 	}{arg1, arg2, arg3})
+	stub := fake.DownloadStub
+	fakeReturns := fake.downloadReturns
 	fake.recordInvocation("Download", []interface{}{arg1, arg2, arg3})
 	fake.downloadMutex.Unlock()
-	if fake.DownloadStub != nil {
-		return fake.DownloadStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.downloadReturns
 	return fakeReturns.result1
 }
 
@@ -123,15 +124,16 @@ func (fake *FakeGithubWebClient) Get(arg1 string, arg2 ...internal.RequestOption
 		arg1 string
 		arg2 []internal.RequestOption
 	}{arg1, arg2})
+	stub := fake.GetStub
+	fakeReturns := fake.getReturns
 	fake.recordInvocation("Get", []interface{}{arg1, arg2})
 	fake.getMutex.Unlock()
-	if fake.GetStub != nil {
-		return fake.GetStub(arg1, arg2...)
+	if stub != nil {
+		return stub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -193,15 +195,16 @@ func (fake *FakeGithubWebClient) Post(arg1 string, arg2 []byte, arg3 ...internal
 		arg2 []byte
 		arg3 []internal.RequestOption
 	}{arg1, arg2Copy, arg3})
+	stub := fake.PostStub
+	fakeReturns := fake.postReturns
 	fake.recordInvocation("Post", []interface{}{arg1, arg2Copy, arg3})
 	fake.postMutex.Unlock()
-	if fake.PostStub != nil {
-		return fake.PostStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.postReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

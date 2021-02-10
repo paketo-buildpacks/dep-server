@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestICU(t *testing.T) {
@@ -189,6 +190,21 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 
 				assert.True(errors.Is(err, depErrors.NoSourceCodeError{Version: "66.1"}))
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct ICU release date", func() {
+			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+				{TagName: "release-67-1", CreatedDate: "2020-04-22T17:49:10Z"},
+				{TagName: "release-66-1", CreatedDate: "2020-03-11T17:21:07Z"},
+				{TagName: "release-65-1", CreatedDate: "2019-10-02T21:30:54Z"},
+			}, nil)
+
+			releaseDate, err := icu.GetReleaseDate("66.1")
+			require.NoError(err)
+
+			assert.Equal("2020-03-11T17:21:07Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

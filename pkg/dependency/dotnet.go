@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 const (
@@ -122,6 +123,15 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		depVersion.DeprecationDate = channel.EOLDate + "T00:00:00Z"
 	}
 	return depVersion, nil
+}
+
+func (d dotnet) GetReleaseDate(version string) (time.Time, error) {
+	channel, err := d.getChannel(version)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get channel: %w", err)
+	}
+
+	return time.Parse("2006-01-02", d.dotnetType.getReleaseDate(channel, version))
 }
 
 func (d dotnet) getAllChannelVersions() ([]string, error) {

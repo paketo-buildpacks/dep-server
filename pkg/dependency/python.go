@@ -65,16 +65,24 @@ func (p Python) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:         version,
 		URI:             sourceURI,
 		SHA:             sha256,
-		ReleaseDate:     releaseDate,
+		ReleaseDate:     releaseDate.Format(time.RFC3339),
 		DeprecationDate: deprecationDate,
 	}, nil
 }
 
-func (p Python) getReleaseMetadata(version string) (string, string, []string, error) {
+func (p Python) GetReleaseDate(version string) (time.Time, error) {
+	_, releaseDate, _, err := p.getReleaseMetadata(version)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("could not get release metadata: %w", err)
+	}
+	return releaseDate, nil
+}
+
+func (p Python) getReleaseMetadata(version string) (string, time.Time, []string, error) {
 	versionWithoutPeriods := strings.ReplaceAll(version, ".", "")
 	body, err := p.webClient.Get(fmt.Sprintf("https://www.python.org/downloads/release/python-%s/", versionWithoutPeriods))
 	if err != nil {
-		return "", "", nil, fmt.Errorf("could not get python downloads: %w", err)
+		return "", time.Time{}, nil, fmt.Errorf("could not get python downloads: %w", err)
 	}
 
 	releaseDateRegexp := regexp.MustCompile(`Release Date:</strong> ([\w]{3})[\w\.]* ([\d]+, [\d]+)`)
@@ -124,21 +132,21 @@ func (p Python) getReleaseMetadata(version string) (string, string, []string, er
 	}
 
 	if sourceURI == "" {
-		return "", "", nil, errors.New("could not find source URI on download page")
+		return "", time.Time{}, nil, errors.New("could not find source URI on download page")
 	}
 	if len(potentialMD5s) == 0 {
-		return "", "", nil, errors.New("could not find MD5 on download page")
+		return "", time.Time{}, nil, errors.New("could not find MD5 on download page")
 	}
 	if releaseDateDayAndYear == "" || releaseDateMonth == "" {
-		return "", "", nil, errors.New("could not find release date on download page")
+		return "", time.Time{}, nil, errors.New("could not find release date on download page")
 	}
 
 	releaseDate, err := time.Parse("Jan 2, 2006", fmt.Sprintf("%s %s", releaseDateMonth, releaseDateDayAndYear))
 	if err != nil {
-		return "", "", nil, fmt.Errorf("could not parse release date: %w", err)
+		return "", time.Time{}, nil, fmt.Errorf("could not parse release date: %w", err)
 	}
 
-	return sourceURI, releaseDate.Format(time.RFC3339), potentialMD5s, nil
+	return sourceURI, releaseDate, potentialMD5s, nil
 }
 
 func (p Python) getDependencySHA256(sourceURI string, potentialMD5s []string, version string) (string, error) {

@@ -3,12 +3,14 @@ package dependency
 import (
 	"fmt"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"time"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Dependency
 type Dependency interface {
 	GetAllVersionRefs() ([]string, error)
 	GetDependencyVersion(version string) (DepVersion, error)
+	GetReleaseDate(version string) (time.Time, error)
 }
 
 type DepVersion struct {

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"time"
 )
 
 type CAAPM struct {
@@ -63,6 +64,10 @@ func (c CAAPM) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     "",
 		DeprecationDate: "",
 	}, nil
+}
+
+func (c CAAPM) GetReleaseDate(version string) (time.Time, error) {
+	return time.Time{}, fmt.Errorf("cannot determine release dates for CAAPM")
 }
 
 func (c CAAPM) dependencyURL(version string) string {

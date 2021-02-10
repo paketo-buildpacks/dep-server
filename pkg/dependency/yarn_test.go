@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestYarn(t *testing.T) {
@@ -143,6 +144,26 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 
 				assert.True(errors.Is(err, depErrors.NoSourceCodeError{Version: "v1.0.0"}))
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct yarn release date", func() {
+			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+				{
+					TagName:       "v2.0.0",
+					PublishedDate: "2020-06-28T00:00:00Z",
+				},
+				{
+					TagName:       "v1.0.0",
+					PublishedDate: "2020-06-27T00:00:00Z",
+				},
+			}, nil)
+
+			releaseDate, err := yarn.GetReleaseDate("v1.0.0")
+			require.NoError(err)
+
+			assert.Equal("2020-06-27T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

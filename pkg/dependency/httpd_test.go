@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"testing"
+	"time"
 )
 
 func TestHttpd(t *testing.T) {
@@ -249,6 +250,17 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				assert.Error(err)
 				assert.Contains(err.Error(), "could not find checksum file")
 			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct httpd release date", func() {
+			fakeWebClient.GetReturnsOnCall(0, []byte(httpdIndex2443), nil)
+
+			releaseDate, err := httpd.GetReleaseDate("2.4.43")
+			require.NoError(err)
+
+			assert.Equal("2020-03-30T14:21:00Z", releaseDate.Format(time.RFC3339))
 		})
 	})
 }

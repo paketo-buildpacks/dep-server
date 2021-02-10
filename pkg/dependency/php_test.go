@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestPhp(t *testing.T) {
@@ -366,6 +367,104 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				_, err := php.GetDependencyVersion("7.4.4")
 				assert.Error(err)
 				assert.Equal("could not find .tar.gz file for 7.4.4", err.Error())
+			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		it("returns the correct php release date", func() {
+			fakeWebClient.GetReturns([]byte(`
+{
+ "date": "19 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "19 Mar 2020"
+  },
+  {
+   "filename": "php-7.4.4.tar.bz",
+   "name": "PHP 7.4.4 (tar.bz)",
+   "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "date": "19 Mar 2020"
+  }
+ ]
+}
+`), nil)
+
+			releaseDate, err := php.GetReleaseDate("7.4.4")
+			require.NoError(err)
+
+			assert.Equal("2020-03-19T00:00:00Z", releaseDate.Format(time.RFC3339))
+		})
+
+		when("the release date has an unpadded day", func() {
+			it("properly parses the date", func() {
+				fakeWebClient.GetReturns([]byte(`
+{
+ "date": "1 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 Mar 2020"
+  }
+ ]
+}
+`), nil)
+
+				releaseDate, err := php.GetReleaseDate("7.4.4")
+				require.NoError(err)
+
+				assert.Equal("2020-03-01T00:00:00Z", releaseDate.Format(time.RFC3339))
+			})
+		})
+
+		when("the release date has a full month name", func() {
+			it("properly parses the date", func() {
+				fakeWebClient.GetReturns([]byte(`
+{
+ "date": "01 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "01 March 2020"
+  }
+ ]
+}
+`), nil)
+
+				releaseDate, err := php.GetReleaseDate("7.4.4")
+				require.NoError(err)
+
+				assert.Equal("2020-03-01T00:00:00Z", releaseDate.Format(time.RFC3339))
+			})
+		})
+
+		when("the release date has an unpadded day and a full month name", func() {
+			it("properly parses the date", func() {
+				fakeWebClient.GetReturns([]byte(`
+{
+ "date": "1 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 March 2020"
+  }
+ ]
+}
+`), nil)
+
+				releaseDate, err := php.GetReleaseDate("7.4.4")
+				require.NoError(err)
+
+				assert.Equal("2020-03-01T00:00:00Z", releaseDate.Format(time.RFC3339))
 			})
 		})
 	})

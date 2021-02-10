@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestRuby(t *testing.T) {
@@ -401,6 +402,31 @@ ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some
 					url, _ = fakeWebClient.GetArgsForCall(2)
 					assert.Equal("https://cache.ruby-lang.org/pub/ruby/index.txt", url)
 				})
+			})
+		})
+	})
+
+	when("GetReleaseDate", func() {
+		when("the version IS in the release yaml file", func() {
+			it("returns the correct ruby release date", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
+<tr>
+<td>Ruby 3.0.0</td>
+<td>2020-12-25</td>
+<td><a href="/en/news/2020/12/25/ruby-3-0-0-released/">more...</a></td>
+</tr>
+<tr>
+<td>Ruby 2.7.1</td>
+<td>2020-03-20</td>
+<td><a href="/en/news/2020/03/31/ruby-2-7-1-released/">more...</a></td>
+</tr>
+</table>
+`), nil)
+
+				releaseDate, err := ruby.GetReleaseDate("3.0.0")
+				require.NoError(err)
+
+				assert.Equal("2020-12-25T00:00:00Z", releaseDate.Format(time.RFC3339))
 			})
 		})
 	})
