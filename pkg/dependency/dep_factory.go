@@ -83,6 +83,16 @@ func NewDependencyFactory(accessToken string) DepFactory {
 	}
 }
 
+func (d DepFactory) SupportsDependency(name string) bool {
+	_, err := d.NewDependency(name)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (d DepFactory) NewDependency(name string) (Dependency, error) {
 	switch name {
 	case "bundler":

@@ -89,7 +89,7 @@ func NewGithubClient(webClient GithubWebClient, accessToken string) GithubClient
 
 func (g GithubClient) GetReleaseTags(org, repo string) ([]GithubRelease, error) {
 	body, err := g.webClient.Get(
-		fmt.Sprintf("https://api.github.com/repos/%s/%s/releases", org, repo),
+		fmt.Sprintf("https://api.github.com/repos/%s/%s/releases?per_page=100", org, repo),
 		WithHeader("Authorization", "token "+g.accessToken),
 	)
 	if err != nil {
