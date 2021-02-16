@@ -88,34 +88,43 @@ func NewGithubClient(webClient GithubWebClient, accessToken string) GithubClient
 }
 
 func (g GithubClient) GetReleaseTags(org, repo string) ([]GithubRelease, error) {
-	body, err := g.webClient.Get(
-		fmt.Sprintf("https://api.github.com/repos/%s/%s/releases?per_page=100", org, repo),
-		WithHeader("Authorization", "token "+g.accessToken),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("could not get releases: %w", err)
-	}
-
-	var allReleases []GithubReleaseResponse
-	err = json.Unmarshal(body, &allReleases)
-	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal releases: %w\n%s", err, body)
-	}
-
-	var releases []GithubRelease
-	for _, release := range allReleases {
-		if release.Draft || release.Prerelease {
-			continue
+	page := 1
+	var allReleases []GithubRelease
+	for {
+		body, err := g.webClient.Get(
+			fmt.Sprintf("https://api.github.com/repos/%s/%s/releases?per_page=100&page=%d", org, repo, page),
+			WithHeader("Authorization", "token "+g.accessToken),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("could not get releases: %w", err)
 		}
 
-		releases = append(releases, GithubRelease{
-			TagName:       release.TagName,
-			PublishedDate: release.PublishedAt,
-			CreatedDate:   release.CreatedAt,
-		})
+		var releases []GithubReleaseResponse
+		err = json.Unmarshal(body, &releases)
+		if err != nil {
+			return nil, fmt.Errorf("could not unmarshal releases: %w\n%s", err, body)
+		}
+
+		if len(releases) == 0 {
+			break
+		}
+
+		page++
+
+		for _, release := range releases {
+			if release.Draft || release.Prerelease {
+				continue
+			}
+
+			allReleases = append(allReleases, GithubRelease{
+				TagName:       release.TagName,
+				PublishedDate: release.PublishedAt,
+				CreatedDate:   release.CreatedAt,
+			})
+		}
 	}
 
-	return releases, nil
+	return allReleases, nil
 }
 
 func (g GithubClient) GetTags(org, repo string) ([]string, error) {

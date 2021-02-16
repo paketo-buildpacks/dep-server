@@ -32,14 +32,22 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 
 	when("GetReleaseTags", func() {
 		it("lists tags for all non-draft and non-prerelease releases", func() {
+
 			releasesResponse := `[
-	{"tag_name": "v0.0.0", "draft": true, "published_at": "2020-06-30T00:00:00Z"},
-	{"tag_name": "v0.0.1", "prerelease": true, "published_at": "2020-06-29T00:00:00Z"},
-	{"tag_name": "v1.0.1", "published_at": "2020-06-28T00:00:00Z"},
-	{"tag_name": "v2.0.0", "published_at": "2020-06-27T00:00:00Z"},
-	{"tag_name": "v1.0.0", "published_at": "2020-06-26T00:00:00Z"}
+    {"tag_name": "v1.0.1", "published_at": "2020-06-30T00:00:00Z"},
+    {"tag_name": "v2.0.0", "published_at": "2020-06-29T00:00:00Z"}
+	
 ]`
-			fakeWebClient.GetReturns([]byte(releasesResponse), nil)
+
+			releasesResponse2 := `[
+	{"tag_name": "v0.0.1", "prerelease": true, "published_at": "2020-06-28T00:00:00Z"},
+	{"tag_name": "v1.0.0", "published_at": "2020-06-27T00:00:00Z"},
+	{"tag_name": "v0.0.0", "draft": true, "published_at": "2020-06-26T00:00:00Z"}
+]`
+
+			fakeWebClient.GetReturnsOnCall(0,[]byte(releasesResponse), nil)
+			fakeWebClient.GetReturnsOnCall(1,[]byte(releasesResponse2), nil)
+			fakeWebClient.GetReturnsOnCall(2,[]byte("[]"), nil)
 
 			actualReleases, err := githubClient.GetReleaseTags("some-org", "some-repo")
 			require.NoError(err)
@@ -47,21 +55,29 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 			expectedRelases := []internal.GithubRelease{
 				{
 					TagName:       "v1.0.1",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: "2020-06-30T00:00:00Z",
 				},
 				{
 					TagName:       "v2.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: "2020-06-29T00:00:00Z",
 				},
 				{
 					TagName:       "v1.0.0",
-					PublishedDate: "2020-06-26T00:00:00Z",
+					PublishedDate: "2020-06-27T00:00:00Z",
 				},
 			}
 			assert.Equal(expectedRelases, actualReleases)
 
 			urlArg, optionsArg := fakeWebClient.GetArgsForCall(0)
-			assert.Equal("https://api.github.com/repos/some-org/some-repo/releases", urlArg)
+			assert.Equal("https://api.github.com/repos/some-org/some-repo/releases?per_page=100&page=1", urlArg)
+			assert.Len(optionsArg, 1)
+
+			urlArg, optionsArg = fakeWebClient.GetArgsForCall(1)
+			assert.Equal("https://api.github.com/repos/some-org/some-repo/releases?per_page=100&page=2", urlArg)
+			assert.Len(optionsArg, 1)
+
+			urlArg, optionsArg = fakeWebClient.GetArgsForCall(2)
+			assert.Equal("https://api.github.com/repos/some-org/some-repo/releases?per_page=100&page=3", urlArg)
 			assert.Len(optionsArg, 1)
 
 			request, err := http.NewRequest("", "", nil)
