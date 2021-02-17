@@ -35,7 +35,7 @@ jobs:
     - name: Run tests
       run: go test $(go list ./... | grep -v /pkg/dependency)
 
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    - uses: google-github-actions/setup-gcloud@master
       with:
         version: '270.0.0'
         service_account_key: ${{ secrets.GAE_KEY }}
@@ -92,7 +92,7 @@ jobs:
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
         number: ${{ github.event.pull_request.number }}
 
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    - uses: google-github-actions/setup-gcloud@master
       with:
         version: '270.0.0'
         service_account_key: ${{ secrets.GAE_KEY }}
