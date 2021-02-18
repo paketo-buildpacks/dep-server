@@ -72,7 +72,6 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				"4.8.2",
 				"60.2",
 				"60.1",
-				"59.1",
 			}, versions)
 
 			orgArg, repoArg := fakeGithubClient.GetReleaseTagsArgsForCall(0)
