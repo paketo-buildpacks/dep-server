@@ -22,9 +22,9 @@ type ICU struct {
 }
 
 func (i ICU) GetAllVersionRefs() ([]string, error) {
-	releases, err := i.githubClient.GetReleaseTags("unicode-org", "icu")
+	releases, err := i.getAllVersions()
 	if err != nil {
-		return nil, fmt.Errorf("could not get releases: %w", err)
+		return nil, err
 	}
 
 	for j := 0; j < len(releases); j++ {
@@ -47,9 +47,9 @@ func (i ICU) GetAllVersionRefs() ([]string, error) {
 }
 
 func (i ICU) GetDependencyVersion(version string) (DepVersion, error) {
-	releases, err := i.githubClient.GetReleaseTags("unicode-org", "icu")
+	releases, err := i.getAllVersions()
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get releases: %w", err)
+		return DepVersion{}, err
 	}
 
 	for _, release := range releases {
@@ -65,9 +65,9 @@ func (i ICU) GetDependencyVersion(version string) (DepVersion, error) {
 }
 
 func (i ICU) GetReleaseDate(version string) (time.Time, error) {
-	releases, err := i.githubClient.GetReleaseTags("unicode-org", "icu")
+	releases, err := i.getAllVersions()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return time.Time{}, err
 	}
 
 	for _, release := range releases {
@@ -121,6 +121,9 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 	assetName = fmt.Sprintf("icu4c-%s-src.tgz.asc", icuVersion)
 	releaseAssetSignature, err := i.githubClient.GetReleaseAsset("unicode-org", "icu", tag, assetName)
 	if err != nil {
+		if errors.Is(err, internal_errors.AssetNotFound{AssetName: assetName}) {
+			return DepVersion{}, depErrors.NoSourceCodeError{Version: version}
+		}
 		return DepVersion{}, fmt.Errorf("could not get release artifact signature: %w", err)
 	}
 
@@ -157,4 +160,26 @@ func versionToICUVersion(version string) string {
 func versionToTag(version string) string {
 	tag := fmt.Sprintf("release-%s", strings.ReplaceAll(version, ".", "-"))
 	return tag
+}
+
+func (i ICU) getAllVersions() ([]internal.GithubRelease, error) {
+	releases, err := i.githubClient.GetReleaseTags("unicode-org", "icu")
+	if err != nil {
+		return nil, fmt.Errorf("could not get releases: %w", err)
+	}
+
+	tagsToIgnore := map[string]bool{
+		"release-59-1": true,
+		"release-58-2": true,
+		"release-57-1": true,
+		"release-56-1": true,
+	}
+
+	var prunedReleases []internal.GithubRelease
+	for _, release := range releases {
+		if !tagsToIgnore[release.TagName] {
+			prunedReleases = append(prunedReleases, release)
+		}
+	}
+	return prunedReleases, nil
 }

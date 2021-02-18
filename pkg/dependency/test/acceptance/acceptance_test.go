@@ -67,13 +67,6 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 					for _, i := range versionIndicesToGet(versions) {
 						version := versions[i]
 
-						if depName == "icu" {
-							//old versions without ASC files and/or working PGP keys
-							if version == "59.1" || version == "58.2" || version == "57.1" || version == "56.1" {
-								continue
-							}
-						}
-
 						depVersion, err := dep.GetDependencyVersion(version)
 						if err != nil {
 							var noSourceCodeError derrors.NoSourceCodeError
