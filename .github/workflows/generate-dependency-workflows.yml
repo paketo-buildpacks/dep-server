@@ -35,7 +35,7 @@ jobs:
         for dep in $deps; do
           obj="$(echo "$deps_json" | jq -r ".[] | select( .name == \"$dep\")")"
           name="$(echo "${obj}" | jq -r ".name")"
-          stacks="'$(echo "${obj}" | jq -r '.stacks' -c)'"
+          stacks="$(echo "${obj}" | jq -r '.stacks' -c)"
           mixins="$(echo "${obj}" | jq -r '.stacks[] | select( .id == "io.buildpacks.stacks.bionic").mixins // empty' -c)"
           requires="$(echo "${obj}" | jq -r '.requires // empty')"
 
@@ -62,6 +62,7 @@ jobs:
         done
 
     - name: Commit workflows
+      id: commit
       run: |
         git add -AN .github/workflows
         if ! git diff --quiet .github/workflows; then
@@ -71,10 +72,13 @@ jobs:
           git add .github/workflows/*-build-upload.yml
           git add .github/workflows/*-test-upload-metadata.yml
           git commit -m 'Update dependency workflows'
+
+          echo ::set-output name=PUSH::true
         fi
 
     - name: Push changes
       uses: ad-m/github-push-action@master
+      if: steps.commit.outputs.PUSH
       with:
         github_token: ${{ secrets.CORE_DEPS_CI_BOT_GITHUB_TOKEN }}
         branch: ${{ github.ref }}
