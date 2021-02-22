@@ -19,6 +19,7 @@ name: Pipenv Test and Upload Metadata
     - pipenv-test
 env:
   DEP_NAME: pipenv
+  REQUIRED_DEP: python
   VERSION: ${{ github.event.client_payload.version }}
   URI: ${{ github.event.client_payload.uri }}
   SHA256: ${{ github.event.client_payload.sha256 }}
@@ -43,7 +44,7 @@ jobs:
     - name: Get required dependency
       id: required-dependency
       run: |
-        uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.DEP_NAME}}" | jq '. |= sort_by(.version) | reverse[0].uri')"
+        uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq '. |= sort_by(.version) | reverse[0].uri')"
         echo "::set-output name=uri::${uri}"
     - name: Test
       uses: paketo-buildpacks/dep-server/actions/test-dependency@main
@@ -66,7 +67,7 @@ jobs:
         version: ${{ env.VERSION }}
         sha256: ${{ env.SHA256 }}
         uri: ${{ env.URI }}
-        stacks: '''[{"id":"io.buildpacks.stacks.bionic"}]'''
+        stacks: '[{"id":"io.buildpacks.stacks.bionic"}]'
         source-uri: ${{ env.SOURCE_URI }}
         source-sha256: ${{ env.SOURCE_SHA256 }}
         deprecation-date: ${{ env.DEPRECATION_DATE }}

@@ -61,7 +61,7 @@ jobs:
         version: ${{ env.VERSION }}
         sha256: ${{ env.SHA256 }}
         uri: ${{ env.URI }}
-        stacks: '''[{"id":"io.buildpacks.stacks.bionic","mixins":["libexpat1"]}]'''
+        stacks: '[{"id":"io.buildpacks.stacks.bionic","mixins":["libexpat1"]}]'
         source-uri: ${{ env.SOURCE_URI }}
         source-sha256: ${{ env.SOURCE_SHA256 }}
         deprecation-date: ${{ env.DEPRECATION_DATE }}
