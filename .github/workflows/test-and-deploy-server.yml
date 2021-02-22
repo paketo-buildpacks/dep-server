@@ -7,11 +7,21 @@ on:
     paths-ignore:
     - 'pkg/dependency/**'
     - '.github/workflows/test-dependency-library.yml'
+    - '.github/workflows/*-get-new-versions.yml'
+    - '.github/workflows/*-build-upload.yml'
+    - '.github/workflows/*-test-upload-metadata.yml'
+    - '.github/templates/**'
+    - '.github/data/**'
   push:
     branches: [ main ]
     paths-ignore:
     - 'pkg/dependency/**'
     - '.github/workflows/test-dependency-library.yml'
+    - '.github/workflows/*-get-new-versions.yml'
+    - '.github/workflows/*-build-upload.yml'
+    - '.github/workflows/*-test-upload-metadata.yml'
+    - '.github/templates/**'
+    - '.github/data/**'
 
 env:
   GAE_KEY: ${{ secrets.GAE_KEY }}
