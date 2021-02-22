@@ -75,5 +75,5 @@ jobs:
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ secrets.CORE_DEPS_CI_BOT_GITHUB_ACTIONS_TOKEN_WITH_WORKFLOW }}
+        github_token: ${{ secrets.CORE_DEPS_CI_BOT_GITHUB_TOKEN }}
         branch: ${{ github.ref }}
