@@ -40,7 +40,8 @@ runs:
         #!/usr/bin/inputs bash
         set -euo pipefail
 
-        aws s3 cp "s3://${{ inputs.bucket-name }}/metadata/${{ inputs.dependency-name }}.json" metadata.json
+        filename="$(echo '${{ inputs.dependency-name }}' | awk '{print tolower($0)}')"
+        aws s3 cp "s3://${{ inputs.bucket-name }}/metadata/${filename}.json" metadata.json
 
         metadata="$(cat << EOF
         {
@@ -60,4 +61,4 @@ runs:
 
         echo "${updated_metadata}" > metadata.json
 
-        aws s3 cp metadata.json "s3://${{ inputs.bucket-name }}/metadata/${{ inputs.dependency-name }}.json"
+        aws s3 cp metadata.json "s3://${{ inputs.bucket-name }}/metadata/${filename}.json"
