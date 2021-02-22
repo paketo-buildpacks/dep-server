@@ -38,6 +38,7 @@ jobs:
           stacks="$(echo "${obj}" | jq -r '.stacks' -c)"
           mixins="$(echo "${obj}" | jq -r '.stacks[] | select( .id == "io.buildpacks.stacks.bionic").mixins // empty' -c)"
           requires="$(echo "${obj}" | jq -r '.requires // empty')"
+          skip_test="$(echo "${obj}" | jq -r '.skip_test // false')"
 
           ytt \
             -f ".github/templates/get-new-versions.yml" \
@@ -58,6 +59,7 @@ jobs:
             -v stacks="${stacks}" \
             -v mixins="${mixins}" \
             -v required_dependency="${requires}" \
+            -v skip_test="${skip_test}" \
             > ".github/workflows/${name}-test-upload-metadata.yml"
         done
 
