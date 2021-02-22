@@ -49,28 +49,28 @@ jobs:
           echo "DEPRECATION_DATE=${{ github.event.inputs.deprecation_date }}" >> $GITHUB_ENV
         fi
 
-    #@ if data.values.skip_test != true:
-      #@ if data.values.required_dependency != '':
-      - name: Get required dependency
-        id: required-dependency
-        run: |
-          uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq '. |= sort_by(.version) | reverse[0].uri')"
-          echo "::set-output name=uri::${uri}"
-      #@ end
-
-      - name: Test
-        uses: paketo-buildpacks/dep-server/actions/test-dependency@main
-        with:
-          name: "${{ env.DEP_NAME }}"
-          version: "${{ env.VERSION }}"
-          dependency_url: "${{ env.URI }}"
-          #@ if data.values.mixins != '':
-          mixins: #@ data.values.mixins
-          #@ end
-          #@ if data.values.required_dependency != '':
-          required_dependency: '${{ steps.required-dependency.outputs.uri }}'
-          #@ end
+  #@ if data.values.skip_test != 'true':
+    #@ if data.values.required_dependency != '':
+    - name: Get required dependency
+      id: required-dependency
+      run: |
+        uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq '. |= sort_by(.version) | reverse[0].uri')"
+        echo "::set-output name=uri::${uri}"
     #@ end
+
+    - name: Test
+      uses: paketo-buildpacks/dep-server/actions/test-dependency@main
+      with:
+        name: "${{ env.DEP_NAME }}"
+        version: "${{ env.VERSION }}"
+        dependency_url: "${{ env.URI }}"
+        #@ if data.values.mixins != '':
+        mixins: #@ data.values.mixins
+        #@ end
+        #@ if data.values.required_dependency != '':
+        required_dependency: '${{ steps.required-dependency.outputs.uri }}'
+        #@ end
+  #@ end
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
