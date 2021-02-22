@@ -39,7 +39,7 @@ jobs:
 
     steps:
     - name: Set Env Vars
-      run: |https://api.deps.paketo.io/v1/dependency?name=go
+      run: |
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           echo "URI=${{ github.event.inputs.uri }}" >> $GITHUB_ENV
@@ -50,7 +50,6 @@ jobs:
         fi
 
     #@ if data.values.skip_test != true:
-
       #@ if data.values.required_dependency != '':
       - name: Get required dependency
         id: required-dependency

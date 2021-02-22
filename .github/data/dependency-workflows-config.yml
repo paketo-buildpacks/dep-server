@@ -4,3 +4,4 @@ name:
 stacks:
 mixins:
 required_dependency:
+skip_test:
