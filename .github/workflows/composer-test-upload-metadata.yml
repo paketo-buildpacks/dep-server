@@ -40,12 +40,6 @@ jobs:
           echo "SOURCE_SHA256=${{ github.event.inputs.source_sha256 }}" >> $GITHUB_ENV
           echo "DEPRECATION_DATE=${{ github.event.inputs.deprecation_date }}" >> $GITHUB_ENV
         fi
-    - name: Test
-      uses: paketo-buildpacks/dep-server/actions/test-dependency@main
-      with:
-        name: ${{ env.DEP_NAME }}
-        version: ${{ env.VERSION }}
-        dependency_url: ${{ env.URI }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
