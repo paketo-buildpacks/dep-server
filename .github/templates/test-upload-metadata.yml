@@ -54,7 +54,7 @@ jobs:
     - name: Get required dependency
       id: required-dependency
       run: |
-        uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq '. |= sort_by(.version) | reverse[0].uri')"
+        uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq -r '. |= sort_by(.version) | reverse[0].uri')"
         echo "::set-output name=uri::${uri}"
     #@ end
 
