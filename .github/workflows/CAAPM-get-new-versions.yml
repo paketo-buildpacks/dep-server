@@ -1,0 +1,57 @@
+name: Caapm Get New Versions
+"on":
+  workflow_dispatch: {}
+  schedule:
+  - cron: '*/5 * * * *'
+env:
+  DEP_NAME: CAAPM
+  GCP_BUCKET: ${{ secrets.DEPENDENCY_ARTIFACTS_BUCKET }}
+jobs:
+  check-CAAPM:
+    name: Check for new versions
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Turnstyle
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT }}
+        service_account_key: ${{ secrets.GAE_KEY }}
+    - name: Get Known Versions
+      id: known-versions
+      run: |
+        echo "::set-output name=known-versions::"$(gsutil cat "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json")""
+    - name: Get New Versions
+      id: get-new-versions
+      uses: ./actions/list-new-upstream-dependency-versions
+      with:
+        name: ${{ env.DEP_NAME }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        known-versions: ${{ steps.known-versions.outputs.known-versions }}
+    - name: Trigger Builds
+      run: |
+        new_versions='${{ steps.get-new-versions.outputs.new-versions }}'
+        for version in $(echo "${new_versions}" | jq -r .[]); do
+          curl -X POST \
+            https://api.github.com/repos/${GITHUB_REPOSITORY}/dispatches \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}" \
+            -d "{ \
+                  \"event_type\": \"${{ env.DEP_NAME }}-build\", \
+                  \"client_payload\": { \
+                    \"data\": { \
+                      \"version\": \"${version}\" \
+                     } \
+                   } \
+                 }"
+        done
+    - name: Updates Known Versions
+      run: |
+        echo '${{ steps.get-new-versions.outputs.upstream-versions }}' > known_versions
+        gsutil cp known_versions "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json"

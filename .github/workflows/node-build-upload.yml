@@ -1,0 +1,71 @@
+name: Node Build and Upload
+"on":
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        required: true
+  repository_dispatch:
+    types:
+    - node-build
+env:
+  DEP_NAME: node
+  VERSION: ${{ github.event.client_payload.data.version }}
+jobs:
+  build-upload:
+    name: Build and Upload Dependency
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.15
+    - name: Set Env Vars
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        fi
+    - name: Get upstream dependency
+      id: upstream
+      uses: paketo-buildpacks/dep-server/actions/get-upstream-dependency@main
+      with:
+        name: ${{ env.DEP_NAME }}
+        version: ${{ env.VERSION }}
+        github-token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+    - name: Build
+      id: build
+      uses: paketo-buildpacks/dep-server/actions/build-dependency@main
+      with:
+        name: ${{ env.DEP_NAME }}
+        version: ${{ env.VERSION }}
+        url: ${{ steps.upstream.outputs.uri }}
+        sha256: ${{ steps.upstream.outputs.sha256 }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Upload
+      id: upload
+      uses: paketo-buildpacks/dep-server/actions/upload-dependency@main
+      with:
+        bucket-name: ${{ secrets.DEPS_BUCKET }}
+        dependency-name: ${{ env.DEP_NAME }}
+        artifact-path: ${{ github.workspace }}/${{ steps.build.outputs.artifact-path }}
+    - name: Trigger Tests
+      uses: paketo-buildpacks/github-config/actions/dispatch@main
+      with:
+        repos: paketo-buildpacks/dep-server
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        event: node-test
+        payload: |
+          {
+            "version": "${{ env.VERSION }}",
+            "uri": "${{ steps.upload.outputs.dependency-uri }}",
+            "sha256": "${{ steps.build.outputs.sha256 }}",
+            "source_uri": "${{ steps.upstream.outputs.uri }}",
+            "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
+            "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}"
+          }

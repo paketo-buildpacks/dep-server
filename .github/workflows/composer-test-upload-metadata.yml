@@ -1,0 +1,66 @@
+name: Composer Test and Upload Metadata
+"on":
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        required: true
+      URI:
+        required: true
+      SHA256:
+        required: true
+      SOURCE_URI:
+        required: true
+      SOURCE_SHA256:
+        required: true
+      DEPRECATION_DATE:
+        required: true
+  repository_dispatch:
+    types:
+    - composer-test
+env:
+  DEP_NAME: composer
+  VERSION: ${{ github.event.client_payload.version }}
+  URI: ${{ github.event.client_payload.uri }}
+  SHA256: ${{ github.event.client_payload.sha256 }}
+  SOURCE_URI: ${{ github.event.client_payload.source_uri }}
+  SOURCE_SHA256: ${{ github.event.client_payload.source_sha256 }}
+  DEPRECATION_DATE: ${{ github.event.client_payload.deprecation_date }}
+jobs:
+  test-upload-metadata:
+    name: Test Dependency and Upload Metadata
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Set Env Vars
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          echo "URI=${{ github.event.inputs.uri }}" >> $GITHUB_ENV
+          echo "SHA256=${{ github.event.inputs.sha256 }}" >> $GITHUB_ENV
+          echo "SOURCE_URI=${{ github.event.inputs.source_uri }}" >> $GITHUB_ENV
+          echo "SOURCE_SHA256=${{ github.event.inputs.source_sha256 }}" >> $GITHUB_ENV
+          echo "DEPRECATION_DATE=${{ github.event.inputs.deprecation_date }}" >> $GITHUB_ENV
+        fi
+    - name: Test
+      uses: paketo-buildpacks/dep-server/actions/test-dependency@main
+      with:
+        name: ${{ env.DEP_NAME }}
+        version: ${{ env.VERSION }}
+        dependency_url: ${{ env.URI }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Upload dependency metadata
+      uses: paketo-buildpacks/dep-server/actions/upload-metadata@main
+      with:
+        bucket-name: ${{ secrets.DEPS_BUCKET }}
+        dependency-name: ${{ env.DEP_NAME }}
+        version: ${{ env.VERSION }}
+        sha256: ${{ env.SHA256 }}
+        uri: ${{ env.URI }}
+        stacks: '''[{"id":"io.buildpacks.stacks.bionic"}]'''
+        source-uri: ${{ env.SOURCE_URI }}
+        source-sha256: ${{ env.SOURCE_SHA256 }}
+        deprecation-date: ${{ env.DEPRECATION_DATE }}
