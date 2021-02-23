@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func (y Yarn) GetAllVersionRefs() ([]string, error) {
 
 	var versions []string
 	for _, release := range releases {
-		versions = append(versions, release.TagName)
+		versions = append(versions, strings.TrimPrefix(release.TagName, "v"))
 	}
 	return versions, nil
 }
@@ -48,8 +49,9 @@ func (y Yarn) GetDependencyVersion(version string) (DepVersion, error) {
 	}
 
 	for _, release := range releases {
-		if release.TagName == version {
-			depVersion, err := y.createDependencyVersion(version, release)
+		tagName := "v" + version
+		if release.TagName == tagName {
+			depVersion, err := y.createDependencyVersion(version, tagName, release)
 			if err != nil {
 				return DepVersion{}, fmt.Errorf("could not create yarn version: %w", err)
 			}
@@ -78,7 +80,7 @@ func (y Yarn) GetReleaseDate(version string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
 }
 
-func (y Yarn) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {
+func (y Yarn) createDependencyVersion(version, tagName string, release internal.GithubRelease) (DepVersion, error) {
 	yarnGPGKey, err := y.webClient.Get("https://dl.yarnpkg.com/debian/pubkey.gpg")
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get yarn GPG key: %w", err)
@@ -92,7 +94,7 @@ func (y Yarn) createDependencyVersion(version string, release internal.GithubRel
 	releaseAssetPath := filepath.Join(releaseAssetDir, fmt.Sprintf("yarn-%s.tar.gz", version))
 
 	assetName := fmt.Sprintf("yarn-%s.tar.gz", version)
-	assetUrl, err := y.githubClient.DownloadReleaseAsset("yarnpkg", "yarn", version, assetName, releaseAssetPath)
+	assetUrl, err := y.githubClient.DownloadReleaseAsset("yarnpkg", "yarn", tagName, assetName, releaseAssetPath)
 	if err != nil {
 		if errors.Is(err, internal_errors.AssetNotFound{AssetName: assetName}) {
 			return DepVersion{}, depErrors.NoSourceCodeError{Version: version}
@@ -112,7 +114,7 @@ func (y Yarn) createDependencyVersion(version string, release internal.GithubRel
 	}
 
 	assetName = fmt.Sprintf("yarn-%s.tar.gz.asc", version)
-	releaseAssetSignature, err := y.githubClient.GetReleaseAsset("yarnpkg", "yarn", version, assetName)
+	releaseAssetSignature, err := y.githubClient.GetReleaseAsset("yarnpkg", "yarn", tagName, assetName)
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get release artifact signature: %w", err)
 	}
