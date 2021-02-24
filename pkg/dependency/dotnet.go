@@ -173,6 +173,13 @@ func (d dotnet) getVersionsForChannel(version string) ([]DotnetVersion, error) {
 			if version == "" || d.dotnetType.versionShouldBeIgnored(version) {
 				continue
 			}
+			parsedVersion, err := semver.NewVersion(version)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse version: %w", err)
+			}
+			if parsedVersion.Prerelease() != "" {
+				continue
+			}
 
 			if _, exists := uniqueVersions[version]; !exists {
 				versions = append(versions, DotnetVersion{Version: version, ReleaseDate: release.ReleaseDate})

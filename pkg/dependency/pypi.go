@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/semver"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -98,6 +99,9 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 	var releases []DepVersion
 	for version, releasesForVersion := range productMetadata.Releases {
 		for _, release := range releasesForVersion {
+			if strings.Contains(version, "b") || strings.Contains(version, "dev") {
+				continue
+			}
 			if release.PackageType != "sdist" {
 				continue
 			}

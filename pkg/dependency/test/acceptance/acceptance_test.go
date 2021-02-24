@@ -3,6 +3,7 @@ package acceptance_test
 import (
 	"errors"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	derrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 	"github.com/sclevine/spec"
@@ -10,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -81,6 +83,13 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 						assert.Equal(version, depVersion.Version)
 						assert.Len(depVersion.SHA, 64, "SHA did not have 64 characters for %s %s", depName, version)
 						assert.NotEmpty(depVersion.URI)
+
+						parsedVersion, err := semver.NewVersion(strings.TrimPrefix(version, "go"))
+						if err == nil {
+							assert.Empty(parsedVersion.Prerelease())
+						} else {
+							fmt.Printf("WARNING: could not parse version '%s' of %s as semver, skipping final version check\n", version, depName)
+						}
 
 						if depName != "CAAPM" {
 							_, err = time.Parse(time.RFC3339, depVersion.ReleaseDate)

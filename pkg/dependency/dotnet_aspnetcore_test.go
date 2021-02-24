@@ -40,7 +40,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetAllVersionRefs", func() {
-		it("returns all dotnet aspnetcore versions with newest versions first", func() {
+		it("returns all dotnet aspnetcore final versions with newest versions first", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 {"releases-index": [{"channel-version": "2.0"}, {"channel-version": "1.1"}, {"channel-version": "1.0"}]}
 `), nil)
@@ -66,6 +66,14 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
     {
       "release-date": "2020-02-01",
       "aspnetcore-runtime": {"version": "2.0.0"}
+    },
+    {
+      "release-date": "2020-02-01",
+      "aspnetcore-runtime": {"version": "2.0.0-preview1.20000.20"}
+    },
+    {
+      "release-date": "2020-02-01",
+      "aspnetcore-runtime": {"version": "2.0.0-preview1-20000-20"}
     }
   ]
 }

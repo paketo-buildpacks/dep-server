@@ -42,7 +42,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetAllVersionRefs", func() {
-		it("returns all yarn release versions with newest versions first", func() {
+		it("returns all yarn final release versions with newest versions first", func() {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "v3.0.0",
@@ -54,6 +54,10 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				},
 				{
 					TagName:       "v2.0.0",
+					PublishedDate: "2020-06-28T00:00:00Z",
+				},
+				{
+					TagName:       "v2.0.0-exp.1",
 					PublishedDate: "2020-06-28T00:00:00Z",
 				},
 				{

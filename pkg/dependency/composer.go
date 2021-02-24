@@ -2,6 +2,7 @@ package dependency
 
 import (
 	"fmt"
+	"github.com/Masterminds/semver"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"strings"
 	"time"
@@ -22,6 +23,13 @@ func (c Composer) GetAllVersionRefs() ([]string, error) {
 
 	var versions []string
 	for _, release := range releases {
+		version, err := semver.NewVersion(release.TagName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse version: %w", err)
+		}
+		if version.Prerelease() != "" {
+			continue
+		}
 		versions = append(versions, release.TagName)
 	}
 	return versions, nil

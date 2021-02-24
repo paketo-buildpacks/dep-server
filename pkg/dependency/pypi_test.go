@@ -38,7 +38,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetAllVersionRefs", func() {
-		it("returns all source release versions with newest versions first", func() {
+		it("returns all source release final versions with newest versions first", func() {
 			fakeWebClient.GetReturns([]byte(`{
 "releases": {
   "1.0.0": [
@@ -55,6 +55,14 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
   ],
   "1.20.0": [
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ],
+  "2.0.0.dev2": [
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ],
+  "2.0.0b1": [
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
   ],
   "2.0.0": [
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},

@@ -39,11 +39,27 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetAllVersionRefs", func() {
-		it("returns all composer release versions with newest versions first", func() {
+		it("returns all composer final release versions with newest versions first", func() {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "3.0.0",
 					PublishedDate: "2020-06-30T00:00:00Z",
+				},
+				{
+					TagName:       "3.0.0-RC",
+					PublishedDate: "2020-06-29T00:00:00Z",
+				},
+				{
+					TagName:       "3.0.0-beta1",
+					PublishedDate: "2020-06-29T00:00:00Z",
+				},
+				{
+					TagName:       "3.0.0-alpha2",
+					PublishedDate: "2020-06-29T00:00:00Z",
+				},
+				{
+					TagName:       "3.0.0-alpha1",
+					PublishedDate: "2020-06-29T00:00:00Z",
 				},
 				{
 					TagName:       "1.0.1",

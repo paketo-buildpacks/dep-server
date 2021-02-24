@@ -39,9 +39,15 @@ func (y Yarn) GetAllVersionRefs() ([]string, error) {
 	var versions []string
 	for _, release := range releases {
 		versionTagName := strings.TrimPrefix(release.TagName, "v")
-		version := semver.MustParse(versionTagName)
+		version, err := semver.NewVersion(versionTagName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse version: %w", err)
+		}
 		/** Versions less than 0.7.0 does not have source code and the version tag does not contains the "v" at the start*/
 		if version.LessThan(semver.MustParse("0.7.0")) {
+			continue
+		}
+		if version.Prerelease() != "" {
 			continue
 		}
 		versions = append(versions, versionTagName)

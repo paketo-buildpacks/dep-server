@@ -40,7 +40,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetAllVersionRefs", func() {
-		it("returns all dotnet SDK versions with newest versions first", func() {
+		it("returns all dotnet SDK final versions with newest versions first", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 {"releases-index": [{"channel-version": "2.0"}, {"channel-version": "1.1"}, {"channel-version": "1.0"}]}
 `), nil)
@@ -60,6 +60,14 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
     {
       "release-date": "2020-02-01",
       "sdk": {"version": "2.0.100"}
+    },
+    {
+      "release-date": "2020-02-01",
+      "sdk": {"version": "2.0.100-preview1.20000.20"}
+    },
+    {
+      "release-date": "2020-02-01",
+      "sdk": {"version": "2.0.100-preview1-20000-20"}
     }
   ]
 }
