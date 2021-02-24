@@ -113,13 +113,13 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("yarnpkg", orgArg)
 			assert.Equal("yarn", repoArg)
 			assert.Equal("v1.0.0", versionArg)
-			assert.Equal("yarn-1.0.0.tar.gz.asc", filenameArg)
+			assert.Equal("yarn-v1.0.0.tar.gz.asc", filenameArg)
 
 			orgArg, repoArg, versionArg, filenameArg, _ = fakeGithubClient.DownloadReleaseAssetArgsForCall(0)
 			assert.Equal("yarnpkg", orgArg)
 			assert.Equal("yarn", repoArg)
 			assert.Equal("v1.0.0", versionArg)
-			assert.Equal("yarn-1.0.0.tar.gz", filenameArg)
+			assert.Equal("yarn-v1.0.0.tar.gz", filenameArg)
 
 			releaseAssetSignatureArg, _, yarnGPGKeyArg := fakeChecksummer.VerifyASCArgsForCall(0)
 			assert.Equal("some-signature", releaseAssetSignatureArg)
@@ -137,7 +137,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
 				fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 				fakeWebClient.GetReturnsOnCall(1, []byte(assetUrlContent), nil)
-				fakeGithubClient.DownloadReleaseAssetReturns("", internal_errors.AssetNotFound{AssetName: "yarn-1.0.0.tar.gz"})
+				fakeGithubClient.DownloadReleaseAssetReturns("", internal_errors.AssetNotFound{AssetName: "yarn-v1.0.0.tar.gz"})
 
 				_, err := yarn.GetDependencyVersion("1.0.0")
 				assert.Error(err)

@@ -98,9 +98,9 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		return DepVersion{}, fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(releaseAssetDir)
-	releaseAssetPath := filepath.Join(releaseAssetDir, fmt.Sprintf("yarn-%s.tar.gz", version))
+	releaseAssetPath := filepath.Join(releaseAssetDir, fmt.Sprintf("yarn-%s.tar.gz", tagName))
 
-	assetName := fmt.Sprintf("yarn-%s.tar.gz", version)
+	assetName := fmt.Sprintf("yarn-%s.tar.gz", tagName)
 	assetUrl, err := y.githubClient.DownloadReleaseAsset("yarnpkg", "yarn", tagName, assetName, releaseAssetPath)
 	if err != nil {
 		if errors.Is(err, internal_errors.AssetNotFound{AssetName: assetName}) {
@@ -120,7 +120,7 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		return DepVersion{}, fmt.Errorf("could not unmarshal asset url content: %w", err)
 	}
 
-	assetName = fmt.Sprintf("yarn-%s.tar.gz.asc", version)
+	assetName = fmt.Sprintf("yarn-%s.tar.gz.asc", tagName)
 	releaseAssetSignature, err := y.githubClient.GetReleaseAsset("yarnpkg", "yarn", tagName, assetName)
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get release artifact signature: %w", err)
