@@ -1,6 +1,7 @@
 package dependency
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -60,6 +61,11 @@ func (d dotnetASPNETCoreType) getReleaseFiles(channel DotnetChannel, version str
 
 func (d dotnetASPNETCoreType) getReleaseVersions(release DotnetChannelRelease) []string {
 	return []string{release.ASPNETCoreRuntime.Version}
+}
+
+func (d dotnetASPNETCoreType) getCPE(version string) (string, error) {
+	majorMinorVersion := strings.Join(strings.Split(version, ".")[0:2], ".")
+	return fmt.Sprintf("cpe:2.3:a:microsoft:asp.net_core:%s:*:*:*:*:*:*:*", majorMinorVersion), nil
 }
 
 func (d dotnetASPNETCoreType) versionShouldBeIgnored(version string) bool {

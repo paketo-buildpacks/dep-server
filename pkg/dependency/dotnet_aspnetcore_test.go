@@ -257,7 +257,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-sha256",
 				ReleaseDate:     "2020-02-20T00:00:00Z",
 				DeprecationDate: "2050-02-20T00:00:00Z",
-				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+				CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -317,7 +317,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
-					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -404,7 +404,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
-					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -445,7 +445,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "shaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
-					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -489,7 +489,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "",
-					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.2:*:*:*:*:*:*:*",
+					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 			})

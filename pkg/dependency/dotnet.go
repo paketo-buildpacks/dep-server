@@ -63,6 +63,7 @@ type dotnetType interface {
 	getReleaseFiles(channel DotnetChannel, version string) []DotnetChannelReleaseFile
 	getReleaseVersions(release DotnetChannelRelease) []string
 	versionShouldBeIgnored(version string) bool
+	getCPE(version string) (string, error)
 }
 
 type dotnet struct {
@@ -113,12 +114,16 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 
 	releaseDate := d.dotnetType.getReleaseDate(channel, version)
 
+	cpe, err := d.dotnetType.getCPE(version)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get cpe: %w", err)
+	}
 	depVersion := DepVersion{
 		Version:     version,
 		URI:         releaseFile.URL,
 		SHA:         sha256,
 		ReleaseDate: releaseDate + "T00:00:00Z",
-		CPE:         fmt.Sprintf("cpe:2.3:a:microsoft:.net_core:%s:*:*:*:*:*:*:*", version),
+		CPE:         cpe,
 	}
 	if channel.EOLDate != "" {
 		depVersion.DeprecationDate = channel.EOLDate + "T00:00:00Z"
