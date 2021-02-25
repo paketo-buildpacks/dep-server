@@ -80,6 +80,7 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		SHA:             dependencySHA,
 		ReleaseDate:     releaseDate.Format(time.RFC3339),
 		DeprecationDate: deprecationDate,
+		CPE:             fmt.Sprintf("cpe:2.3:a:php:php:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 

@@ -45,9 +45,9 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 	{"tag_name": "v0.0.0", "draft": true, "published_at": "2020-06-26T00:00:00Z"}
 ]`
 
-			fakeWebClient.GetReturnsOnCall(0,[]byte(releasesResponse), nil)
-			fakeWebClient.GetReturnsOnCall(1,[]byte(releasesResponse2), nil)
-			fakeWebClient.GetReturnsOnCall(2,[]byte("[]"), nil)
+			fakeWebClient.GetReturnsOnCall(0, []byte(releasesResponse), nil)
+			fakeWebClient.GetReturnsOnCall(1, []byte(releasesResponse2), nil)
+			fakeWebClient.GetReturnsOnCall(2, []byte("[]"), nil)
 
 			actualReleases, err := githubClient.GetReleaseTags("some-org", "some-repo")
 			require.NoError(err)

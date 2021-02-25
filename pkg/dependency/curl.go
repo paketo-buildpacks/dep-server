@@ -129,6 +129,7 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 		URI:         c.dependencyURL(release),
 		SHA:         sha,
 		ReleaseDate: release.Date.Format(time.RFC3339),
+		CPE:         fmt.Sprintf("cpe:2.3:a:haxx:curl:%s:*:*:*:*:*:*:*", release.Version),
 	}, nil
 }
 

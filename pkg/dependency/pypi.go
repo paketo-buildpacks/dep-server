@@ -115,11 +115,17 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 				return nil, fmt.Errorf("could not find sha256 for version %s", version)
 			}
 
+			var cpe string
+			if p.productName == "pip" {
+				cpe = fmt.Sprintf("cpe:2.3:a:pypa:pip:%s:*:*:*:*:python:*:*", version)
+			}
+
 			releases = append(releases, DepVersion{
 				Version:     version,
 				URI:         release.URL,
 				SHA:         release.Digests["sha256"],
 				ReleaseDate: uploadTime.Format(time.RFC3339),
+				CPE:         cpe,
 			})
 		}
 	}

@@ -80,6 +80,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-sha256",
 				ReleaseDate:     "2020-06-27T00:00:00Z",
 				DeprecationDate: "2023-06-27T00:00:00Z",
+				CPE:             "cpe:2.3:a:python:python:3.7.8:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)

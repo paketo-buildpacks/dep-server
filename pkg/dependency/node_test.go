@@ -110,6 +110,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     "2020-02-20T00:00:00Z",
 				DeprecationDate: "2020-06-01T00:00:00Z",
+				CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDep, actualDep)
@@ -147,6 +148,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.ta
 					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     "2015-01-30T00:00:00Z",
 					DeprecationDate: "2016-06-01T00:00:00Z",
+					CPE:             "cpe:2.3:a:nodejs:node.js:0.8.0:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDep, actualDep)
@@ -182,6 +184,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     "2020-01-30T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDep, actualDep)

@@ -146,6 +146,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha-256-gz",
 					ReleaseDate:     "2020-12-25T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:ruby-lang:ruby:3.0.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -185,6 +186,7 @@ ruby-1.6.7	https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz	some-sha-1
 					SHA:             "some-sha-256",
 					ReleaseDate:     "2002-03-01T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:ruby-lang:ruby:1.6.7:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -247,6 +249,7 @@ ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1
 					SHA:             "some-sha-256-gz",
 					ReleaseDate:     "2020-04-20T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:ruby-lang:ruby:2.6.6:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -318,6 +321,7 @@ ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-s
 						SHA:             "some-sha-256",
 						ReleaseDate:     "2007-12-25T00:00:00Z",
 						DeprecationDate: "",
+						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.0:*:*:*:*:*:*:*",
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -390,6 +394,7 @@ ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some
 						SHA:             "some-sha-256",
 						ReleaseDate:     "2009-01-30T00:00:00Z",
 						DeprecationDate: "",
+						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.1:*:*:*:*:*:*:*",
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)
 

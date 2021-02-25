@@ -19,6 +19,7 @@ type DepVersion struct {
 	SHA             string `json:"sha"`
 	ReleaseDate     string `json:"release_date"`
 	DeprecationDate string `json:"deprecation_date"`
+	CPE             string `json:"cpe"`
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Checksummer

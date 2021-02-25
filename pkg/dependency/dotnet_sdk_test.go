@@ -323,6 +323,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-sha256",
 				ReleaseDate:     "2020-02-20T00:00:00Z",
 				DeprecationDate: "2050-02-20T00:00:00Z",
+				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -382,6 +383,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
+					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -468,6 +470,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
+					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -508,6 +511,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "shaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
+					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -550,6 +554,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "2050-02-20T00:00:00Z",
+					CPE:             "cpe:2.3:a:microsoft:.net_core:2.1.201:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -593,6 +598,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-02-20T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 			})

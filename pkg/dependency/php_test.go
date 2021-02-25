@@ -159,6 +159,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     "2020-03-19T00:00:00Z",
 				DeprecationDate: "2023-03-19T00:00:00Z",
+				CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)
@@ -193,6 +194,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-03-19T00:00:00Z",
 					DeprecationDate: "2023-03-19T00:00:00Z",
+					CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -230,6 +232,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2013-05-09T00:00:00Z",
 					DeprecationDate: "2016-05-09T00:00:00Z",
+					CPE:             "cpe:2.3:a:php:php:5.3.25:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -261,6 +264,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2006-08-24T00:00:00Z",
 					DeprecationDate: "2009-08-24T00:00:00Z",
+					CPE:             "cpe:2.3:a:php:php:5.1.6:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 

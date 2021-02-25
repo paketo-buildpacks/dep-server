@@ -2,7 +2,6 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -49,6 +48,7 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		SHA:             sha,
 		ReleaseDate:     tagCommit.Date,
 		DeprecationDate: "",
+		CPE:             fmt.Sprintf("cpe:2.3:a:nginx:nginx:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 
@@ -65,22 +65,6 @@ func (n Nginx) GetReleaseDate(version string) (time.Time, error) {
 	}
 
 	return releaseDate, nil
-}
-
-func (n Nginx) createDependencyVersion(version string, commit internal.GithubTagCommit) (DepVersion, error) {
-	dependencyURL := n.dependencyURL(version)
-	sha, err := n.getDependencySHA(dependencyURL, version)
-	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get nginx sha: %w", err)
-	}
-
-	return DepVersion{
-		Version:         version,
-		URI:             dependencyURL,
-		SHA:             sha,
-		ReleaseDate:     commit.Date,
-		DeprecationDate: "",
-	}, nil
 }
 
 func (n Nginx) getDependencySHA(dependencyURL, version string) (string, error) {

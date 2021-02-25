@@ -151,6 +151,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				ReleaseDate:     "2020-03-19T00:00:00Z",
 				DeprecationDate: "",
+				CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -189,6 +190,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-source-sha",
 					ReleaseDate:     "2020-03-19T00:00:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
 
