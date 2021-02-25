@@ -271,6 +271,95 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("sha512-for-linux-x64-2.0.1", sha512Arg)
 		})
 
+		when("the version is >= 5.0.0", func() {
+			it("returns the correct CPE", func() {
+				fakeWebClient.GetReturns([]byte(`
+{
+  "eol-date": "2050-02-20",
+  "releases": [
+    {
+      "release-date": "2020-02-22",
+      "runtime": {
+        "version": "5.0.2",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-5.0.2",
+            "hash": "sha512-for-linux-x64-5.0.2"
+          }
+        ]
+      }
+    },
+    {
+      "release-date": "2020-02-20",
+      "runtime": {
+        "version": "5.0.1",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-arm.tar.gz",
+            "rid": "linux-arm",
+            "url": "url-for-linux-arm-5.0.1",
+            "hash": "sha512-for-linux-arm-5.0.1"
+          },
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-5.0.1",
+            "hash": "SHA512-FOR-LINUX-X64-5.0.1"
+          },
+          {
+            "name": "dotnet-runtime-osx-64.tar.gz",
+            "rid": "osx-64",
+            "url": "url-for-osx-64-5.0.1",
+            "hash": "sha512-for-osx-64-5.0.1"
+          }
+        ]
+      }
+    },
+    {
+      "release-date": "2020-02-10",
+      "runtime": {
+        "version": "5.0.0",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-5.0.0",
+            "hash": "sha512-for-linux-x64-5.0.0"
+          }
+        ]
+      }
+    }
+  ]
+}
+`), nil)
+				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+
+				actualDep, err := dotnetRuntime.GetDependencyVersion("5.0.1")
+				require.NoError(err)
+
+				expectedDep := dependency.DepVersion{
+					Version:         "5.0.1",
+					URI:             "url-for-linux-x64-5.0.1",
+					SHA:             "some-sha256",
+					ReleaseDate:     "2020-02-20T00:00:00Z",
+					DeprecationDate: "2050-02-20T00:00:00Z",
+					CPE:             "cpe:2.3:a:microsoft:.net:5.0.1:*:*:*:*:*:*:*",
+				}
+				assert.Equal(expectedDep, actualDep)
+
+				urlArg, _ := fakeWebClient.GetArgsForCall(0)
+				assert.Equal("https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/5.0/releases.json", urlArg)
+
+				urlArg, _, _ = fakeWebClient.DownloadArgsForCall(0)
+				assert.Equal("url-for-linux-x64-5.0.1", urlArg)
+
+				_, sha512Arg := fakeChecksummer.VerifySHA512ArgsForCall(0)
+				assert.Equal("sha512-for-linux-x64-5.0.1", sha512Arg)
+			})
+		})
+
 		when("the file rid is ubuntu-x64", func() {
 			it("returns the correct dotnet runtime version", func() {
 				fakeWebClient.GetReturns([]byte(`

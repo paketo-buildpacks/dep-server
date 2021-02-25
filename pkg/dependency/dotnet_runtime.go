@@ -1,6 +1,8 @@
 package dependency
 
 import (
+	"fmt"
+	"github.com/Masterminds/semver"
 	"strings"
 	"time"
 )
@@ -60,6 +62,19 @@ func (d dotnetRuntimeType) getReleaseFiles(channel DotnetChannel, version string
 
 func (d dotnetRuntimeType) getReleaseVersions(release DotnetChannelRelease) []string {
 	return []string{release.Runtime.Version}
+}
+
+func (d dotnetRuntimeType) getCPE(version string) (string, error) {
+	parsedVersion, err := semver.NewVersion(version)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse semverL %w", err)
+	}
+
+	productName := ".net"
+	if parsedVersion.LessThan(semver.MustParse("5.0.0-0")) { // use 5.0.0-0 to ensure 5.0.0 previews/RCs use the new `.net` product name
+		productName = ".net_core"
+	}
+	return fmt.Sprintf("cpe:2.3:a:microsoft:%s:%s:*:*:*:*:*:*:*", productName, version), nil
 }
 
 func (d dotnetRuntimeType) versionShouldBeIgnored(version string) bool {

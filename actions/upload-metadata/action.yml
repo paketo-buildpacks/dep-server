@@ -30,6 +30,9 @@ inputs:
   deprecation-date:
     description: Deprecation date
     required: true
+  cpe:
+    description: NVD identifier in CPE 2.3 notation
+    required: true
 
 runs:
   using: 'composite'
@@ -66,7 +69,8 @@ runs:
           "source_sha256": "${{ inputs.source-sha256 }}",
           "deprecation_date": "${{ inputs.deprecation-date }}",
           "created_at": "${created_at}",
-          "modified_at": "${now}"
+          "modified_at": "${now}",
+          "cpe": "${{ inputs.cpe }}"
         }
         EOF
         )"
