@@ -104,6 +104,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-source-sha",
 				ReleaseDate:     "2020-03-11T17:21:07Z",
 				DeprecationDate: "",
+				CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:66.1:*:*:*:*:c\/c\+\+:*:*`,
 			}
 
 			assert.Equal(expectedDep, actualDep)
@@ -153,6 +154,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-source-sha",
 					ReleaseDate:     "2019-04-11T18:17:52Z",
 					DeprecationDate: "",
+					CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:4.8.2:*:*:*:*:c\/c\+\+:*:*`,
 				}
 
 				assert.Equal(expectedDep, actualDep)

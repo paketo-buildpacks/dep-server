@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -89,5 +90,6 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		SHA:             dependencySHA,
 		ReleaseDate:     release.PublishedDate,
 		DeprecationDate: "",
+		CPE:             fmt.Sprintf("cpe:2.3:a:tini_project:tini:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),
 	}, nil
 }

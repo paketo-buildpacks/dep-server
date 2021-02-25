@@ -59,6 +59,7 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 				SHA:             depSHA,
 				ReleaseDate:     releaseDate.Format(time.RFC3339),
 				DeprecationDate: "",
+				CPE:             fmt.Sprintf("cpe:2.3:a:ruby-lang:ruby:%s:*:*:*:*:*:*:*", version),
 			}, nil
 		}
 	}

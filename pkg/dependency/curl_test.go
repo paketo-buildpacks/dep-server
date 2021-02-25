@@ -78,6 +78,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				URI:         "https://curl.se/download/curl-7.73.0.tar.gz",
 				SHA:         "some-source-sha",
 				ReleaseDate: "2020-10-14T00:00:00Z",
+				CPE:         "cpe:2.3:a:haxx:curl:7.73.0:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDep, actualDep)
@@ -117,6 +118,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 					URI:         "https://curl.se/download/archeology/curl-7.29.0.tar.gz",
 					SHA:         "some-source-sha",
 					ReleaseDate: "2013-02-06T00:00:00Z",
+					CPE:         "cpe:2.3:a:haxx:curl:7.29.0:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDep, actualDep)

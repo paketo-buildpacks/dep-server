@@ -118,6 +118,7 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		URI:         releaseFile.URL,
 		SHA:         sha256,
 		ReleaseDate: releaseDate + "T00:00:00Z",
+		CPE:         fmt.Sprintf("cpe:2.3:a:microsoft:.net_core:%s:*:*:*:*:*:*:*", version),
 	}
 	if channel.EOLDate != "" {
 		depVersion.DeprecationDate = channel.EOLDate + "T00:00:00Z"

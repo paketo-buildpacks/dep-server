@@ -63,6 +63,7 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 		URI:         release.dependencyURL,
 		SHA:         sha,
 		ReleaseDate: release.releaseDate.Format(time.RFC3339),
+		CPE:         fmt.Sprintf("cpe:2.3:a:apache:http_server:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 

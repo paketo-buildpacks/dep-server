@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -73,6 +74,7 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 		SHA:             sha,
 		ReleaseDate:     releaseDate.Format(time.RFC3339),
 		DeprecationDate: "",
+		CPE:             fmt.Sprintf("cpe:2.3:a:golang:go:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "go")),
 	}, nil
 }
 

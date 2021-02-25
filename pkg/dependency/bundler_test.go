@@ -274,6 +274,7 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "9b9a9a5685121403eda1ae148ed3a34c86418f2a2beec7df82a45d4baca0e5d2",
 				ReleaseDate:     "2020-01-02T12:29:43.745Z",
 				DeprecationDate: "",
+				CPE:             "cpe:2.3:a:bundler:bundler:2.1.3:*:*:*:*:ruby:*:*",
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)
 

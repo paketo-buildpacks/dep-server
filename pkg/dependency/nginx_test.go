@@ -79,6 +79,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-source-sha",
 				ReleaseDate:     "2020-06-17T00:00:00Z",
 				DeprecationDate: "",
+				CPE:             "cpe:2.3:a:nginx:nginx:1.0.0:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)
 

@@ -143,6 +143,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		SHA:             dependencySHA,
 		ReleaseDate:     release.CreatedDate,
 		DeprecationDate: "",
+		CPE:             fmt.Sprintf(`cpe:2.3:a:icu-project:international_components_for_unicode:%s:*:*:*:*:c\/c\+\+:*:*`, version),
 	}, nil
 }
 

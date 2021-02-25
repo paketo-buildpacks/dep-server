@@ -80,6 +80,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-sha256",
 				ReleaseDate:     "2020-03-30T14:21:00Z",
 				DeprecationDate: "",
+				CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)
@@ -109,6 +110,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-03-30T14:21:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -166,6 +168,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2020-03-30T14:21:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -219,6 +222,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					SHA:             "some-sha256",
 					ReleaseDate:     "2006-07-27T17:39:00Z",
 					DeprecationDate: "",
+					CPE:             "cpe:2.3:a:apache:http_server:2.2.3:*:*:*:*:*:*:*",
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)

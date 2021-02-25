@@ -117,6 +117,7 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 		SHA:             sha,
 		ReleaseDate:     releaseDate.Format(time.RFC3339),
 		DeprecationDate: deprecationDate,
+		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(release.Version, "v")),
 	}, nil
 }
 

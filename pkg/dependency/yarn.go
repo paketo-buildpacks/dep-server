@@ -148,5 +148,6 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		SHA:             dependencySHA,
 		ReleaseDate:     release.PublishedDate,
 		DeprecationDate: "",
+		CPE:             fmt.Sprintf("cpe:2.3:a:yarnpkg:yarn:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }

@@ -106,6 +106,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				SHA:             "some-source-sha",
 				ReleaseDate:     "2020-06-27T00:00:00Z",
 				DeprecationDate: "",
+				CPE:             "cpe:2.3:a:yarnpkg:yarn:1.0.0:*:*:*:*:*:*:*",
 			}
 
 			assert.Equal(expectedDep, actualDep)
