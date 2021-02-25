@@ -2,7 +2,7 @@ name: Ruby Get New Versions
 "on":
   workflow_dispatch: {}
   schedule:
-  - cron: '*/5 * * * *'
+  - cron: '*/15 * * * *'
 env:
   DEP_NAME: ruby
   GCP_BUCKET: ${{ secrets.DEPENDENCY_ARTIFACTS_BUCKET }}

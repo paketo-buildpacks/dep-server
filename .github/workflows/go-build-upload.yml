@@ -32,7 +32,7 @@ jobs:
       with:
         name: ${{ env.DEP_NAME }}
         version: ${{ env.VERSION }}
-        github-token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Build
       id: build
       uses: paketo-buildpacks/dep-server/actions/build-dependency@main

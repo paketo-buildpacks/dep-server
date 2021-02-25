@@ -2,7 +2,7 @@ name: Curl Get New Versions
 "on":
   workflow_dispatch: {}
   schedule:
-  - cron: '*/5 * * * *'
+  - cron: '*/15 * * * *'
 env:
   DEP_NAME: curl
   GCP_BUCKET: ${{ secrets.DEPENDENCY_ARTIFACTS_BUCKET }}
