@@ -16,8 +16,6 @@ jobs:
 
     - name: Check out code
       uses: actions/checkout@v2
-      with:
-        persist-credentials: false
 
     - name: Checkout Branch
       uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
