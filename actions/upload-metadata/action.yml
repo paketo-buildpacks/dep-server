@@ -37,11 +37,23 @@ runs:
     - id: upload
       shell: bash
       run: |
-        #!/usr/bin/inputs bash
         set -euo pipefail
 
         filename="$(echo '${{ inputs.dependency-name }}' | awk '{print tolower($0)}')"
         aws s3 cp "s3://${{ inputs.bucket-name }}/metadata/${filename}.json" metadata.json
+
+        now="$(date '+%FT%T%:z')"
+
+        created_at=
+        original_created_at="$(jq \
+          --arg version "${{ inputs.version }}" \
+          -r '.[] | select(.version == $version) | .created_at // ""' metadata.json)"
+
+        if [[ -n "${original_created_at}" ]]; then
+          created_at="${original_created_at}"
+        else
+          created_at="${now}"
+        fi
 
         metadata="$(cat << EOF
         {
@@ -52,12 +64,17 @@ runs:
           "stacks": ${{ inputs.stacks }},
           "source": "${{ inputs.source-uri }}",
           "source_sha256": "${{ inputs.source-sha256 }}",
-          "deprecation_date": "${{ inputs.deprecation-date }}"
+          "deprecation_date": "${{ inputs.deprecation-date }}",
+          "created_at": "${created_at}",
+          "modified_at": "${now}"
         }
         EOF
         )"
 
-        updated_metadata="$(jq --argjson metadata "${metadata}" --arg version "${{ inputs.version }}" -r 'del(.[] | select(.version == $version)) | [$metadata] + .' metadata.json)"
+        updated_metadata="$(jq \
+          --argjson metadata "${metadata}" \
+          --arg version "${{ inputs.version }}" \
+          -r 'del(.[] | select(.version == $version)) | [$metadata] + .' metadata.json)"
 
         echo "${updated_metadata}" > metadata.json
 
