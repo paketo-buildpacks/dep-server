@@ -63,7 +63,7 @@ jobs:
                  }"
         done
 
-    - name: Updates Known Versions
+    - name: Update Known Versions
       run: |
         echo '${{ steps.get-new-versions.outputs.upstream-versions }}' > known_versions
         gsutil cp known_versions "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json"
