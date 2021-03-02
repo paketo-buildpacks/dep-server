@@ -30,7 +30,7 @@ func (d DotnetSDK) GetDependencyVersion(version string) (DepVersion, error) {
 	}.GetDependencyVersion(version)
 }
 
-func (d DotnetSDK) GetReleaseDate(version string) (time.Time, error) {
+func (d DotnetSDK) GetReleaseDate(version string) (*time.Time, error) {
 	return dotnet{
 		dotnetType:  dotnetSDKType{},
 		checksummer: d.checksummer,
@@ -53,19 +53,27 @@ func (d dotnetSDKType) getReleaseFiles(channel DotnetChannel, version string) []
 	return nil
 }
 
-func (d dotnetSDKType) getReleaseDate(channel DotnetChannel, version string) string {
+func (d dotnetSDKType) getReleaseDate(channel DotnetChannel, version string) (*time.Time, error) {
 	for _, release := range channel.Releases {
 		if release.SDK.Version == version {
-			return release.ReleaseDate
+			releaseDate, err := time.Parse("2006-01-02", release.ReleaseDate)
+			if err != nil {
+				return nil, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return &releaseDate, nil
 		}
 
 		for _, sdk := range release.SDKs {
 			if sdk.Version == version {
-				return release.ReleaseDate
+				releaseDate, err := time.Parse("2006-01-02", release.ReleaseDate)
+				if err != nil {
+					return nil, fmt.Errorf("could not parse release date: %w", err)
+				}
+				return &releaseDate, nil
 			}
 		}
 	}
-	return ""
+	return nil, nil
 }
 
 func (d dotnetSDKType) getReleaseVersions(release DotnetChannelRelease) []string {

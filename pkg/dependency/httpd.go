@@ -62,17 +62,17 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:     version,
 		URI:         release.dependencyURL,
 		SHA:         sha,
-		ReleaseDate: release.releaseDate.Format(time.RFC3339),
+		ReleaseDate: &release.releaseDate,
 		CPE:         fmt.Sprintf("cpe:2.3:a:apache:http_server:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 
-func (h Httpd) GetReleaseDate(version string) (time.Time, error) {
+func (h Httpd) GetReleaseDate(version string) (*time.Time, error) {
 	release, err := h.getRelease(version)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get release: %w", err)
+		return nil, fmt.Errorf("could not get release: %w", err)
 	}
-	return release.releaseDate, nil
+	return &release.releaseDate, nil
 }
 
 func (h Httpd) getRelease(version string) (HttpdRelease, error) {

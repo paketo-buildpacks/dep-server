@@ -119,12 +119,13 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 			actualDep, err := pypi.GetDependencyVersion("2.0.0")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2010, 5, 1, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "2.0.0",
 				URI:             "some-url",
 				SHA:             "some-sha256",
-				ReleaseDate:     "2010-05-01T00:00:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:pypa:pip:2.0.0:*:*:*:*:python:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)

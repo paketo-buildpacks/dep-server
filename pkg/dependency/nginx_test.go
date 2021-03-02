@@ -64,7 +64,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetTagCommitReturns(internal.GithubTagCommit{
 				Tag:  "release-1.0.0",
 				SHA:  "dddddddddddddddddddddddddddddddddddddddd",
-				Date: "2020-06-17T00:00:00Z",
+				Date: time.Date(2020, 06, 17, 0, 0, 0, 0, time.UTC),
 			}, nil)
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
@@ -73,12 +73,13 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			actualDepVersion, err := nginx.GetDependencyVersion("1.0.0")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 06, 17, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "1.0.0",
 				URI:             "http://nginx.org/download/nginx-1.0.0.tar.gz",
 				SHA:             "some-source-sha",
-				ReleaseDate:     "2020-06-17T00:00:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:nginx:nginx:1.0.0:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)
@@ -100,7 +101,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetTagCommitReturns(internal.GithubTagCommit{
 				Tag:  "release-1.0.0",
 				SHA:  "dddddddddddddddddddddddddddddddddddddddd",
-				Date: "2020-06-17T00:00:00Z",
+				Date: time.Date(2020, 06, 17, 0, 0, 0, 0, time.UTC),
 			}, nil)
 
 			releaseDate, err := nginx.GetReleaseDate("1.0.0")

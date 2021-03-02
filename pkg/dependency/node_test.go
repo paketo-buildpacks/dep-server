@@ -104,12 +104,14 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 02, 20, 0, 0, 0, 0, time.UTC)
+			expectedDeprecationDate := time.Date(2020, 06, 01, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "v13.9.0",
 				URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
 				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				ReleaseDate:     "2020-02-20T00:00:00Z",
-				DeprecationDate: "2020-06-01T00:00:00Z",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
 			}
 
@@ -142,12 +144,14 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.ta
 
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2015, 01, 30, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2016, 06, 01, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
 					Version:         "v0.8.0",
 					URI:             "https://nodejs.org/dist/v0.8.0/node-v0.8.0.tar.gz",
 					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					ReleaseDate:     "2015-01-30T00:00:00Z",
-					DeprecationDate: "2016-06-01T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:nodejs:node.js:0.8.0:*:*:*:*:*:*:*",
 				}
 
@@ -178,12 +182,13 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2020, 01, 30, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
 					Version:         "v13.9.0",
 					URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
 					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					ReleaseDate:     "2020-01-30T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
 				}
 

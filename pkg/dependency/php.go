@@ -30,7 +30,7 @@ type PhpRawRelease struct {
 
 type PhpRelease struct {
 	Version string
-	Date    time.Time
+	Date    *time.Time
 	Source  []PhpSource
 }
 
@@ -41,10 +41,10 @@ func (p Php) GetAllVersionRefs() ([]string, error) {
 	}
 
 	sort.Slice(phpReleases, func(i, j int) bool {
-		if phpReleases[i].Date.Equal(phpReleases[j].Date) {
+		if phpReleases[i].Date.Equal(*phpReleases[j].Date) {
 			return phpReleases[i].Version > phpReleases[j].Version
 		}
-		return phpReleases[i].Date.After(phpReleases[j].Date)
+		return phpReleases[i].Date.After(*phpReleases[j].Date)
 	})
 
 	var versions []string
@@ -72,22 +72,22 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get release date: %w", err)
 	}
 
-	deprecationDate := p.calculateDeprecationDate(releaseDate)
+	deprecationDate := p.calculateDeprecationDate(*releaseDate)
 
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
 		SHA:             dependencySHA,
-		ReleaseDate:     releaseDate.Format(time.RFC3339),
+		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:php:php:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 
-func (p Php) GetReleaseDate(version string) (time.Time, error) {
+func (p Php) GetReleaseDate(version string) (*time.Time, error) {
 	release, err := p.getRelease(version)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get release: %w", err)
+		return nil, fmt.Errorf("could not get release: %w", err)
 	}
 
 	return p.getReleaseDate(release)
@@ -182,31 +182,31 @@ func (p Php) getDependencySHA(release PhpRawRelease, version string) (string, er
 	return "", fmt.Errorf("could not find .tar.gz file for %s", version)
 }
 
-func (p Php) getReleaseDate(release PhpRawRelease) (time.Time, error) {
+func (p Php) getReleaseDate(release PhpRawRelease) (*time.Time, error) {
 	if parsedDate, err := time.Parse("02 Jan 2006", release.Date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("2 Jan 2006", release.Date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("02 January 2006", release.Date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("2 January 2006", release.Date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
-	return time.Time{}, fmt.Errorf("release date '%s' did not match any expected patterns", release.Date)
+	return nil, fmt.Errorf("release date '%s' did not match any expected patterns", release.Date)
 }
 
-func (p Php) calculateDeprecationDate(releaseDate time.Time) string {
+func (p Php) calculateDeprecationDate(releaseDate time.Time) *time.Time {
 	deprecationDate := time.Date(releaseDate.Year()+3, releaseDate.Month(), releaseDate.Day(),
 		0, 0, 0, 0, time.UTC)
 
-	return deprecationDate.Format(time.RFC3339)
+	return &deprecationDate
 }
 
 func (p Php) dependencyURL(release PhpRawRelease, version string) string {
@@ -218,24 +218,24 @@ func (p Php) dependencyURL(release PhpRawRelease, version string) string {
 	return fmt.Sprintf("https://www.php.net/distributions/php-%s.tar.gz", version)
 }
 
-func (p Php) parseReleaseDate(date string) (time.Time, error) {
+func (p Php) parseReleaseDate(date string) (*time.Time, error) {
 	if parsedDate, err := time.Parse("02 Jan 2006", date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("2 Jan 2006", date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("02 January 2006", date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
 	if parsedDate, err := time.Parse("2 January 2006", date); err == nil {
-		return parsedDate, nil
+		return &parsedDate, nil
 	}
 
-	return time.Time{}, fmt.Errorf("release date '%s' did not match any expected patterns", date)
+	return nil, fmt.Errorf("release date '%s' did not match any expected patterns", date)
 }
 
 func (p Php) getSHA256FromReleaseFile(release PhpRawRelease, file PhpSource, version string) (string, error) {

@@ -73,11 +73,12 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 			actualDep, err := curl.GetDependencyVersion("7.73.0")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 10, 14, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:     "7.73.0",
 				URI:         "https://curl.se/download/curl-7.73.0.tar.gz",
 				SHA:         "some-source-sha",
-				ReleaseDate: "2020-10-14T00:00:00Z",
+				ReleaseDate: &expectedReleaseDate,
 				CPE:         "cpe:2.3:a:haxx:curl:7.73.0:*:*:*:*:*:*:*",
 			}
 
@@ -113,11 +114,12 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				actualDep, err := curl.GetDependencyVersion("7.29.0")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2013, 02, 06, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
 					Version:     "7.29.0",
 					URI:         "https://curl.se/download/archeology/curl-7.29.0.tar.gz",
 					SHA:         "some-source-sha",
-					ReleaseDate: "2013-02-06T00:00:00Z",
+					ReleaseDate: &expectedReleaseDate,
 					CPE:         "cpe:2.3:a:haxx:curl:7.29.0:*:*:*:*:*:*:*",
 				}
 

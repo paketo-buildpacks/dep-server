@@ -34,17 +34,17 @@ type FakeDependency struct {
 		result1 dependency.DepVersion
 		result2 error
 	}
-	GetReleaseDateStub        func(string) (time.Time, error)
+	GetReleaseDateStub        func(string) (*time.Time, error)
 	getReleaseDateMutex       sync.RWMutex
 	getReleaseDateArgsForCall []struct {
 		arg1 string
 	}
 	getReleaseDateReturns struct {
-		result1 time.Time
+		result1 *time.Time
 		result2 error
 	}
 	getReleaseDateReturnsOnCall map[int]struct {
-		result1 time.Time
+		result1 *time.Time
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -171,7 +171,7 @@ func (fake *FakeDependency) GetDependencyVersionReturnsOnCall(i int, result1 dep
 	}{result1, result2}
 }
 
-func (fake *FakeDependency) GetReleaseDate(arg1 string) (time.Time, error) {
+func (fake *FakeDependency) GetReleaseDate(arg1 string) (*time.Time, error) {
 	fake.getReleaseDateMutex.Lock()
 	ret, specificReturn := fake.getReleaseDateReturnsOnCall[len(fake.getReleaseDateArgsForCall)]
 	fake.getReleaseDateArgsForCall = append(fake.getReleaseDateArgsForCall, struct {
@@ -196,7 +196,7 @@ func (fake *FakeDependency) GetReleaseDateCallCount() int {
 	return len(fake.getReleaseDateArgsForCall)
 }
 
-func (fake *FakeDependency) GetReleaseDateCalls(stub func(string) (time.Time, error)) {
+func (fake *FakeDependency) GetReleaseDateCalls(stub func(string) (*time.Time, error)) {
 	fake.getReleaseDateMutex.Lock()
 	defer fake.getReleaseDateMutex.Unlock()
 	fake.GetReleaseDateStub = stub
@@ -209,28 +209,28 @@ func (fake *FakeDependency) GetReleaseDateArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeDependency) GetReleaseDateReturns(result1 time.Time, result2 error) {
+func (fake *FakeDependency) GetReleaseDateReturns(result1 *time.Time, result2 error) {
 	fake.getReleaseDateMutex.Lock()
 	defer fake.getReleaseDateMutex.Unlock()
 	fake.GetReleaseDateStub = nil
 	fake.getReleaseDateReturns = struct {
-		result1 time.Time
+		result1 *time.Time
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeDependency) GetReleaseDateReturnsOnCall(i int, result1 time.Time, result2 error) {
+func (fake *FakeDependency) GetReleaseDateReturnsOnCall(i int, result1 *time.Time, result2 error) {
 	fake.getReleaseDateMutex.Lock()
 	defer fake.getReleaseDateMutex.Unlock()
 	fake.GetReleaseDateStub = nil
 	if fake.getReleaseDateReturnsOnCall == nil {
 		fake.getReleaseDateReturnsOnCall = make(map[int]struct {
-			result1 time.Time
+			result1 *time.Time
 			result2 error
 		})
 	}
 	fake.getReleaseDateReturnsOnCall[i] = struct {
-		result1 time.Time
+		result1 *time.Time
 		result2 error
 	}{result1, result2}
 }

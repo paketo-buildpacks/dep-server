@@ -111,6 +111,8 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetDependencyVersion", func() {
+		var expectedReleaseDate = time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
+
 		it("returns the correct go version", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 [
@@ -149,8 +151,8 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				Version:         "go1.13.9",
 				URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 				SHA:             "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-				ReleaseDate:     "2020-03-19T00:00:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -188,8 +190,8 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 					Version:         "go1.13.9",
 					URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 					SHA:             "some-source-sha",
-					ReleaseDate:     "2020-03-19T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)

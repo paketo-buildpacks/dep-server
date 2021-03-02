@@ -48,12 +48,16 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 
 	for _, release := range bundlerReleases {
 		if release.Version == version {
+			releaseDate, err := time.Parse(time.RFC3339Nano, release.Date)
+			if err != nil {
+				return DepVersion{}, fmt.Errorf("could not parse release date: %w", err)
+			}
 			return DepVersion{
 				Version:         version,
 				URI:             depURL,
 				SHA:             release.SHA,
-				ReleaseDate:     release.Date,
-				DeprecationDate: "",
+				ReleaseDate:     &releaseDate,
+				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:bundler:bundler:%s:*:*:*:*:ruby:*:*", version),
 			}, nil
 		}
@@ -62,23 +66,23 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
-func (b Bundler) GetReleaseDate(version string) (time.Time, error) {
+func (b Bundler) GetReleaseDate(version string) (*time.Time, error) {
 	bundlerReleases, err := b.getAllReleases()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range bundlerReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse(time.RFC3339Nano, release.Date)
 			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+				return nil, fmt.Errorf("could not parse release date: %w", err)
 			}
-			return releaseDate, nil
+			return &releaseDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (b Bundler) getAllReleases() ([]BundlerRelease, error) {

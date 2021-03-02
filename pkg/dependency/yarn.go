@@ -74,23 +74,19 @@ func (y Yarn) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find yarn version %s", version)
 }
 
-func (y Yarn) GetReleaseDate(version string) (time.Time, error) {
+func (y Yarn) GetReleaseDate(version string) (*time.Time, error) {
 	releases, err := y.githubClient.GetReleaseTags("yarnpkg", "yarn")
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range releases {
 		if release.TagName == version {
-			releaseDate, err := time.Parse(time.RFC3339, release.PublishedDate)
-			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
-			}
-			return releaseDate, nil
+			return &release.PublishedDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (y Yarn) createDependencyVersion(version, tagName string, release internal.GithubRelease) (DepVersion, error) {
@@ -146,8 +142,8 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
 		SHA:             dependencySHA,
-		ReleaseDate:     release.PublishedDate,
-		DeprecationDate: "",
+		ReleaseDate:     &release.PublishedDate,
+		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:yarnpkg:yarn:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }

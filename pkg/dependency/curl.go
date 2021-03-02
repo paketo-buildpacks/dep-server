@@ -61,19 +61,19 @@ func (c Curl) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
-func (c Curl) GetReleaseDate(version string) (time.Time, error) {
+func (c Curl) GetReleaseDate(version string) (*time.Time, error) {
 	curlReleases, err := c.getAllReleases()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range curlReleases {
 		if release.Version == version {
-			return release.Date, nil
+			return &release.Date, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (c Curl) getAllReleases() ([]CurlRelease, error) {
@@ -128,7 +128,7 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 		Version:     release.Version,
 		URI:         c.dependencyURL(release),
 		SHA:         sha,
-		ReleaseDate: release.Date.Format(time.RFC3339),
+		ReleaseDate: &release.Date,
 		CPE:         fmt.Sprintf("cpe:2.3:a:haxx:curl:%s:*:*:*:*:*:*:*", release.Version),
 	}, nil
 }

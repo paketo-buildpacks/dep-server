@@ -61,13 +61,13 @@ func (c CAAPM) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:         version,
 		URI:             dependencyURL,
 		SHA:             dependencySHA,
-		ReleaseDate:     "",
-		DeprecationDate: "",
+		ReleaseDate:     nil,
+		DeprecationDate: nil,
 	}, nil
 }
 
-func (c CAAPM) GetReleaseDate(version string) (time.Time, error) {
-	return time.Time{}, fmt.Errorf("cannot determine release dates for CAAPM")
+func (c CAAPM) GetReleaseDate(_ string) (*time.Time, error) {
+	return nil, fmt.Errorf("cannot determine release dates for CAAPM")
 }
 
 func (c CAAPM) dependencyURL(version string) string {

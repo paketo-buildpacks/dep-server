@@ -46,23 +46,23 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "v3.0.0",
-					PublishedDate: "2020-06-30T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 30, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v1.0.1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 28, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v2.0.0-exp.1",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 28, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v1.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 
@@ -83,11 +83,11 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "v2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 28, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v1.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 			assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
@@ -100,12 +100,13 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			actualDep, err := yarn.GetDependencyVersion("1.0.0")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.0",
 				URI:             "some-source-url",
 				SHA:             "some-source-sha",
-				ReleaseDate:     "2020-06-27T00:00:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:yarnpkg:yarn:1.0.0:*:*:*:*:*:*:*",
 			}
 
@@ -136,7 +137,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 					{
 						TagName:       "v1.0.0",
-						PublishedDate: "2020-06-27T00:00:00Z",
+						PublishedDate: time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC),
 					},
 				}, nil)
 				assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
@@ -157,11 +158,11 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "v2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 28, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v1.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 

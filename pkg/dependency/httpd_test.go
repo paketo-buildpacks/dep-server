@@ -66,6 +66,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetDependencyVersion", func() {
+		var expectedReleaseDate = time.Date(2020, 03, 30, 14, 21, 0, 0, time.UTC)
+
 		it("returns the correct httpd version", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(httpdIndex2443), nil)
 
@@ -78,8 +80,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				Version:         "2.4.43",
 				URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
 				SHA:             "some-sha256",
-				ReleaseDate:     "2020-03-30T14:21:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 			}
 
@@ -108,8 +110,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-03-30T14:21:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 				}
 
@@ -166,8 +168,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-03-30T14:21:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
 				}
 
@@ -216,12 +218,13 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				actualDepVersion, err := httpd.GetDependencyVersion("2.2.3")
 				require.NoError(err)
 
+				expectedReleaseDate223 := time.Date(2006, 07, 27, 17, 39, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.2.3",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.2.3.tar.bz2",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2006-07-27T17:39:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate223,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.2.3:*:*:*:*:*:*:*",
 				}
 

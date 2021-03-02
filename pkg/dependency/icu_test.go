@@ -44,17 +44,17 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 	when("GetAllVersionRefs", func() {
 		it("returns all ICU release versions with newest versions first", func() {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{TagName: "release-59-1", CreatedDate: "2017-04-13T13:46:59Z"},
-				{TagName: "release-60-1", CreatedDate: "2017-10-31T15:14:15Z"},
-				{TagName: "release-60-2", CreatedDate: "2017-12-13T20:01:38Z"},
-				{TagName: "release-67-1", CreatedDate: "2020-04-22T17:49:10Z"},
-				{TagName: "release-66-1", CreatedDate: "2020-03-11T17:21:07Z"},
-				{TagName: "release-66-1-99", CreatedDate: "2020-03-12T17:21:07Z"},
-				{TagName: "release-65-1", CreatedDate: "2019-10-02T21:30:54Z"},
-				{TagName: "release-60-3", CreatedDate: "2019-04-11T18:44:36Z"},
-				{TagName: "release-59-2", CreatedDate: "2019-04-11T18:43:42Z"},
-				{TagName: "release-4-8-2", CreatedDate: "2019-04-11T18:17:52Z"},
-				{TagName: "release-99-99", CreatedDate: "2019-04-11T18:17:52Z"},
+				{TagName: "release-59-1", CreatedDate: time.Date(2017, 04, 13, 13, 46, 59, 0, time.UTC)},
+				{TagName: "release-60-1", CreatedDate: time.Date(2017, 10, 31, 15, 14, 15, 0, time.UTC)},
+				{TagName: "release-60-2", CreatedDate: time.Date(2017, 12, 13, 20, 01, 38, 0, time.UTC)},
+				{TagName: "release-67-1", CreatedDate: time.Date(2020, 04, 22, 17, 49, 10, 0, time.UTC)},
+				{TagName: "release-66-1", CreatedDate: time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)},
+				{TagName: "release-66-1-99", CreatedDate: time.Date(2020, 03, 12, 17, 21, 07, 0, time.UTC)},
+				{TagName: "release-65-1", CreatedDate: time.Date(2019, 10, 02, 21, 30, 54, 0, time.UTC)},
+				{TagName: "release-60-3", CreatedDate: time.Date(2019, 04, 11, 18, 44, 36, 0, time.UTC)},
+				{TagName: "release-59-2", CreatedDate: time.Date(2019, 04, 11, 18, 43, 42, 0, time.UTC)},
+				{TagName: "release-4-8-2", CreatedDate: time.Date(2019, 04, 11, 18, 17, 52, 0, time.UTC)},
+				{TagName: "release-99-99", CreatedDate: time.Date(2019, 04, 11, 18, 17, 52, 0, time.UTC)},
 			}, nil)
 
 			versions, err := icu.GetAllVersionRefs()
@@ -83,9 +83,9 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 	when("GetDependencyVersion", func() {
 		it("returns the correct ICU version", func() {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{TagName: "release-67-1", CreatedDate: "2020-04-22T17:49:10Z"},
-				{TagName: "release-66-1", CreatedDate: "2020-03-11T17:21:07Z"},
-				{TagName: "release-65-1", CreatedDate: "2019-10-02T21:30:54Z"},
+				{TagName: "release-67-1", CreatedDate: time.Date(2020, 04, 22, 17, 49, 10, 0, time.UTC)},
+				{TagName: "release-66-1", CreatedDate: time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)},
+				{TagName: "release-65-1", CreatedDate: time.Date(2020, 10, 02, 21, 30, 54, 0, time.UTC)},
 			}, nil)
 			assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
@@ -98,12 +98,13 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 			actualDep, err := icu.GetDependencyVersion("66.1")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "66.1",
 				URI:             "some-source-url",
 				SHA:             "some-source-sha",
-				ReleaseDate:     "2020-03-11T17:21:07Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:66.1:*:*:*:*:c\/c\+\+:*:*`,
 			}
 
@@ -134,9 +135,9 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 		when("getting a version prior to 49", func() {
 			it("returns the correct ICU version", func() {
 				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-					{TagName: "release-4-8-3", CreatedDate: "2019-04-12T18:17:52Z"},
-					{TagName: "release-4-8-2", CreatedDate: "2019-04-11T18:17:52Z"},
-					{TagName: "release-4-8-1", CreatedDate: "2019-04-10T18:17:52Z"},
+					{TagName: "release-4-8-3", CreatedDate: time.Date(2019, 04, 12, 18, 17, 52, 0, time.UTC)},
+					{TagName: "release-4-8-2", CreatedDate: time.Date(2019, 04, 11, 18, 17, 52, 0, time.UTC)},
+					{TagName: "release-4-8-1", CreatedDate: time.Date(2019, 04, 10, 18, 17, 52, 0, time.UTC)},
 				}, nil)
 				assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
 				fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
@@ -148,12 +149,13 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				actualDep, err := icu.GetDependencyVersion("4.8.2")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2019, 04, 11, 18, 17, 52, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
 					Version:         "4.8.2",
 					URI:             "some-source-url",
 					SHA:             "some-source-sha",
-					ReleaseDate:     "2019-04-11T18:17:52Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:4.8.2:*:*:*:*:c\/c\+\+:*:*`,
 				}
 
@@ -179,7 +181,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 		when("the asset cannot be found", func() {
 			it("returns a NoSourceCode error", func() {
 				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-					{TagName: "release-66-1", CreatedDate: "2020-03-11T17:21:07Z"},
+					{TagName: "release-66-1", CreatedDate: time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)},
 				}, nil)
 				assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
 				fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
@@ -197,9 +199,9 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 	when("GetReleaseDate", func() {
 		it("returns the correct ICU release date", func() {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{TagName: "release-67-1", CreatedDate: "2020-04-22T17:49:10Z"},
-				{TagName: "release-66-1", CreatedDate: "2020-03-11T17:21:07Z"},
-				{TagName: "release-65-1", CreatedDate: "2019-10-02T21:30:54Z"},
+				{TagName: "release-67-1", CreatedDate: time.Date(2020, 04, 22, 17, 49, 10, 0, time.UTC)},
+				{TagName: "release-66-1", CreatedDate: time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)},
+				{TagName: "release-65-1", CreatedDate: time.Date(2019, 10, 02, 21, 30, 54, 0, time.UTC)},
 			}, nil)
 
 			releaseDate, err := icu.GetReleaseDate("66.1")
