@@ -16,6 +16,8 @@ jobs:
 
     - name: Check out code
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
     - name: Checkout Branch
       uses: paketo-buildpacks/github-config/actions/pull-request/checkout-branch@main
