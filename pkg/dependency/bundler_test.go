@@ -1,14 +1,16 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestBundler(t *testing.T) {
@@ -268,12 +270,13 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 			actualDepVersion, err := bundler.GetDependencyVersion("2.1.3")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 01, 02, 12, 29, 43, 745000000, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "2.1.3",
 				URI:             "https://rubygems.org/downloads/bundler-2.1.3.gem",
 				SHA:             "9b9a9a5685121403eda1ae148ed3a34c86418f2a2beec7df82a45d4baca0e5d2",
-				ReleaseDate:     "2020-01-02T12:29:43.745Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:bundler:bundler:2.1.3:*:*:*:*:ruby:*:*",
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)

@@ -140,12 +140,13 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 				actualDepVersion, err := ruby.GetDependencyVersion("3.0.0")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2020, 12, 25, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "3.0.0",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.0.tar.gz",
 					SHA:             "some-sha-256-gz",
-					ReleaseDate:     "2020-12-25T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:3.0.0:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -180,12 +181,13 @@ ruby-1.6.7	https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz	some-sha-1
 				actualDepVersion, err := ruby.GetDependencyVersion("1.6.7")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2002, 3, 1, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "1.6.7",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz",
 					SHA:             "some-sha-256",
-					ReleaseDate:     "2002-03-01T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:1.6.7:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -243,12 +245,13 @@ ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1
 				actualDepVersion, err := ruby.GetDependencyVersion("2.6.6")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2020, 4, 20, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.6.6",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz",
 					SHA:             "some-sha-256-gz",
-					ReleaseDate:     "2020-04-20T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:2.6.6:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -315,12 +318,13 @@ ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-s
 					actualDepVersion, err := ruby.GetDependencyVersion("1.9.0")
 					require.NoError(err)
 
+					expectedReleaseDate := time.Date(2007, 12, 25, 0, 0, 0, 0, time.UTC)
 					expectedDepVersion := dependency.DepVersion{
 						Version:         "1.9.0",
 						URI:             "https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz",
 						SHA:             "some-sha-256",
-						ReleaseDate:     "2007-12-25T00:00:00Z",
-						DeprecationDate: "",
+						ReleaseDate:     &expectedReleaseDate,
+						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.0:*:*:*:*:*:*:*",
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)
@@ -388,12 +392,13 @@ ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some
 					actualDepVersion, err := ruby.GetDependencyVersion("1.9.1")
 					require.NoError(err)
 
+					expectedReleaseDate := time.Date(2009, 1, 30, 0, 0, 0, 0, time.UTC)
 					expectedDepVersion := dependency.DepVersion{
 						Version:         "1.9.1",
 						URI:             "https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz",
 						SHA:             "some-sha-256",
-						ReleaseDate:     "2009-01-30T00:00:00Z",
-						DeprecationDate: "",
+						ReleaseDate:     &expectedReleaseDate,
+						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.1:*:*:*:*:*:*:*",
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)

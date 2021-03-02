@@ -46,25 +46,20 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:         version,
 		URI:             dependencyURL,
 		SHA:             sha,
-		ReleaseDate:     tagCommit.Date,
-		DeprecationDate: "",
+		ReleaseDate:     &tagCommit.Date,
+		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nginx:nginx:%s:*:*:*:*:*:*:*", version),
 	}, nil
 }
 
-func (n Nginx) GetReleaseDate(version string) (time.Time, error) {
+func (n Nginx) GetReleaseDate(version string) (*time.Time, error) {
 	tagName := "release-" + version
 	tagCommit, err := n.githubClient.GetTagCommit("nginx", "nginx", tagName)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get tags: %w", err)
+		return nil, fmt.Errorf("could not get tags: %w", err)
 	}
 
-	releaseDate, err := time.Parse(time.RFC3339, tagCommit.Date)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
-	}
-
-	return releaseDate, nil
+	return &tagCommit.Date, nil
 }
 
 func (n Nginx) getDependencySHA(dependencyURL, version string) (string, error) {

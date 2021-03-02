@@ -3,6 +3,8 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
 )
 
@@ -11,8 +13,8 @@ type GithubReleaseResponse struct {
 	Draft       bool                 `json:"draft"`
 	Prerelease  bool                 `json:"prerelease"`
 	Assets      []GithubReleaseAsset `json:"assets"`
-	PublishedAt string               `json:"published_at"`
-	CreatedAt   string               `json:"created_at"`
+	PublishedAt time.Time            `json:"published_at"`
+	CreatedAt   time.Time            `json:"created_at"`
 }
 
 type GithubReleaseAsset struct {
@@ -22,8 +24,8 @@ type GithubReleaseAsset struct {
 
 type GithubRelease struct {
 	TagName       string
-	PublishedDate string
-	CreatedDate   string
+	PublishedDate time.Time
+	CreatedDate   time.Time
 }
 
 type GithubTagResponse struct {
@@ -35,14 +37,14 @@ type GithubTagResponse struct {
 type GithubTagCommit struct {
 	Tag  string
 	SHA  string
-	Date string
+	Date time.Time
 }
 
 type GithubCommitResponse struct {
 	SHA    string `json:"sha"`
 	Commit struct {
 		Committer struct {
-			Date string `json:"date"`
+			Date time.Time `json:"date"`
 		} `json:"committer"`
 	} `json:"commit"`
 }

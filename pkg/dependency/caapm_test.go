@@ -1,13 +1,15 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestCAAPM(t *testing.T) {
@@ -78,8 +80,8 @@ func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 				Version:         "20.1.0",
 				URI:             "https://ca.bintray.com/apm-agents/CA-APM-PHPAgent-20.1.0_linux.tar.gz",
 				SHA:             "some-source-sha",
-				ReleaseDate:     "",
-				DeprecationDate: "",
+				ReleaseDate:     nil,
+				DeprecationDate: nil,
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)

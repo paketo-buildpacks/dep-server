@@ -29,7 +29,7 @@ func (d DotnetASPNETCore) GetDependencyVersion(version string) (DepVersion, erro
 	}.GetDependencyVersion(version)
 }
 
-func (d DotnetASPNETCore) GetReleaseDate(version string) (time.Time, error) {
+func (d DotnetASPNETCore) GetReleaseDate(version string) (*time.Time, error) {
 	return dotnet{
 		dotnetType:  dotnetASPNETCoreType{},
 		checksummer: d.checksummer,
@@ -41,13 +41,17 @@ func (d dotnetASPNETCoreType) getChannelVersion(version string) string {
 	return strings.Join(strings.Split(version, ".")[0:2], ".")
 }
 
-func (d dotnetASPNETCoreType) getReleaseDate(channel DotnetChannel, version string) string {
+func (d dotnetASPNETCoreType) getReleaseDate(channel DotnetChannel, version string) (*time.Time, error) {
 	for _, release := range channel.Releases {
 		if release.ASPNETCoreRuntime.Version == version {
-			return release.ReleaseDate
+			releaseDate, err := time.Parse("2006-01-02", release.ReleaseDate)
+			if err != nil {
+				return nil, fmt.Errorf("could not parse release date: %w", err)
+			}
+			return &releaseDate, nil
 		}
 	}
-	return ""
+	return nil, nil
 }
 
 func (d dotnetASPNETCoreType) getReleaseFiles(channel DotnetChannel, version string) []DotnetChannelReleaseFile {

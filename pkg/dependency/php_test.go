@@ -153,12 +153,14 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			actualDepVersion, err := php.GetDependencyVersion("7.4.4")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
+			expectedDeprecationDate := time.Date(2023, 03, 19, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "7.4.4",
 				URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
 				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				ReleaseDate:     "2020-03-19T00:00:00Z",
-				DeprecationDate: "2023-03-19T00:00:00Z",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
 			}
 
@@ -188,12 +190,14 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				actualDepVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2023, 03, 19, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "7.4.4",
 					URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-03-19T00:00:00Z",
-					DeprecationDate: "2023-03-19T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -226,12 +230,14 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				actualDepVersion, err := php.GetDependencyVersion("5.3.25")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2013, 05, 9, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2016, 05, 9, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.3.25",
 					URI:             "https://www.php.net/distributions/php-5.3.25.tar.gz",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2013-05-09T00:00:00Z",
-					DeprecationDate: "2016-05-09T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.3.25:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -258,12 +264,14 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				actualDepVersion, err := php.GetDependencyVersion("5.1.6")
 				require.NoError(err)
 
+				expectedReleaseDate := time.Date(2006, 8, 24, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2009, 8, 24, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.1.6",
 					URI:             "https://www.php.net/distributions/php-5.1.6.tar.gz",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2006-08-24T00:00:00Z",
-					DeprecationDate: "2009-08-24T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.1.6:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -315,7 +323,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
-				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate)
+				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
 			})
 		})
 
@@ -338,7 +346,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
-				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate)
+				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
 			})
 		})
 
@@ -361,7 +369,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
-				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate)
+				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
 			})
 		})
 

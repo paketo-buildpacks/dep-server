@@ -58,23 +58,19 @@ func (p PyPi) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find release with version %s: %w", version, err)
 }
 
-func (p PyPi) GetReleaseDate(version string) (time.Time, error) {
+func (p PyPi) GetReleaseDate(version string) (*time.Time, error) {
 	releases, err := p.getReleases()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range releases {
 		if release.Version == version {
-			releaseDate, err := time.Parse(time.RFC3339, release.ReleaseDate)
-			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
-			}
-			return releaseDate, nil
+			return release.ReleaseDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (p PyPi) getReleases() ([]DepVersion, error) {
@@ -124,7 +120,7 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 				Version:     version,
 				URI:         release.URL,
 				SHA:         release.Digests["sha256"],
-				ReleaseDate: uploadTime.Format(time.RFC3339),
+				ReleaseDate: &uploadTime,
 				CPE:         cpe,
 			})
 		}
@@ -136,8 +132,8 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 func (p PyPi) sortReleases(releases []DepVersion) error {
 	var sortErr error
 	sort.Slice(releases, func(i, j int) bool {
-		if releases[i].ReleaseDate != releases[j].ReleaseDate {
-			return releases[i].ReleaseDate > releases[j].ReleaseDate
+		if *releases[i].ReleaseDate != *releases[j].ReleaseDate {
+			return releases[i].ReleaseDate.After(*releases[j].ReleaseDate)
 		}
 
 		semver1, err := semver.NewVersion(releases[i].Version)

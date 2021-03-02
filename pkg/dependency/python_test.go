@@ -74,12 +74,14 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 			actualDepVersion, err := python.GetDependencyVersion("3.7.8")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
+			expectedDeprecationDate := time.Date(2023, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "3.7.8",
 				URI:             "https://www.python.org/ftp/python/3.7.8/Python-3.7.8.tgz",
 				SHA:             "some-sha256",
-				ReleaseDate:     "2020-06-27T00:00:00Z",
-				DeprecationDate: "2023-06-27T00:00:00Z",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:python:python:3.7.8:*:*:*:*:*:*:*",
 			}
 
@@ -101,7 +103,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := python.GetDependencyVersion("3.7.8")
 				require.NoError(err)
 
-				assert.Equal("2020-09-02T00:00:00Z", depVersion.ReleaseDate)
+				assert.Equal("2020-09-02T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
 			})
 		})
 
@@ -114,7 +116,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := python.GetDependencyVersion("3.7.8")
 				require.NoError(err)
 
-				assert.Equal("2023-06-01T00:00:00Z", depVersion.DeprecationDate)
+				assert.Equal("2023-06-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
 			})
 		})
 

@@ -184,6 +184,11 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetDependencyVersion", func() {
+		var (
+			expectedReleaseDate = time.Date(2020, 02, 20, 0, 0, 0, 0, time.UTC)
+			expectedDeprecationDate = time.Date(2050, 02, 20, 0, 0, 0, 0, time.UTC)
+		)
+
 		it("returns the correct dotnet runtime version", func() {
 			fakeWebClient.GetReturns([]byte(`
 {
@@ -255,8 +260,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 				Version:         "2.0.1",
 				URI:             "url-for-linux-x64-2.0.1",
 				SHA:             "some-sha256",
-				ReleaseDate:     "2020-02-20T00:00:00Z",
-				DeprecationDate: "2050-02-20T00:00:00Z",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -343,8 +348,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					Version:         "5.0.1",
 					URI:             "url-for-linux-x64-5.0.1",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-02-20T00:00:00Z",
-					DeprecationDate: "2050-02-20T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net:5.0.1:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -404,8 +409,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.0.1",
 					URI:             "url-for-ubuntu-x64-2.0.1",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-02-20T00:00:00Z",
-					DeprecationDate: "2050-02-20T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -491,8 +496,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.0.1",
 					URI:             "url-for-linux-x64-2.0.1",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-02-20T00:00:00Z",
-					DeprecationDate: "2050-02-20T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -532,8 +537,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.0.1",
 					URI:             "url-for-linux-x64-2.0.1",
 					SHA:             "shaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa256",
-					ReleaseDate:     "2020-02-20T00:00:00Z",
-					DeprecationDate: "2050-02-20T00:00:00Z",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -576,8 +581,8 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					Version:         "2.0.2",
 					URI:             "url-for-linux-x64-2.0.2",
 					SHA:             "some-sha256",
-					ReleaseDate:     "2020-02-20T00:00:00Z",
-					DeprecationDate: "",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.2:*:*:*:*:*:*:*",
 				}
 				assert.Equal(expectedDep, actualDep)

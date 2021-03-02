@@ -59,7 +59,7 @@ type DotnetChannelReleaseFile struct {
 
 type dotnetType interface {
 	getChannelVersion(version string) string
-	getReleaseDate(channel DotnetChannel, version string) string
+	getReleaseDate(channel DotnetChannel, version string) (*time.Time, error)
 	getReleaseFiles(channel DotnetChannel, version string) []DotnetChannelReleaseFile
 	getReleaseVersions(release DotnetChannelRelease) []string
 	versionShouldBeIgnored(version string) bool
@@ -112,7 +112,10 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get sha: %w", err)
 	}
 
-	releaseDate := d.dotnetType.getReleaseDate(channel, version)
+	releaseDate, err := d.dotnetType.getReleaseDate(channel, version)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("error getting release date: %w", err)
+	}
 
 	cpe, err := d.dotnetType.getCPE(version)
 	if err != nil {
@@ -122,22 +125,26 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:     version,
 		URI:         releaseFile.URL,
 		SHA:         sha256,
-		ReleaseDate: releaseDate + "T00:00:00Z",
+		ReleaseDate: releaseDate,
 		CPE:         cpe,
 	}
 	if channel.EOLDate != "" {
-		depVersion.DeprecationDate = channel.EOLDate + "T00:00:00Z"
+		deprecationDate, err := time.Parse("2006-01-02", channel.EOLDate)
+		if err != nil {
+			return DepVersion{}, fmt.Errorf("could not parse EOL date: %w", err)
+		}
+		depVersion.DeprecationDate = &deprecationDate
 	}
 	return depVersion, nil
 }
 
-func (d dotnet) GetReleaseDate(version string) (time.Time, error) {
+func (d dotnet) GetReleaseDate(version string) (*time.Time, error) {
 	channel, err := d.getChannel(version)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get channel: %w", err)
+		return nil, fmt.Errorf("could not get channel: %w", err)
 	}
 
-	return time.Parse("2006-01-02", d.dotnetType.getReleaseDate(channel, version))
+	return d.dotnetType.getReleaseDate(channel, version)
 }
 
 func (d dotnet) getAllChannelVersions() ([]string, error) {

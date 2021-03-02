@@ -3,17 +3,18 @@ package acceptance_test
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strings"
+	"testing"
+
 	"github.com/Masterminds/semver"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	derrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
-	"strings"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	derrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
 const githubAccessTokenEnvVar = "GITHUB_ACCESS_TOKEN"
@@ -92,18 +93,14 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 						}
 
 						if depName != "CAAPM" {
-							_, err = time.Parse(time.RFC3339, depVersion.ReleaseDate)
-							require.NoError(err, "could not parse release date for %s %s", depName, version)
-						}
-
-						if depVersion.DeprecationDate != "" {
-							_, err = time.Parse(time.RFC3339, depVersion.DeprecationDate)
-							require.NoError(err, "could not parse deprecation date for %s %s", depName, version)
+							assert.False(depVersion.ReleaseDate.IsZero())
 						}
 					}
 
-					for i := 0; i < len(depVersions)-1; i++ {
-						assert.GreaterOrEqual(depVersions[0].ReleaseDate, depVersions[1].ReleaseDate)
+					if depName != "CAAPM" {
+						for i := 0; i < len(depVersions)-1; i++ {
+							assert.True(depVersions[0].ReleaseDate.After(*depVersions[1].ReleaseDate) || depVersions[0].ReleaseDate.Equal(*depVersions[1].ReleaseDate))
+						}
 					}
 				})
 			}(depName)

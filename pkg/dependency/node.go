@@ -65,23 +65,23 @@ func (n Node) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
-func (n Node) GetReleaseDate(version string) (time.Time, error) {
+func (n Node) GetReleaseDate(version string) (*time.Time, error) {
 	nodeReleases, err := n.getAllReleases()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range nodeReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse("2006-01-02", release.Date)
 			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+				return nil, fmt.Errorf("could not parse release date: %w", err)
 			}
-			return releaseDate, nil
+			return &releaseDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (n Node) getAllReleases() ([]NodeRelease, error) {
@@ -115,7 +115,7 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 		Version:         release.Version,
 		URI:             n.dependencyURL(release.Version),
 		SHA:             sha,
-		ReleaseDate:     releaseDate.Format(time.RFC3339),
+		ReleaseDate:     &releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(release.Version, "v")),
 	}, nil
@@ -138,22 +138,22 @@ func (n Node) getReleaseSchedule() (ReleaseSchedule, error) {
 	return releaseSchedule, nil
 }
 
-func (n Node) getDeprecationDate(version string, releaseSchedule ReleaseSchedule) string {
+func (n Node) getDeprecationDate(version string, releaseSchedule ReleaseSchedule) *time.Time {
 	versionIndex := strings.Split(version, ".")[0]
 	if versionIndex == "v0" {
 		versionIndex = strings.Join(strings.Split(version, ".")[0:2], ".")
 	}
 	release, ok := releaseSchedule[versionIndex]
 	if !ok {
-		return ""
+		return nil
 	}
 
 	deprecationDate, err := time.Parse("2006-01-02", release.End)
 	if err != nil {
-		return ""
+		return nil
 	}
 
-	return deprecationDate.Format(time.RFC3339)
+	return &deprecationDate
 }
 
 func (n Node) getDependencySHA(version string) (string, error) {

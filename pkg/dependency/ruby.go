@@ -57,8 +57,8 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 				Version:         version,
 				URI:             depURL,
 				SHA:             depSHA,
-				ReleaseDate:     releaseDate.Format(time.RFC3339),
-				DeprecationDate: "",
+				ReleaseDate:     &releaseDate,
+				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:ruby-lang:ruby:%s:*:*:*:*:*:*:*", version),
 			}, nil
 		}
@@ -67,23 +67,23 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find version %s", version)
 }
 
-func (r Ruby) GetReleaseDate(version string) (time.Time, error) {
+func (r Ruby) GetReleaseDate(version string) (*time.Time, error) {
 	rubyReleases, err := r.getAllReleases()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not get releases: %w", err)
+		return nil, fmt.Errorf("could not get releases: %w", err)
 	}
 
 	for _, release := range rubyReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse("2006-01-02", release.Date)
 			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
+				return nil, fmt.Errorf("could not parse release date: %w", err)
 			}
-			return releaseDate, nil
+			return &releaseDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find release date for version %s", version)
+	return nil, fmt.Errorf("could not find release date for version %s", version)
 }
 
 func (r Ruby) getAllReleases() ([]RubyRelease, error) {

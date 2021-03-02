@@ -33,7 +33,7 @@ func (i ICU) GetAllVersionRefs() ([]string, error) {
 
 	sort.Slice(releases, func(j, k int) bool {
 		if releases[j].CreatedDate != releases[k].CreatedDate {
-			return releases[j].CreatedDate > releases[k].CreatedDate
+			return releases[j].CreatedDate.After(releases[k].CreatedDate)
 		}
 		return releases[j].TagName > releases[k].TagName
 	})
@@ -64,23 +64,19 @@ func (i ICU) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{}, fmt.Errorf("could not find ICU version %s", version)
 }
 
-func (i ICU) GetReleaseDate(version string) (time.Time, error) {
+func (i ICU) GetReleaseDate(version string) (*time.Time, error) {
 	releases, err := i.getAllVersions()
 	if err != nil {
-		return time.Time{}, err
+		return nil, err
 	}
 
 	for _, release := range releases {
 		if tagToVersion(release.TagName) == version {
-			releaseDate, err := time.Parse(time.RFC3339, release.CreatedDate)
-			if err != nil {
-				return time.Time{}, fmt.Errorf("could not parse release date: %w", err)
-			}
-			return releaseDate, nil
+			return &release.CreatedDate, nil
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("could not find ICU version %s", version)
+	return nil, fmt.Errorf("could not find ICU version %s", version)
 }
 
 func (i ICU) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {
@@ -141,8 +137,8 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
 		SHA:             dependencySHA,
-		ReleaseDate:     release.CreatedDate,
-		DeprecationDate: "",
+		ReleaseDate:     &release.CreatedDate,
+		DeprecationDate: nil,
 		CPE:             fmt.Sprintf(`cpe:2.3:a:icu-project:international_components_for_unicode:%s:*:*:*:*:c\/c\+\+:*:*`, version),
 	}, nil
 }

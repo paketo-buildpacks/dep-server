@@ -2,15 +2,18 @@ package internal_test
 
 import (
 	"errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internalfakes"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"testing"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internalfakes"
 )
 
 func TestGithubClient(t *testing.T) {
@@ -52,21 +55,21 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 			actualReleases, err := githubClient.GetReleaseTags("some-org", "some-repo")
 			require.NoError(err)
 
-			expectedRelases := []internal.GithubRelease{
+			expectedReleases := []internal.GithubRelease{
 				{
 					TagName:       "v1.0.1",
-					PublishedDate: "2020-06-30T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v2.0.0",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "v1.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 27, 0, 0, 0, 0, time.UTC),
 				},
 			}
-			assert.Equal(expectedRelases, actualReleases)
+			assert.Equal(expectedReleases, actualReleases)
 
 			urlArg, optionsArg := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://api.github.com/repos/some-org/some-repo/releases?per_page=100&page=1", urlArg)
@@ -268,7 +271,7 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 			expectedTagCommit := internal.GithubTagCommit{
 				Tag:  "1.0.0",
 				SHA:  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-				Date: "2020-01-31T00:00:00Z",
+				Date: time.Date(2020, 01, 31, 0, 0, 0, 0, time.UTC),
 			}
 
 			assert.Equal(expectedTagCommit, actualTagCommit)

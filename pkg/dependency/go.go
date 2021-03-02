@@ -72,31 +72,31 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 		Version:         version,
 		URI:             g.dependencyURL(version),
 		SHA:             sha,
-		ReleaseDate:     releaseDate.Format(time.RFC3339),
-		DeprecationDate: "",
+		ReleaseDate:     releaseDate,
+		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:golang:go:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "go")),
 	}, nil
 }
 
-func (g Go) GetReleaseDate(version string) (time.Time, error) {
+func (g Go) GetReleaseDate(version string) (*time.Time, error) {
 	body, err := g.webClient.Get("https://golang.org/doc/devel/release.html")
 	if err != nil {
-		return time.Time{}, fmt.Errorf("could not hit golang.org: %w", err)
+		return nil, fmt.Errorf("could not hit golang.org: %w", err)
 	}
 
 	re := regexp.MustCompile(fmt.Sprintf(`%s\s*\(released\s*(.*?)\)`, version))
 	match := re.FindStringSubmatch(string(body))
 
 	if len(match) < 2 {
-		return time.Time{}, fmt.Errorf("could not find release date")
+		return nil, fmt.Errorf("could not find release date")
 	}
 
 	releaseDate, err := time.Parse("2006/01/02", match[1])
 	if err != nil {
-		return time.Time{}, fmt.Errorf("error parsing release date: %w", err)
+		return nil, fmt.Errorf("error parsing release date: %w", err)
 	}
 
-	return releaseDate, nil
+	return &releaseDate, nil
 }
 
 func (g Go) getDependencySHA(version string, releases []GoReleaseWithFiles) (string, error) {

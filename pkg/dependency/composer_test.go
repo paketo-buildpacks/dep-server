@@ -40,38 +40,39 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 
 	when("GetAllVersionRefs", func() {
 		it("returns all composer final release versions with newest versions first", func() {
+			time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC)
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "3.0.0",
-					PublishedDate: "2020-06-30T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "3.0.0-RC",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "3.0.0-beta1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "3.0.0-alpha2",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "3.0.0-alpha1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "1.0.1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "1.0.0",
-					PublishedDate: "2020-06-27T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 27, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 
@@ -90,15 +91,15 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "3.0.0",
-					PublishedDate: "2020-06-30T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "1.0.1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 			fakeWebClient.GetReturnsOnCall(0,
@@ -107,12 +108,13 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			actualDep, err := composer.GetDependencyVersion("1.0.1")
 			require.NoError(err)
 
+			expectedReleaseDate := time.Date(2020, 6, 29, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.1",
 				URI:             "https://getcomposer.org/download/1.0.1/composer.phar",
 				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				ReleaseDate:     "2020-06-29T00:00:00Z",
-				DeprecationDate: "",
+				ReleaseDate:     &expectedReleaseDate,
+				DeprecationDate: nil,
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -126,7 +128,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 					{
 						TagName:       "3.0.0",
-						PublishedDate: "2020-06-30T00:00:00Z",
+						PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
 					},
 				}, nil)
 				fakeWebClient.GetReturnsOnCall(0, nil, nil)
@@ -144,15 +146,15 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 				{
 					TagName:       "3.0.0",
-					PublishedDate: "2020-06-30T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "1.0.1",
-					PublishedDate: "2020-06-29T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
 				},
 				{
 					TagName:       "2.0.0",
-					PublishedDate: "2020-06-28T00:00:00Z",
+					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
 				},
 			}, nil)
 
