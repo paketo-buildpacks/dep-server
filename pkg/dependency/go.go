@@ -3,7 +3,6 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
 type Go struct {
@@ -65,13 +66,13 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 
 	sha, err := g.getDependencySHA(version, goReleasesWithFiles)
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get dependency SHA: %w", err)
+		return DepVersion{}, fmt.Errorf("could not get dependency SHA256: %w", err)
 	}
 
 	return DepVersion{
 		Version:         version,
 		URI:             g.dependencyURL(version),
-		SHA:             sha,
+		SHA256:          sha,
 		ReleaseDate:     releaseDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:golang:go:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "go")),
@@ -114,7 +115,7 @@ func (g Go) getDependencySHA(version string, releases []GoReleaseWithFiles) (str
 	}
 
 	if !foundSHA {
-		return "", fmt.Errorf("could not find SHA for %s: %w", version, errors.NoSourceCodeError{Version: version})
+		return "", fmt.Errorf("could not find SHA256 for %s: %w", version, errors.NoSourceCodeError{Version: version})
 	}
 
 	if sha == "" {

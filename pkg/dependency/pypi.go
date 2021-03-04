@@ -3,10 +3,11 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type PyPi struct {
@@ -119,7 +120,7 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 			releases = append(releases, DepVersion{
 				Version:     version,
 				URI:         release.URL,
-				SHA:         release.Digests["sha256"],
+				SHA256:      release.Digests["sha256"],
 				ReleaseDate: &uploadTime,
 				CPE:         cpe,
 			})

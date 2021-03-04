@@ -2,17 +2,19 @@ package dependency_test
 
 import (
 	"errors"
+	"testing"
+	"time"
+
+	"github.com/sclevine/spec"
+	"github.com/sclevine/spec/report"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
-	"github.com/sclevine/spec"
-	"github.com/sclevine/spec/report"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func TestYarn(t *testing.T) {
@@ -104,7 +106,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.0",
 				URI:             "some-source-url",
-				SHA:             "some-source-sha",
+				SHA256:          "some-source-sha",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:yarnpkg:yarn:1.0.0:*:*:*:*:*:*:*",

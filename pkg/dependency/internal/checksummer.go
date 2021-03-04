@@ -57,11 +57,11 @@ func (c Checksummer) VerifyMD5(path, expectedMD5 string) error {
 func (c Checksummer) VerifySHA1(path, expectedSHA string) error {
 	actualSHA, err := c.getSHA1(path)
 	if err != nil {
-		return fmt.Errorf("failed to get actual SHA: %w", err)
+		return fmt.Errorf("failed to get actual SHA256: %w", err)
 	}
 
 	if actualSHA != expectedSHA {
-		return fmt.Errorf("expected SHA '%s' but got '%s'", expectedSHA, actualSHA)
+		return fmt.Errorf("expected SHA256 '%s' but got '%s'", expectedSHA, actualSHA)
 	}
 
 	return nil
@@ -70,11 +70,11 @@ func (c Checksummer) VerifySHA1(path, expectedSHA string) error {
 func (c Checksummer) VerifySHA256(path, expectedSHA string) error {
 	actualSHA, err := c.GetSHA256(path)
 	if err != nil {
-		return fmt.Errorf("failed to get actual SHA: %w", err)
+		return fmt.Errorf("failed to get actual SHA256: %w", err)
 	}
 
 	if actualSHA != expectedSHA {
-		return fmt.Errorf("expected SHA '%s' but got '%s'", expectedSHA, actualSHA)
+		return fmt.Errorf("expected SHA256 '%s' but got '%s'", expectedSHA, actualSHA)
 	}
 
 	return nil
@@ -83,11 +83,11 @@ func (c Checksummer) VerifySHA256(path, expectedSHA string) error {
 func (c Checksummer) VerifySHA512(path, expectedSHA string) error {
 	actualSHA, err := c.GetSHA512(path)
 	if err != nil {
-		return fmt.Errorf("failed to get actual SHA: %w", err)
+		return fmt.Errorf("failed to get actual SHA256: %w", err)
 	}
 
 	if actualSHA != expectedSHA {
-		return fmt.Errorf("expected SHA '%s' but got '%s'", expectedSHA, actualSHA)
+		return fmt.Errorf("expected SHA256 '%s' but got '%s'", expectedSHA, actualSHA)
 	}
 
 	return nil
@@ -103,7 +103,7 @@ func (c Checksummer) GetSHA256(path string) (string, error) {
 	hash := sha256.New()
 	_, err = io.Copy(hash, file)
 	if err != nil {
-		return "nil", fmt.Errorf("failed to calculate SHA: %w", err)
+		return "nil", fmt.Errorf("failed to calculate SHA256: %w", err)
 	}
 
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
@@ -119,7 +119,7 @@ func (c Checksummer) GetSHA512(path string) (string, error) {
 	hash := sha512.New()
 	_, err = io.Copy(hash, file)
 	if err != nil {
-		return "nil", fmt.Errorf("failed to calculate SHA: %w", err)
+		return "nil", fmt.Errorf("failed to calculate SHA256: %w", err)
 	}
 
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil

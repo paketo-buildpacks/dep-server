@@ -15,12 +15,12 @@ type Dependency interface {
 }
 
 type DepVersion struct {
-	Version         string `json:"version"`
-	URI             string `json:"uri"`
-	SHA             string `json:"sha"`
+	Version         string     `json:"version"`
+	URI             string     `json:"uri"`
+	SHA256          string     `json:"sha256"`
 	ReleaseDate     *time.Time `json:"release_date,omitempty"`
 	DeprecationDate *time.Time `json:"deprecation_date,omitempty"`
-	CPE             string `json:"cpe"`
+	CPE             string     `json:"cpe"`
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Checksummer

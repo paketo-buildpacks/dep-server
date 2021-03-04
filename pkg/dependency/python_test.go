@@ -2,15 +2,17 @@ package dependency_test
 
 import (
 	"errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"strings"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestPython(t *testing.T) {
@@ -79,7 +81,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "3.7.8",
 				URI:             "https://www.python.org/ftp/python/3.7.8/Python-3.7.8.tgz",
-				SHA:             "some-sha256",
+				SHA256:          "some-sha256",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:python:python:3.7.8:*:*:*:*:*:*:*",
@@ -156,7 +158,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := python.GetDependencyVersion("3.3.3")
 				require.NoError(err)
 
-				assert.Equal("some-sha256", depVersion.SHA)
+				assert.Equal("some-sha256", depVersion.SHA256)
 
 				_, firstMD5 := fakeChecksummer.VerifyMD5ArgsForCall(0)
 				_, secondMD5 := fakeChecksummer.VerifyMD5ArgsForCall(1)
@@ -178,7 +180,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := python.GetDependencyVersion("2.5.5")
 				require.NoError(err)
 
-				assert.Equal("some-sha256", depVersion.SHA)
+				assert.Equal("some-sha256", depVersion.SHA256)
 
 				_, firstMD5 := fakeChecksummer.VerifyMD5ArgsForCall(0)
 				_, secondMD5 := fakeChecksummer.VerifyMD5ArgsForCall(1)
@@ -199,7 +201,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				depVersion, err := python.GetDependencyVersion("3.1.0")
 				require.NoError(err)
 
-				assert.Equal("some-sha256", depVersion.SHA)
+				assert.Equal("some-sha256", depVersion.SHA256)
 
 				assert.Equal(0, fakeChecksummer.VerifyMD5CallCount())
 			})

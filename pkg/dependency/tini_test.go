@@ -1,15 +1,17 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 )
 
 func TestTini(t *testing.T) {
@@ -89,7 +91,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:         "v1.0.0",
 				URI:             "some-tarball-url",
-				SHA:             "some-source-sha",
+				SHA256:          "some-source-sha",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:tini_project:tini:1.0.0:*:*:*:*:*:*:*",

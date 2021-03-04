@@ -1,14 +1,16 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestRuby(t *testing.T) {
@@ -144,7 +146,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "3.0.0",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.0.tar.gz",
-					SHA:             "some-sha-256-gz",
+					SHA256:          "some-sha-256-gz",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:3.0.0:*:*:*:*:*:*:*",
@@ -159,7 +161,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 			})
 		})
 
-		when("the version IS in the release yaml file but it does NOT have the URL and SHA", func() {
+		when("the version IS in the release yaml file but it does NOT have the URL and SHA256", func() {
 			it("check the index.txt file", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 <tr>
@@ -185,7 +187,7 @@ ruby-1.6.7	https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz	some-sha-1
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "1.6.7",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz",
-					SHA:             "some-sha-256",
+					SHA256:          "some-sha-256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:1.6.7:*:*:*:*:*:*:*",
@@ -249,7 +251,7 @@ ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.6.6",
 					URI:             "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz",
-					SHA:             "some-sha-256-gz",
+					SHA256:          "some-sha-256-gz",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:2.6.6:*:*:*:*:*:*:*",
@@ -322,7 +324,7 @@ ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-s
 					expectedDepVersion := dependency.DepVersion{
 						Version:         "1.9.0",
 						URI:             "https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz",
-						SHA:             "some-sha-256",
+						SHA256:          "some-sha-256",
 						ReleaseDate:     &expectedReleaseDate,
 						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.0:*:*:*:*:*:*:*",
@@ -396,7 +398,7 @@ ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some
 					expectedDepVersion := dependency.DepVersion{
 						Version:         "1.9.1",
 						URI:             "https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz",
-						SHA:             "some-sha-256",
+						SHA256:          "some-sha-256",
 						ReleaseDate:     &expectedReleaseDate,
 						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.1:*:*:*:*:*:*:*",

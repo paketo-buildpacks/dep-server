@@ -3,7 +3,6 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type Httpd struct {
@@ -61,7 +62,7 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{
 		Version:     version,
 		URI:         release.dependencyURL,
-		SHA:         sha,
+		SHA256:      sha,
 		ReleaseDate: &release.releaseDate,
 		CPE:         fmt.Sprintf("cpe:2.3:a:apache:http_server:%s:*:*:*:*:*:*:*", version),
 	}, nil

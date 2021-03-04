@@ -55,7 +55,7 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 			return DepVersion{
 				Version:         version,
 				URI:             depURL,
-				SHA:             release.SHA,
+				SHA256:          release.SHA,
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:bundler:bundler:%s:*:*:*:*:ruby:*:*", version),

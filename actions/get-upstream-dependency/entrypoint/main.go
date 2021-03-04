@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"os"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 )
 
 func main() {

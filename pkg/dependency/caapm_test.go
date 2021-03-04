@@ -79,7 +79,7 @@ func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "20.1.0",
 				URI:             "https://ca.bintray.com/apm-agents/CA-APM-PHPAgent-20.1.0_linux.tar.gz",
-				SHA:             "some-source-sha",
+				SHA256:          "some-source-sha",
 				ReleaseDate:     nil,
 				DeprecationDate: nil,
 			}

@@ -82,7 +82,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 						depVersions = append(depVersions, depVersion)
 
 						assert.Equal(version, depVersion.Version)
-						assert.Len(depVersion.SHA, 64, "SHA did not have 64 characters for %s %s", depName, version)
+						assert.Len(depVersion.SHA256, 64, "SHA256 did not have 64 characters for %s %s", depName, version)
 						assert.NotEmpty(depVersion.URI)
 
 						parsedVersion, err := semver.NewVersion(strings.TrimPrefix(version, "go"))

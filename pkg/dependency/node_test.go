@@ -1,14 +1,16 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestNode(t *testing.T) {
@@ -109,7 +111,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 			expectedDep := dependency.DepVersion{
 				Version:         "v13.9.0",
 				URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
-				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
@@ -149,7 +151,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.ta
 				expectedDep := dependency.DepVersion{
 					Version:         "v0.8.0",
 					URI:             "https://nodejs.org/dist/v0.8.0/node-v0.8.0.tar.gz",
-					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:nodejs:node.js:0.8.0:*:*:*:*:*:*:*",
@@ -186,7 +188,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 				expectedDep := dependency.DepVersion{
 					Version:         "v13.9.0",
 					URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
-					SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
@@ -210,7 +212,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 			})
 		})
 
-		when("the SHA cannot be found", func() {
+		when("the SHA256 cannot be found", func() {
 			it("returns an error", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 		[
@@ -229,7 +231,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 				fakeWebClient.GetReturnsOnCall(2, nil, nil)
 				_, err := node.GetDependencyVersion("v14.0.0")
 				assert.Error(err)
-				assert.Contains(err.Error(), "could not find SHA for node-v14.0.0.tar.gz")
+				assert.Contains(err.Error(), "could not find SHA256 for node-v14.0.0.tar.gz")
 			})
 		})
 	})

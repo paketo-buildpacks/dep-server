@@ -3,14 +3,16 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Masterminds/semver"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
 const (
@@ -124,7 +126,7 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 	depVersion := DepVersion{
 		Version:     version,
 		URI:         releaseFile.URL,
-		SHA:         sha256,
+		SHA256:      sha256,
 		ReleaseDate: releaseDate,
 		CPE:         cpe,
 	}

@@ -3,11 +3,13 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
-	"gopkg.in/yaml.v2"
 	"regexp"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v2"
+
+	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
 type Ruby struct {
@@ -56,7 +58,7 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 			return DepVersion{
 				Version:         version,
 				URI:             depURL,
-				SHA:             depSHA,
+				SHA256:          depSHA,
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:ruby-lang:ruby:%s:*:*:*:*:*:*:*", version),
@@ -172,5 +174,5 @@ func (r Ruby) getDependencyURLAndSHAFromMirror(version string) (string, string, 
 		}
 	}
 
-	return "", "", fmt.Errorf("could not find URL and SHA for version %s", version)
+	return "", "", fmt.Errorf("could not find URL and SHA256 for version %s", version)
 }

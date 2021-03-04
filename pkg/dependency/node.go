@@ -103,7 +103,7 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 	deprecationDate := n.getDeprecationDate(release.Version, releaseSchedule)
 	sha, err := n.getDependencySHA(release.Version)
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get dependency SHA: %w", err)
+		return DepVersion{}, fmt.Errorf("could not get dependency SHA256: %w", err)
 	}
 
 	releaseDate, err := time.Parse("2006-01-02", release.Date)
@@ -114,7 +114,7 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 	return DepVersion{
 		Version:         release.Version,
 		URI:             n.dependencyURL(release.Version),
-		SHA:             sha,
+		SHA256:          sha,
 		ReleaseDate:     &releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(release.Version, "v")),
@@ -159,7 +159,7 @@ func (n Node) getDeprecationDate(version string, releaseSchedule ReleaseSchedule
 func (n Node) getDependencySHA(version string) (string, error) {
 	body, err := n.webClient.Get(n.shaFileURL(version))
 	if err != nil {
-		return "", fmt.Errorf("could not get SHA file: %w", err)
+		return "", fmt.Errorf("could not get SHA256 file: %w", err)
 	}
 
 	var dependencySHA string
@@ -169,7 +169,7 @@ func (n Node) getDependencySHA(version string) (string, error) {
 		}
 	}
 	if dependencySHA == "" {
-		return "", fmt.Errorf("could not find SHA for node-%s.tar.gz", version)
+		return "", fmt.Errorf("could not find SHA256 for node-%s.tar.gz", version)
 	}
 	return dependencySHA, nil
 }

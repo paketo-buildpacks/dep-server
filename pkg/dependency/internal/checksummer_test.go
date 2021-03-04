@@ -169,11 +169,11 @@ KbtkeGcVHGGJtT8krUQB6f3VPT2vQg==
 			require.NoError(err)
 		})
 
-		when("the SHA does not match", func() {
+		when("the SHA256 does not match", func() {
 			it("returns an error", func() {
 				err := checksummer.VerifySHA1(filePath, "some-bad-sha")
 				assert.Error(err)
-				assert.Equal("expected SHA 'some-bad-sha' but got '21202296bf50267250155e46d3b9eb3e4c1acb7e'", err.Error())
+				assert.Equal("expected SHA256 'some-bad-sha' but got '21202296bf50267250155e46d3b9eb3e4c1acb7e'", err.Error())
 			})
 		})
 	})
@@ -184,11 +184,11 @@ KbtkeGcVHGGJtT8krUQB6f3VPT2vQg==
 			require.NoError(err)
 		})
 
-		when("the SHA does not match", func() {
+		when("the SHA256 does not match", func() {
 			it("returns an error", func() {
 				err := checksummer.VerifySHA256(filePath, "some-bad-sha")
 				assert.Error(err)
-				assert.Equal("expected SHA 'some-bad-sha' but got '6e32ea34db1b3755d7dec972eb72c705338f0dd8e0be881d966963438fb2e800'", err.Error())
+				assert.Equal("expected SHA256 'some-bad-sha' but got '6e32ea34db1b3755d7dec972eb72c705338f0dd8e0be881d966963438fb2e800'", err.Error())
 			})
 		})
 	})
@@ -199,11 +199,11 @@ KbtkeGcVHGGJtT8krUQB6f3VPT2vQg==
 			require.NoError(err)
 		})
 
-		when("the SHA does not match", func() {
+		when("the SHA256 does not match", func() {
 			it("returns an error", func() {
 				err := checksummer.VerifySHA512(filePath, "some-bad-sha")
 				assert.Error(err)
-				assert.Equal("expected SHA 'some-bad-sha' but got 'b7b2b9e0a4d7f84985a720d1273166bb00132a60ac45388a7d3090a7d4c9692f38d019f807a02750f810f52c623362f977040231c2bbf5947170fe83686cfd9d'", err.Error())
+				assert.Equal("expected SHA256 'some-bad-sha' but got 'b7b2b9e0a4d7f84985a720d1273166bb00132a60ac45388a7d3090a7d4c9692f38d019f807a02750f810f52c623362f977040231c2bbf5947170fe83686cfd9d'", err.Error())
 			})
 		})
 	})

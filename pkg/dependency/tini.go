@@ -2,12 +2,13 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 )
 
 type Tini struct {
@@ -83,7 +84,7 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 	return DepVersion{
 		Version:         version,
 		URI:             tarballURL,
-		SHA:             dependencySHA,
+		SHA256:          dependencySHA,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:tini_project:tini:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),

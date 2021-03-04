@@ -1,14 +1,16 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestPhp(t *testing.T) {
@@ -158,7 +160,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "7.4.4",
 				URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
-				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
@@ -170,8 +172,8 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.4", url)
 		})
 
-		when("the dependency has an MD5 instead of a SHA", func() {
-			it("validates the MD5 and calculates the SHA", func() {
+		when("the dependency has an MD5 instead of a SHA256", func() {
+			it("validates the MD5 and calculates the SHA256", func() {
 				fakeWebClient.GetReturns([]byte(`
 {
  "date": "19 Mar 2020",
@@ -195,7 +197,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "7.4.4",
 					URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
@@ -235,7 +237,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.3.25",
 					URI:             "https://www.php.net/distributions/php-5.3.25.tar.gz",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.3.25:*:*:*:*:*:*:*",
@@ -269,7 +271,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.1.6",
 					URI:             "https://www.php.net/distributions/php-5.1.6.tar.gz",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.1.6:*:*:*:*:*:*:*",
