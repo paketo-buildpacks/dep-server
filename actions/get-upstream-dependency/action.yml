@@ -50,9 +50,9 @@ runs:
         )"
 
         echo "::set-output name=uri::$(jq -r .uri <<< "${metadata}")"
-        echo "::set-output name=sha256::$(jq -r .sha <<< "${metadata}")"
-        echo "::set-output name=release-date::$(jq -r .release_date <<< "${metadata}")"
-        echo "::set-output name=deprecation-date::$(jq -r .deprecation_date <<< "${metadata}")"
+        echo "::set-output name=sha256::$(jq -r .sha256 <<< "${metadata}")"
+        echo "::set-output name=release-date::$(jq -r '.release_date // empty' <<< "${metadata}")"
+        echo "::set-output name=deprecation-date::$(jq -r '.deprecation_date // empty' <<< "${metadata}")"
         echo "::set-output name=cpe::$(jq -r .cpe <<< "${metadata}")"
 
         rm -f ./entrypoint
