@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
 )
 
 type ICU struct {
@@ -136,7 +137,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 	return DepVersion{
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
-		SHA:             dependencySHA,
+		SHA256:          dependencySHA,
 		ReleaseDate:     &release.CreatedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf(`cpe:2.3:a:icu-project:international_components_for_unicode:%s:*:*:*:*:c\/c\+\+:*:*`, version),

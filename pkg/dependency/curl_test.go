@@ -77,7 +77,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:     "7.73.0",
 				URI:         "https://curl.se/download/curl-7.73.0.tar.gz",
-				SHA:         "some-source-sha",
+				SHA256:      "some-source-sha",
 				ReleaseDate: &expectedReleaseDate,
 				CPE:         "cpe:2.3:a:haxx:curl:7.73.0:*:*:*:*:*:*:*",
 			}
@@ -118,7 +118,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				expectedDep := dependency.DepVersion{
 					Version:     "7.29.0",
 					URI:         "https://curl.se/download/archeology/curl-7.29.0.tar.gz",
-					SHA:         "some-source-sha",
+					SHA256:      "some-source-sha",
 					ReleaseDate: &expectedReleaseDate,
 					CPE:         "cpe:2.3:a:haxx:curl:7.29.0:*:*:*:*:*:*:*",
 				}

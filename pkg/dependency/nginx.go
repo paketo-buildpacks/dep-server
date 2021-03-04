@@ -45,7 +45,7 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
-		SHA:             sha,
+		SHA256:          sha,
 		ReleaseDate:     &tagCommit.Date,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nginx:nginx:%s:*:*:*:*:*:*:*", version),

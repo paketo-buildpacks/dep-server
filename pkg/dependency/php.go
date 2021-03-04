@@ -77,7 +77,7 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
-		SHA:             dependencySHA,
+		SHA256:          dependencySHA,
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:php:php:%s:*:*:*:*:*:*:*", version),
@@ -174,7 +174,7 @@ func (p Php) getDependencySHA(release PhpRawRelease, version string) (string, er
 
 				return sha, nil
 			} else {
-				return "", fmt.Errorf("could not find SHA or MD5 for %s", version)
+				return "", fmt.Errorf("could not find SHA256 or MD5 for %s", version)
 			}
 		}
 	}

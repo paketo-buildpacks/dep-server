@@ -2,12 +2,13 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type CAAPM struct {
@@ -60,7 +61,7 @@ func (c CAAPM) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
-		SHA:             dependencySHA,
+		SHA256:          dependencySHA,
 		ReleaseDate:     nil,
 		DeprecationDate: nil,
 	}, nil

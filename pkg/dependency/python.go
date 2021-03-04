@@ -64,7 +64,7 @@ func (p Python) GetDependencyVersion(version string) (DepVersion, error) {
 	return DepVersion{
 		Version:         version,
 		URI:             sourceURI,
-		SHA:             sha256,
+		SHA256:          sha256,
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:python:python:%s:*:*:*:*:*:*:*", version),

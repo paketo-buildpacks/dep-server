@@ -1,14 +1,16 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestPyPi(t *testing.T) {
@@ -123,7 +125,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:         "2.0.0",
 				URI:             "some-url",
-				SHA:             "some-sha256",
+				SHA256:          "some-sha256",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:pypa:pip:2.0.0:*:*:*:*:python:*:*",

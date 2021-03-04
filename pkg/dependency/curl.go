@@ -127,7 +127,7 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 	return DepVersion{
 		Version:     release.Version,
 		URI:         c.dependencyURL(release),
-		SHA:         sha,
+		SHA256:      sha,
 		ReleaseDate: &release.Date,
 		CPE:         fmt.Sprintf("cpe:2.3:a:haxx:curl:%s:*:*:*:*:*:*:*", release.Version),
 	}, nil

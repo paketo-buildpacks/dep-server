@@ -2,16 +2,18 @@ package main_test
 
 import (
 	"encoding/json"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/sclevine/spec"
-
-	"github.com/sclevine/spec/report"
-	assertpkg "github.com/stretchr/testify/assert"
-	requirepkg "github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/sclevine/spec"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+
+	"github.com/sclevine/spec/report"
+	assertpkg "github.com/stretchr/testify/assert"
+	requirepkg "github.com/stretchr/testify/require"
 )
 
 func TestEntrypoint(t *testing.T) {

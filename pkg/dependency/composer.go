@@ -2,10 +2,12 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 )
 
 type Composer struct {
@@ -77,7 +79,7 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 	return DepVersion{
 		Version:         release.TagName,
 		URI:             c.dependencyURL(release.TagName),
-		SHA:             sha,
+		SHA256:          sha,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 	}, nil
@@ -87,11 +89,11 @@ func (c Composer) getDependencySHA(version string) (string, error) {
 	shaUrl := c.shaURL(version)
 	body, err := c.webClient.Get(shaUrl)
 	if err != nil {
-		return "", fmt.Errorf("could not download composer SHA file: %w", err)
+		return "", fmt.Errorf("could not download composer SHA256 file: %w", err)
 	}
 	depSHA := strings.Split(string(body), " ")[0]
 	if len(depSHA) < 64 {
-		return "", fmt.Errorf("could not get SHA from file %s", shaUrl)
+		return "", fmt.Errorf("could not get SHA256 from file %s", shaUrl)
 	}
 	return depSHA, nil
 }

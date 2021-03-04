@@ -1,15 +1,17 @@
 package dependency_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 )
 
 func TestComposer(t *testing.T) {
@@ -112,7 +114,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.1",
 				URI:             "https://getcomposer.org/download/1.0.1/composer.phar",
-				SHA:             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 			}
@@ -123,7 +125,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("composer", repoArg)
 		})
 
-		when("the SHA cannot be found", func() {
+		when("the SHA256 cannot be found", func() {
 			it("returns an error", func() {
 				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
 					{
@@ -136,7 +138,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				_, err := composer.GetDependencyVersion("3.0.0")
 				assert.Error(err)
 
-				assert.Contains(err.Error(), "could not get SHA from file")
+				assert.Contains(err.Error(), "could not get SHA256 from file")
 			})
 		})
 	})

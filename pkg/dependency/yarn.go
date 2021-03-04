@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Masterminds/semver"
-	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
+
+	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal/internal_errors"
 )
 
 type Yarn struct {
@@ -141,7 +143,7 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 	return DepVersion{
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
-		SHA:             dependencySHA,
+		SHA256:          dependencySHA,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:yarnpkg:yarn:%s:*:*:*:*:*:*:*", version),

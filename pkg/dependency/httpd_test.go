@@ -2,15 +2,17 @@ package dependency_test
 
 import (
 	"fmt"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"regexp"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"regexp"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 )
 
 func TestHttpd(t *testing.T) {
@@ -79,7 +81,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "2.4.43",
 				URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
-				SHA:             "some-sha256",
+				SHA256:          "some-sha256",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
@@ -109,7 +111,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
@@ -143,7 +145,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					depVersion, err := httpd.GetDependencyVersion("2.4.43")
 					require.NoError(err)
 
-					assert.Equal("some-sha256", depVersion.SHA)
+					assert.Equal("some-sha256", depVersion.SHA256)
 
 					_, checksumArg := fakeChecksummer.VerifySHA1ArgsForCall(0)
 					assert.Equal("some-sha1", checksumArg)
@@ -167,7 +169,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
@@ -202,7 +204,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					depVersion, err := httpd.GetDependencyVersion("2.4.43")
 					require.NoError(err)
 
-					assert.Equal("some-sha256", depVersion.SHA)
+					assert.Equal("some-sha256", depVersion.SHA256)
 
 					_, checksumArg := fakeChecksummer.VerifyMD5ArgsForCall(0)
 					assert.Equal("some-md5", checksumArg)
@@ -222,7 +224,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.2.3",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.2.3.tar.bz2",
-					SHA:             "some-sha256",
+					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate223,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.2.3:*:*:*:*:*:*:*",

@@ -274,7 +274,7 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "2.1.3",
 				URI:             "https://rubygems.org/downloads/bundler-2.1.3.gem",
-				SHA:             "9b9a9a5685121403eda1ae148ed3a34c86418f2a2beec7df82a45d4baca0e5d2",
+				SHA256:          "9b9a9a5685121403eda1ae148ed3a34c86418f2a2beec7df82a45d4baca0e5d2",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:bundler:bundler:2.1.3:*:*:*:*:ruby:*:*",

@@ -2,15 +2,17 @@ package dependency_test
 
 import (
 	"errors"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
-	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
+	"testing"
+	"time"
+
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
+
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	depErrors "github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
 func TestGo(t *testing.T) {
@@ -150,7 +152,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			expectedDep := dependency.DepVersion{
 				Version:         "go1.13.9",
 				URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
-				SHA:             "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+				SHA256:          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
@@ -164,8 +166,8 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("https://golang.org/doc/devel/release.html", urlArg)
 		})
 
-		when("the SHA is empty", func() {
-			it("calculates the SHA", func() {
+		when("the SHA256 is empty", func() {
+			it("calculates the SHA256", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 [
 {"version": "go1.13.9", "files": [{"sha256": "", "kind": "source"}]}
@@ -189,7 +191,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				expectedDep := dependency.DepVersion{
 					Version:         "go1.13.9",
 					URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
-					SHA:             "some-source-sha",
+					SHA256:          "some-source-sha",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
