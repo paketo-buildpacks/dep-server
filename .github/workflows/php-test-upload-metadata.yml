@@ -14,6 +14,8 @@ name: Php Test and Upload Metadata
         required: true
       DEPRECATION_DATE:
         required: true
+      CPE:
+        required: true
   repository_dispatch:
     types:
     - php-test
@@ -25,6 +27,7 @@ env:
   SOURCE_URI: ${{ github.event.client_payload.source_uri }}
   SOURCE_SHA256: ${{ github.event.client_payload.source_sha256 }}
   DEPRECATION_DATE: ${{ github.event.client_payload.deprecation_date }}
+  CPE: ${{ github.event.client_payload.cpe }}
 jobs:
   test-upload-metadata:
     name: Test Dependency and Upload Metadata
@@ -39,6 +42,7 @@ jobs:
           echo "SOURCE_URI=${{ github.event.inputs.source_uri }}" >> $GITHUB_ENV
           echo "SOURCE_SHA256=${{ github.event.inputs.source_sha256 }}" >> $GITHUB_ENV
           echo "DEPRECATION_DATE=${{ github.event.inputs.deprecation_date }}" >> $GITHUB_ENV
+          echo "CPE=${{ github.event.inputs.cpe }}" >> $GITHUB_ENV
         fi
     - name: Test
       uses: paketo-buildpacks/dep-server/actions/test-dependency@main
@@ -65,3 +69,4 @@ jobs:
         source-uri: ${{ env.SOURCE_URI }}
         source-sha256: ${{ env.SOURCE_SHA256 }}
         deprecation-date: ${{ env.DEPRECATION_DATE }}
+        cpe: ${{ env.CPE }}
