@@ -267,6 +267,24 @@ func (g GithubClient) GetTagCommit(org, repo, tag string) (GithubTagCommit, erro
 	}, nil
 }
 
+func (g GithubClient) GetReleaseDate(org, repo, tag string) (*time.Time, error) {
+	body, err := g.webClient.Get(
+		fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/tags/%s", org, repo, tag),
+		WithHeader("Authorization", "token "+g.accessToken),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not get release for tag %s: %w", tag, err)
+	}
+
+	var releaseResponse GithubReleaseResponse
+	err = json.Unmarshal(body, &releaseResponse)
+	if err != nil {
+		return nil, fmt.Errorf("could not unmarshal release: %w\n%s", err, body)
+	}
+
+	return &releaseResponse.PublishedAt, nil
+}
+
 func (g GithubClient) getReleaseAssetURL(org, repo, tag, assetName string) (string, error) {
 	body, err := g.webClient.Get(
 		fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/tags/%s", org, repo, tag),

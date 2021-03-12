@@ -277,4 +277,18 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal(expectedTagCommit, actualTagCommit)
 		})
 	})
+
+	when("GetReleaseDate", func() {
+		it("returns the release date of the given release tag", func() {
+			releaseResponse := `{"published_at": "2021-02-11T14:34:19Z"}`
+			fakeWebClient.GetReturnsOnCall(0, []byte(releaseResponse), nil)
+
+			actualReleaseDate, err := githubClient.GetReleaseDate("some-org", "some-repo", "1.0.0")
+			require.NoError(err)
+
+			expectedReleaseDate := "2021-02-11T14:34:19Z"
+
+			assert.Equal(expectedReleaseDate, actualReleaseDate.Format(time.RFC3339))
+		})
+	})
 }
