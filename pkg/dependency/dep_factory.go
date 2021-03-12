@@ -47,6 +47,7 @@ type GithubClient interface {
 	DownloadReleaseAsset(org, repo, version, filename, outputPath string) (url string, err error)
 	DownloadSourceTarball(org, repo, version, outputPath string) (url string, err error)
 	GetTagCommit(org, repo, version string) (internal.GithubTagCommit, error)
+	GetReleaseDate(org, repo, tag string) (*time.Time, error)
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WebClient
@@ -191,6 +192,13 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 		return Ruby{
 			checksummer: d.checksummer,
 			fileSystem:  d.fileSystem,
+			webClient:   d.webClient,
+		}, nil
+	case "rust":
+		return Rust{
+			checksummer: d.checksummer,
+			fileSystem:  d.fileSystem,
+			githubClient: d.githubClient,
 			webClient:   d.webClient,
 		}, nil
 	case "tini":

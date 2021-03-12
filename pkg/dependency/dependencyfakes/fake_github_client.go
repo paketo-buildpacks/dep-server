@@ -3,6 +3,7 @@ package dependencyfakes
 
 import (
 	"sync"
+	"time"
 
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
@@ -56,6 +57,21 @@ type FakeGithubClient struct {
 	}
 	getReleaseAssetReturnsOnCall map[int]struct {
 		result1 []byte
+		result2 error
+	}
+	GetReleaseDateStub        func(string, string, string) (*time.Time, error)
+	getReleaseDateMutex       sync.RWMutex
+	getReleaseDateArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getReleaseDateReturns struct {
+		result1 *time.Time
+		result2 error
+	}
+	getReleaseDateReturnsOnCall map[int]struct {
+		result1 *time.Time
 		result2 error
 	}
 	GetReleaseTagsStub        func(string, string) ([]internal.GithubRelease, error)
@@ -307,6 +323,72 @@ func (fake *FakeGithubClient) GetReleaseAssetReturnsOnCall(i int, result1 []byte
 	}{result1, result2}
 }
 
+func (fake *FakeGithubClient) GetReleaseDate(arg1 string, arg2 string, arg3 string) (*time.Time, error) {
+	fake.getReleaseDateMutex.Lock()
+	ret, specificReturn := fake.getReleaseDateReturnsOnCall[len(fake.getReleaseDateArgsForCall)]
+	fake.getReleaseDateArgsForCall = append(fake.getReleaseDateArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.GetReleaseDateStub
+	fakeReturns := fake.getReleaseDateReturns
+	fake.recordInvocation("GetReleaseDate", []interface{}{arg1, arg2, arg3})
+	fake.getReleaseDateMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeGithubClient) GetReleaseDateCallCount() int {
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
+	return len(fake.getReleaseDateArgsForCall)
+}
+
+func (fake *FakeGithubClient) GetReleaseDateCalls(stub func(string, string, string) (*time.Time, error)) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = stub
+}
+
+func (fake *FakeGithubClient) GetReleaseDateArgsForCall(i int) (string, string, string) {
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
+	argsForCall := fake.getReleaseDateArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeGithubClient) GetReleaseDateReturns(result1 *time.Time, result2 error) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = nil
+	fake.getReleaseDateReturns = struct {
+		result1 *time.Time
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeGithubClient) GetReleaseDateReturnsOnCall(i int, result1 *time.Time, result2 error) {
+	fake.getReleaseDateMutex.Lock()
+	defer fake.getReleaseDateMutex.Unlock()
+	fake.GetReleaseDateStub = nil
+	if fake.getReleaseDateReturnsOnCall == nil {
+		fake.getReleaseDateReturnsOnCall = make(map[int]struct {
+			result1 *time.Time
+			result2 error
+		})
+	}
+	fake.getReleaseDateReturnsOnCall[i] = struct {
+		result1 *time.Time
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeGithubClient) GetReleaseTags(arg1 string, arg2 string) ([]internal.GithubRelease, error) {
 	fake.getReleaseTagsMutex.Lock()
 	ret, specificReturn := fake.getReleaseTagsReturnsOnCall[len(fake.getReleaseTagsArgsForCall)]
@@ -512,6 +594,8 @@ func (fake *FakeGithubClient) Invocations() map[string][][]interface{} {
 	defer fake.downloadSourceTarballMutex.RUnlock()
 	fake.getReleaseAssetMutex.RLock()
 	defer fake.getReleaseAssetMutex.RUnlock()
+	fake.getReleaseDateMutex.RLock()
+	defer fake.getReleaseDateMutex.RUnlock()
 	fake.getReleaseTagsMutex.RLock()
 	defer fake.getReleaseTagsMutex.RUnlock()
 	fake.getTagCommitMutex.RLock()
