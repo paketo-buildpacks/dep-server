@@ -1,6 +1,6 @@
 module github.com/paketo-buildpacks/dep-server/pkg/dependency/test/acceptance
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Masterminds/semver v1.5.0
