@@ -46,7 +46,7 @@ check_server() {
 }
 
 main() {
-  extract_tarball_and_install
+  extract_tarball
   check_version "$1"
   check_server
 
