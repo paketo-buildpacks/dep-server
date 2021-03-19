@@ -7,7 +7,7 @@ on:
 jobs:
   approve:
     name: Auto Approve
-    if: ${{ github.event.pull_request.user.login == 'paketo-bot' }}
+    if: ${{ github.event.pull_request.user.login == 'paketo-bot' || github.event.pull_request.user.login == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -16,7 +16,5 @@ jobs:
     - name: Approve
       uses: paketo-buildpacks/github-config/actions/pull-request/approve@main
       with:
-        user: paketo-bot-reviewer
         token: ${{ secrets.PAKETO_BOT_REVIEWER_GITHUB_TOKEN }}
-        author: ${{ github.event.pull_request.user.login }}
         number: ${{ github.event.number }}
