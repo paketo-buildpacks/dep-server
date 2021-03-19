@@ -7,6 +7,7 @@
 * bundler
 * CAAPM
 * composer
+* curl
 * dotnet-aspnetcore
 * dotnet-runtime
 * dotnet-sdk
@@ -20,6 +21,8 @@
 * pipenv
 * python
 * ruby
+* rust
+* tini
 * yarn
 
 ## Example
@@ -34,9 +37,9 @@
 [
   {
     "name": "go",
-    "version": "1.15",
-    "sha256": "29d4ae84b0cb970442becfe70ee76ce9df67341d15da81b370690fac18111e63",
-    "uri": "https://deps.paketo.io/go/go_1.15_linux_x64_bionic_29d4ae84.tgz",
+    "version": "go1.16.2",
+    "sha256": "abd965e71fad990d13d26e737c25a57184a33969e302d723c2b156c84dc619a5",
+    "uri": "https://deps.paketo.io/go/go_go1.16.2_linux_x64_bionic_abd965e7.tgz",
     "stacks": [
       {
         "id": "io.buildpacks.stacks.bionic"
@@ -45,15 +48,18 @@
         "id": "io.paketo.stacks.tiny"
       }
     ],
-    "source": "https://dl.google.com/go/go1.15.src.tar.gz",
-    "source_sha256": "69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a",
-    "deprecation_date": ""
+    "source": "https://dl.google.com/go/go1.16.2.src.tar.gz",
+    "source_sha256": "37ca14287a23cb8ba2ac3f5c3dd8adbc1f7a54b9701a57824bf19a0b271f83ea",
+    "deprecation_date": "",
+    "created_at": "2021-03-11T20:20:29+00:00",
+    "modified_at": "2021-03-11T20:20:29+00:00",
+    "cpe": "cpe:2.3:a:golang:go:1.16.2:*:*:*:*:*:*:*"
   },
   {
     "name": "go",
-    "version": "1.13.15",
-    "sha256": "b4ff131749bea80121374747424f2f02bb7dbdabc69b5aad8cff185f15e1aec9",
-    "uri": "https://deps.paketo.io/go/go_1.13.15_linux_x64_bionic_b4ff1317.tgz",
+    "version": "go1.15.10",
+    "sha256": "39d03136ebc4d9c230c0a8ca52a9ebbca7d41669f9161a9b5d68cdf7c14a9c40",
+    "uri": "https://deps.paketo.io/go/go_go1.15.10_linux_x64_bionic_39d03136.tgz",
     "stacks": [
       {
         "id": "io.buildpacks.stacks.bionic"
@@ -62,9 +68,12 @@
         "id": "io.paketo.stacks.tiny"
       }
     ],
-    "source": "https://dl.google.com/go/go1.13.15.src.tar.gz",
-    "source_sha256": "5fb43171046cf8784325e67913d55f88a683435071eef8e9da1aa8a1588fcf5d",
-    "deprecation_date": ""
+    "source": "https://dl.google.com/go/go1.15.10.src.tar.gz",
+    "source_sha256": "c1dbca6e0910b41d61a95bf9878f6d6e93d15d884c226b91d9d4b1113c10dd65",
+    "deprecation_date": "",
+    "created_at": "2021-03-11T20:20:26+00:00",
+    "modified_at": "2021-03-11T20:20:26+00:00",
+    "cpe": "cpe:2.3:a:golang:go:1.15.10:*:*:*:*:*:*:*"
   }
 ]
 ```
