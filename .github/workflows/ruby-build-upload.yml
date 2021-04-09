@@ -57,7 +57,7 @@ jobs:
     - name: Modify CPE for Dispatch
       id: modify-cpe
       run: |
-        cpe="$(echo ${{ steps.upstream.outputs.cpe }} | sed 's|\\|\\\\|g')"
+        cpe="$(echo '${{ steps.upstream.outputs.cpe }}' | sed 's|\\|\\\\|g')"
         echo "::set-output name=cpe::${cpe}"
     - name: Trigger Tests
       uses: paketo-buildpacks/github-config/actions/dispatch@main
