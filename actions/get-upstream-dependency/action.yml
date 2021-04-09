@@ -53,6 +53,6 @@ runs:
         echo "::set-output name=sha256::$(jq -r .sha256 <<< "${metadata}")"
         echo "::set-output name=release-date::$(jq -r '.release_date // empty' <<< "${metadata}")"
         echo "::set-output name=deprecation-date::$(jq -r '.deprecation_date // empty' <<< "${metadata}")"
-        echo "::set-output name=cpe::$(jq -r .cpe <<< "${metadata}")"
+        echo "::set-output name=cpe::$(jq .cpe <<< "${metadata}")"
 
         rm -f ./entrypoint

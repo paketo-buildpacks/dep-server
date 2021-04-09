@@ -66,12 +66,6 @@ jobs:
         dependency-name: ${{ env.DEP_NAME }}
         artifact-path: "${{ github.workspace }}/${{ steps.build.outputs.artifact-path }}"
 
-    - name: Modify CPE for Dispatch
-      id: modify-cpe
-      run: |
-        cpe="$(echo '${{ steps.upstream.outputs.cpe }}' | sed 's|\\|\\\\|g')"
-        echo "::set-output name=cpe::${cpe}"
-
     - name: Trigger Tests
       uses: paketo-buildpacks/github-config/actions/dispatch@main
       with:
@@ -86,5 +80,5 @@ jobs:
             "source_uri": "${{ steps.upstream.outputs.uri }}",
             "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
             "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
-            "cpe": "${{ steps.modify-cpe.outputs.cpe }}"
+            "cpe": "${{ steps.upstream.outputs.cpe }}"
           }

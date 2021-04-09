@@ -83,6 +83,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
+    - name: Modify CPE for Upload
+      id: modify-cpe
+      run: |
+        cpe="$(echo '${{ env.CPE }}' | sed 's|\\|\\\\|g')"
+        echo "::set-output name=cpe::${cpe}"
+
     - name: Upload dependency metadata
       uses: paketo-buildpacks/dep-server/actions/upload-metadata@main
       with:
@@ -95,4 +101,4 @@ jobs:
         source-uri: "${{ env.SOURCE_URI }}"
         source-sha256: "${{ env.SOURCE_SHA256 }}"
         deprecation-date: "${{ env.DEPRECATION_DATE }}"
-        cpe: "${{ env.CPE }}"
+        cpe: "${{ steps.modify-cpe.outputs.cpe }}"
