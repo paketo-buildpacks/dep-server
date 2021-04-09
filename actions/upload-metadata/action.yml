@@ -58,6 +58,8 @@ runs:
           created_at="${now}"
         fi
 
+        cpe="$(echo '${{ inputs.cpe }}' | sed 's|\\|\\\\|g')"
+
         metadata="$(cat << EOF
         {
           "name": "${{ inputs.dependency-name }}",
@@ -70,7 +72,7 @@ runs:
           "deprecation_date": "${{ inputs.deprecation-date }}",
           "created_at": "${created_at}",
           "modified_at": "${now}",
-          "cpe": "${{ inputs.cpe }}"
+          "cpe": "${cpe}"
         }
         EOF
         )"
