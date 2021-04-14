@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"time"
@@ -20,10 +19,6 @@ func NewWebClient() WebClient {
 		httpClient: &http.Client{
 			Timeout: 5 * time.Minute,
 			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout:   30 * time.Second,
-					KeepAlive: 30 * time.Second,
-				}).DialContext,
 				TLSHandshakeTimeout: 10 * time.Second,
 			},
 		},
