@@ -1,7 +1,23 @@
 # Dep Server
 
+## Summary
+This repository is responsible for setting up the Dependencies Server, which
+provides a way to access dependencies and their associated metadata. The server
+can be accessed at: api.deps.paketo.io.
+
+This repository also contains dependency specific code for retrieving versions
+and metadata, which can be found in the
+[`pkg/dependency`](https://github.com/paketo-buildpacks/dep-server/tree/main/pkg/dependency)
+directory. [Github
+Actions](https://github.com/paketo-buildpacks/dep-server/tree/main/actions) and
+[workflows](https://github.com/paketo-buildpacks/dep-server/tree/main/.github/workflows)
+for automating the retrievial of new dependencies can also be found in this
+repository.
+
+
 ## Usage
-`curl https://api.deps.paketo.io/v1/dependency?name=<DEP-NAME>`
+`curl https://api.deps.paketo.io/v1/dependency?name=<DEP-NAME>` to retrive
+dependency metadata.
 
 ## Supported Dependencies
 * bundler
