@@ -7,11 +7,6 @@ on:
     paths:
     - 'pkg/dependency/**'
     - '.github/workflows/test-dependency-library.yml'
-  push:
-    branches: [ main ]
-    paths:
-    - 'pkg/dependency/**'
-    - '.github/workflows/test-dependency-library.yml'
 
 jobs:
   test:
@@ -34,3 +29,18 @@ jobs:
       run: cd pkg/dependency/test/acceptance && go test ./...
       env:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  approve:
+    name: Auto Approve
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Approve
+      uses: paketo-buildpacks/github-config/actions/pull-request/approve@main
+      with:
+        token: ${{ secrets.PAKETO_BOT_REVIEWER_GITHUB_TOKEN }}
+        number: ${{ github.event.number }}
