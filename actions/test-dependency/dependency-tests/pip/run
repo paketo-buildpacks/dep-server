@@ -7,8 +7,7 @@ parent_dir="$(cd "$(dirname "$0")" && pwd)"
 extract_tarball_pip() {
   rm -rf pip
   mkdir pip
-  tar -xf dependency/*.tgz -C pip --wildcards ./pip-*.tar.gz
-  tar -xf pip/pip-*.tar.gz -C pip
+  tar -xf dependency/*.tgz -C pip
 }
 
 extract_tarball_python() {
