@@ -5,9 +5,12 @@ set -euo pipefail
 parent_dir="$(cd "$(dirname "$0")" && pwd)"
 
 extract_tarball_pip() {
-  rm -rf pip
-  mkdir pip
-  tar -xf dependency/*.tgz -C pip
+  rm -rf pip_bundle
+  mkdir pip_bundle
+  tar -xf dependency/*.tgz -C pip_bundle
+
+  mkdir pip_bundle/pip
+  tar -xf pip_bundle/pip-*.tar.gz -C pip_bundle/pip
 }
 
 extract_tarball_python() {
@@ -22,7 +25,7 @@ set_ld_library_path() {
 
 check_version() {
   expected_version="$1"
-  actual_version="$(./python/bin/python ./pip/setup.py  --version)"
+  actual_version="$(./python/bin/python ./pip_bundle/pip/setup.py  --version)"
   if [[ "${actual_version}" != "${expected_version}" ]]; then
     echo "Version ${actual_version} does not match expected version ${expected_version}"
     exit 1
