@@ -21,7 +21,7 @@ set_ruby_location() {
 
 check_version() {
   expected_version="$1"
-  actual_version="$(GEM_PATH="${PWD}/bundler" ./bundler/bin/bundler --version | cut -d' ' -f3)"
+  actual_version="$(GEM_PATH="${PWD}/bundler" ./bundler/bin/bundler "_${expected_version}_" --version | cut -d' ' -f3)"
   if [[ "${actual_version}" != "${expected_version}" ]]; then
     echo "Version ${actual_version} does not match expected version ${expected_version}"
     exit 1
