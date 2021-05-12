@@ -11,6 +11,7 @@ import (
 
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 )
 
 func TestRust(t *testing.T) {
@@ -64,8 +65,13 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 
 	when("GetDependencyVersion", func() {
 		it("returns the correct rust version", func() {
-			releaseDate := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
-			fakeGithubClient.GetReleaseDateReturns(&releaseDate, nil)
+			date := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
+			tagCommit := internal.GithubTagCommit{
+				Tag:  "1.49.0",
+				SHA:  "some-sha",
+				Date: date,
+			}
+			fakeGithubClient.GetTagCommitReturns(tagCommit, nil)
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
@@ -77,7 +83,7 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 				Version:         "1.49.0",
 				URI:             "https://static.rust-lang.org/dist/rustc-1.49.0-src.tar.gz",
 				SHA256:          "some-source-sha",
-				ReleaseDate:     &releaseDate,
+				ReleaseDate:     &tagCommit.Date,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:rust-lang:rust:1.49.0:*:*:*:*:*:*:*",
 			}
@@ -99,9 +105,14 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetReleaseDate", func() {
-		it("returns the correct nginx release date", func() {
-			releaseDate := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
-			fakeGithubClient.GetReleaseDateReturns(&releaseDate, nil)
+		it("returns the correct rust release date", func() {
+			date := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
+			tagCommit := internal.GithubTagCommit{
+				Tag:  "1.49.0",
+				SHA:  "some-sha",
+				Date: date,
+			}
+			fakeGithubClient.GetTagCommitReturns(tagCommit, nil)
 
 			actualReleaseDate, err := rust.GetReleaseDate("1.49.0")
 			require.NoError(err)

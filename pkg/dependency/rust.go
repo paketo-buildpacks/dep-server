@@ -63,12 +63,12 @@ func (r Rust) GetDependencyVersion(version string) (DepVersion, error) {
 }
 
 func (r Rust) GetReleaseDate(version string) (*time.Time, error) {
-	releaseDate, err := r.githubClient.GetReleaseDate("rust-lang", "rust", version)
+	tagCommit, err := r.githubClient.GetTagCommit("rust-lang", "rust", version)
 	if err != nil {
 		return nil, fmt.Errorf("could not get release date: %w", err)
 	}
 
-	return releaseDate, nil
+	return &tagCommit.Date, nil
 }
 
 func (r Rust) getDependencySHA(dependencyURL, version string) (string, error) {

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/sclevine/spec"
@@ -99,8 +100,16 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 					}
 
 					if depName != "CAAPM" {
-						for i := 0; i < len(depVersions)-1; i++ {
-							assert.True(depVersions[0].ReleaseDate.After(*depVersions[1].ReleaseDate) || depVersions[0].ReleaseDate.Equal(*depVersions[1].ReleaseDate))
+						if depName == "bundler" || depName == "composer" || depName == "nginx" {
+							for i := 0; i < len(depVersions)-1; i++ {
+								d := 24 * time.Hour
+								secondDay := depVersions[i+1].ReleaseDate.Truncate(d)
+								assert.True(depVersions[i].ReleaseDate.Truncate(d).After(secondDay) || depVersions[i].ReleaseDate.Truncate(d).Equal(secondDay))
+							}
+						} else {
+							for i := 0; i < len(depVersions)-1; i++ {
+								assert.True(depVersions[i].ReleaseDate.After(*depVersions[i+1].ReleaseDate) || depVersions[i].ReleaseDate.Equal(*depVersions[i+1].ReleaseDate), fmt.Sprintf("failed with %s and %s", depVersions[i], depVersions[i+1]))
+							}
 						}
 					}
 				})
