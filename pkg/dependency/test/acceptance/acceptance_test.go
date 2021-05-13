@@ -34,6 +34,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 		assert       = assert.New(t)
 		require      = require.New(t)
 		dependencies = []string{
+			"apcu",
 			"bundler",
 			"CAAPM",
 			"composer",

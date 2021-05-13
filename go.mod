@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Masterminds/semver v1.5.0
+	github.com/mmcdole/gofeed v1.1.3
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/sclevine/spec v1.4.0
 	github.com/stretchr/testify v1.7.0
