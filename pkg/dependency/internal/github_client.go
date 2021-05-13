@@ -30,7 +30,8 @@ type GithubRelease struct {
 
 type GithubTagResponse struct {
 	Object struct {
-		SHA string `json:"sha"`
+		Type string `json:"type"`
+		URL  string `json:"url"`
 	} `json:"object"`
 }
 
@@ -41,12 +42,19 @@ type GithubTagCommit struct {
 }
 
 type GithubCommitResponse struct {
-	SHA    string `json:"sha"`
-	Commit struct {
-		Committer struct {
-			Date time.Time `json:"date"`
-		} `json:"committer"`
-	} `json:"commit"`
+	SHA       string `json:"sha"`
+	Committer struct {
+		Date time.Time `json:"date"`
+	} `json:"committer"`
+}
+
+type GithubAnnotatedTagResponse struct {
+	Tagger struct {
+		Date time.Time `json:"date"`
+	} `json:"tagger"`
+	Object struct {
+		SHA string `json:"sha"`
+	} `json:"object"`
 }
 
 type GithubGraphQLRequest struct {
@@ -247,23 +255,38 @@ func (g GithubClient) GetTagCommit(org, repo, tag string) (GithubTagCommit, erro
 	}
 
 	body, err = g.webClient.Get(
-		fmt.Sprintf("https://api.github.com/repos/%s/%s/commits/%s", org, repo, tagResponse.Object.SHA),
+		tagResponse.Object.URL,
 		WithHeader("Authorization", "token "+g.accessToken),
 	)
 	if err != nil {
 		return GithubTagCommit{}, fmt.Errorf("could not get commit: %w", err)
 	}
 
-	var githubCommitResponse GithubCommitResponse
-	err = json.Unmarshal(body, &githubCommitResponse)
-	if err != nil {
-		return GithubTagCommit{}, fmt.Errorf("could not unmarshal releases: %w\n%s", err, body)
+	var commitSha string
+	var releaseDate time.Time
+
+	if tagResponse.Object.Type == "commit" {
+		var githubCommitResponse GithubCommitResponse
+		err = json.Unmarshal(body, &githubCommitResponse)
+		if err != nil {
+			return GithubTagCommit{}, fmt.Errorf("could not unmarshal releases: %w\n%s", err, body)
+		}
+		commitSha = githubCommitResponse.SHA
+		releaseDate = githubCommitResponse.Committer.Date
+	} else {
+		var githubAnnotatedTagResponse GithubAnnotatedTagResponse
+		err = json.Unmarshal(body, &githubAnnotatedTagResponse)
+		if err != nil {
+			return GithubTagCommit{}, fmt.Errorf("could not unmarshal releases: %w\n%s", err, body)
+		}
+		commitSha = githubAnnotatedTagResponse.Object.SHA
+		releaseDate = githubAnnotatedTagResponse.Tagger.Date
 	}
 
 	return GithubTagCommit{
 		Tag:  tag,
-		SHA:  githubCommitResponse.SHA,
-		Date: githubCommitResponse.Commit.Committer.Date,
+		SHA:  commitSha,
+		Date: releaseDate,
 	}, nil
 }
 

@@ -250,31 +250,59 @@ func testGithubClient(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("GetTagCommit", func() {
-		it("returns the commit for the given tag", func() {
-			tagResponse := `{"object": {"sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}}`
-			commitResponse := `
+		when("targeting a non-annotated tag", func() {
+			it("returns the commit for the given tag", func() {
+				tagResponse := `{"object": {"sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "type":"commit", "url":"some-url"}}`
+				commitResponse := `
 {
-  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-  "commit": {
+	"sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 	"committer": {
 	  "date": "2020-01-31T00:00:00Z"
 	}
-  }
 }
 `
-			fakeWebClient.GetReturnsOnCall(0, []byte(tagResponse), nil)
-			fakeWebClient.GetReturnsOnCall(1, []byte(commitResponse), nil)
+				fakeWebClient.GetReturnsOnCall(0, []byte(tagResponse), nil)
+				fakeWebClient.GetReturnsOnCall(1, []byte(commitResponse), nil)
 
-			actualTagCommit, err := githubClient.GetTagCommit("some-org", "some-repo", "1.0.0")
-			require.NoError(err)
+				actualTagCommit, err := githubClient.GetTagCommit("some-org", "some-repo", "1.0.0")
+				require.NoError(err)
 
-			expectedTagCommit := internal.GithubTagCommit{
-				Tag:  "1.0.0",
-				SHA:  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-				Date: time.Date(2020, 01, 31, 0, 0, 0, 0, time.UTC),
-			}
+				expectedTagCommit := internal.GithubTagCommit{
+					Tag:  "1.0.0",
+					SHA:  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+					Date: time.Date(2020, 01, 31, 0, 0, 0, 0, time.UTC),
+				}
 
-			assert.Equal(expectedTagCommit, actualTagCommit)
+				assert.Equal(expectedTagCommit, actualTagCommit)
+			})
+		})
+		when("targeting an annotated tag", func() {
+			it("returns the commit for the given tag", func() {
+				tagResponse := `{"object": {"type":"tag", "url":"some-url"}}`
+				commitResponse := `
+{
+	"tagger": {
+	  "date": "2020-01-31T00:00:00Z"
+	},
+	"object": {
+	  "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	}
+}
+`
+				fakeWebClient.GetReturnsOnCall(0, []byte(tagResponse), nil)
+				fakeWebClient.GetReturnsOnCall(1, []byte(commitResponse), nil)
+
+				actualTagCommit, err := githubClient.GetTagCommit("some-org", "some-repo", "1.0.0")
+				require.NoError(err)
+
+				expectedTagCommit := internal.GithubTagCommit{
+					Tag:  "1.0.0",
+					SHA:  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+					Date: time.Date(2020, 01, 31, 0, 0, 0, 0, time.UTC),
+				}
+
+				assert.Equal(expectedTagCommit, actualTagCommit)
+			})
 		})
 	})
 
