@@ -17,15 +17,6 @@ type Python struct {
 	webClient   WebClient
 }
 
-type PythonRelease struct {
-	version       string
-	releaseDate   time.Time
-	dependencyURL string
-	sha256URL     string
-	sha1URL       string
-	md5URL        string
-}
-
 func (p Python) GetAllVersionRefs() ([]string, error) {
 	body, err := p.webClient.Get("https://www.python.org/downloads/")
 	if err != nil {

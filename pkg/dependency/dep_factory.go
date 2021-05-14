@@ -98,6 +98,13 @@ func (d DepFactory) SupportsDependency(name string) bool {
 
 func (d DepFactory) NewDependency(name string) (Dependency, error) {
 	switch name {
+	case "apc", "apcu":
+		return Pecl{
+			productName: name,
+			checksummer: d.checksummer,
+			fileSystem:  d.fileSystem,
+			webClient:   d.webClient,
+		}, nil
 	case "bundler":
 		return Bundler{
 			checksummer: d.checksummer,
@@ -196,10 +203,10 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 		}, nil
 	case "rust":
 		return Rust{
-			checksummer: d.checksummer,
-			fileSystem:  d.fileSystem,
+			checksummer:  d.checksummer,
+			fileSystem:   d.fileSystem,
 			githubClient: d.githubClient,
-			webClient:   d.webClient,
+			webClient:    d.webClient,
 		}, nil
 	case "tini":
 		return Tini{

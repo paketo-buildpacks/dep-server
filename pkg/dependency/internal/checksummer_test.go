@@ -1,15 +1,16 @@
 package internal_test
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
+
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestChecksummer(t *testing.T) {
@@ -113,7 +114,7 @@ KbtkeGcVHGGJtT8krUQB6f3VPT2vQg==
 		err = ioutil.WriteFile(filePath, []byte(fileContents), 0644)
 		require.NoError(err)
 
-		checksummer = internal.Checksummer{}
+		checksummer = internal.NewChecksummer()
 	})
 
 	it.After(func() {
