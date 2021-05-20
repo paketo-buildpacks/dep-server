@@ -13,7 +13,6 @@ import (
 
 type Pecl struct {
 	productName string
-
 	checksummer Checksummer
 	fileSystem  FileSystem
 	webClient   WebClient

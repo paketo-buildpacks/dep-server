@@ -19,7 +19,7 @@ import (
 )
 
 const githubAccessTokenEnvVar = "GITHUB_ACCESS_TOKEN"
-const versionsToTest = 10
+const versionsToTest = 2
 
 func TestAcceptance(t *testing.T) {
 	if _, ok := os.LookupEnv(githubAccessTokenEnvVar); !ok {
@@ -34,6 +34,8 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 		assert       = assert.New(t)
 		require      = require.New(t)
 		dependencies = []string{
+			"alanxz/rabbitmq-c",
+			"allegro/php-protobuf",
 			"apcu",
 			"bundler",
 			"CAAPM",
@@ -42,18 +44,25 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 			"dotnet-aspnetcore",
 			"dotnet-runtime",
 			"dotnet-sdk",
+			"edenhill/librdkafka",
 			"go",
 			"httpd",
 			"icu",
 			"nginx",
 			"node",
+			"nrk/phpiredis",
+			"phacility/xhprof",
 			"php",
 			"pip",
 			"pipenv",
 			"python",
+			"redis/hiredis",
 			"ruby",
 			"rust",
+			"sektioneins/suhosin",
+			"tideways/php-xhprof-extension",
 			"tini",
+			"twigphp/Twig",
 			"yarn",
 		}
 	)
@@ -85,7 +94,10 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 						depVersions = append(depVersions, depVersion)
 
 						assert.Equal(version, depVersion.Version)
-						assert.Len(depVersion.SHA256, 64, "SHA256 did not have 64 characters for %s %s", depName, version)
+
+						if !strings.Contains(depName, "/") {
+							assert.Len(depVersion.SHA256, 64, "SHA256 did not have 64 characters for %s %s", depName, version)
+						}
 						assert.NotEmpty(depVersion.URI)
 
 						parsedVersion, err := semver.NewVersion(strings.TrimPrefix(version, "go"))

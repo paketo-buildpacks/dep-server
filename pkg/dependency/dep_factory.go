@@ -98,6 +98,24 @@ func (d DepFactory) SupportsDependency(name string) bool {
 
 func (d DepFactory) NewDependency(name string) (Dependency, error) {
 	switch name {
+	//Github dependencies must follow the org/repo format
+	case
+		"alanxz/rabbitmq-c",
+		"allegro/php-protobuf",
+		"edenhill/librdkafka",
+		"nrk/phpiredis",
+		"phacility/xhprof",
+		"redis/hiredis",
+		"sektioneins/suhosin",
+		"tideways/php-xhprof-extension",
+		"twigphp/Twig":
+		return Github{
+			productName:  name,
+			checksummer:  d.checksummer,
+			fileSystem:   d.fileSystem,
+			githubClient: d.githubClient,
+			webClient:    d.webClient,
+		}, nil
 	case "apc", "apcu":
 		return Pecl{
 			productName: name,
