@@ -19,7 +19,7 @@ import (
 )
 
 const githubAccessTokenEnvVar = "GITHUB_ACCESS_TOKEN"
-const versionsToTest = 2
+const versionsToTest = 10
 
 func TestAcceptance(t *testing.T) {
 	if _, ok := os.LookupEnv(githubAccessTokenEnvVar); !ok {
@@ -51,7 +51,6 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 			"nginx",
 			"node",
 			"nrk/phpiredis",
-			"phacility/xhprof",
 			"php",
 			"pip",
 			"pipenv",

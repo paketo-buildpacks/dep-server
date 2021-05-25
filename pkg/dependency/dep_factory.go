@@ -99,15 +99,16 @@ func (d DepFactory) SupportsDependency(name string) bool {
 func (d DepFactory) NewDependency(name string) (Dependency, error) {
 	switch name {
 	//Github dependencies must follow the org/repo format
+	//The following don't work well yet:
+	// "nrk/phpiredis",
 	case
 		"alanxz/rabbitmq-c",
 		"allegro/php-protobuf",
 		"edenhill/librdkafka",
-		"nrk/phpiredis",
-		"phacility/xhprof",
 		"redis/hiredis",
 		"sektioneins/suhosin",
 		"tideways/php-xhprof-extension",
+		"nrk/phpiredis",
 		"twigphp/Twig":
 		return Github{
 			productName:  name,

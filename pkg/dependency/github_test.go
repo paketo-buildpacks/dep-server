@@ -40,112 +40,65 @@ func testGithub(t *testing.T, when spec.G, it spec.S) {
 	})
 	when("GetAllVersionRefs", func() {
 		it("returns all final release versions with newest versions first", func() {
-			time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC)
-			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{
-					TagName:       "3.0.0",
-					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "3.0.0-RC",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "3.0.0-beta1",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "3.0.0-alpha2",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "3.0.0-alpha1",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "1.0.1",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "2.0.0",
-					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "1.0.0",
-					PublishedDate: time.Date(2020, 06, 27, 0, 0, 0, 0, time.UTC),
-				},
+			fakeGithubClient.GetTagsReturns([]string{
+				"1.49.0",
+				"1.48.0",
+				"1.47.0",
+				"1.46.0-alpha1",
+				"0.2",
+				"release-0.1",
+				"rabbitmq-c-0.3",
 			}, nil)
 
 			versions, err := github.GetAllVersionRefs()
 			require.NoError(err)
-			assert.Equal([]string{"3.0.0", "1.0.1", "2.0.0", "1.0.0"}, versions)
+			assert.Equal([]string{"1.49.0", "1.48.0", "1.47.0", "0.2"}, versions)
 
-			orgArg, repoArg := fakeGithubClient.GetReleaseTagsArgsForCall(0)
+			orgArg, repoArg := fakeGithubClient.GetTagsArgsForCall(0)
 			assert.Equal("alanxz", orgArg)
 			assert.Equal("rabbitmq-c", repoArg)
 		})
 	})
 	when("GetDependencyVersion", func() {
 		it("returns the correct composer version", func() {
-			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{
-					TagName:       "3.0.0",
-					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "1.0.1",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "2.0.0",
-					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
-				},
-			}, nil)
+			date := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
+			tagCommit := internal.GithubTagCommit{
+				Tag:  "0.11.0",
+				SHA:  "some-sha",
+				Date: date,
+			}
+			fakeGithubClient.GetTagCommitReturns(tagCommit, nil)
+			// fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 
-			actualDep, err := github.GetDependencyVersion("1.0.1")
+			actualDepVersion, err := github.GetDependencyVersion("0.11.0")
 			require.NoError(err)
 
-			expectedReleaseDate := time.Date(2020, 6, 29, 0, 0, 0, 0, time.UTC)
-			expectedDep := dependency.DepVersion{
-				Version:         "1.0.1",
-				URI:             "https://github.com/alanxz/rabbitmq-c/archive/v1.0.1.tar.gz",
+			expectedDepVersion := dependency.DepVersion{
+				Version:         "0.11.0",
+				URI:             "https://github.com/alanxz/rabbitmq-c/archive/v0.11.0.tar.gz",
 				SHA256:          "",
-				ReleaseDate:     &expectedReleaseDate,
+				ReleaseDate:     &tagCommit.Date,
 				DeprecationDate: nil,
+				CPE:             "",
 			}
-			assert.Equal(expectedDep, actualDep)
-
-			orgArg, repoArg := fakeGithubClient.GetReleaseTagsArgsForCall(0)
-			assert.Equal("alanxz", orgArg)
-			assert.Equal("rabbitmq-c", repoArg)
+			assert.Equal(expectedDepVersion, actualDepVersion)
 		})
 	})
 
 	when("GetReleaseDate", func() {
 		it("returns the correct composer release date", func() {
-			fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
-				{
-					TagName:       "3.0.0",
-					PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "1.0.1",
-					PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					TagName:       "2.0.0",
-					PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
-				},
-			}, nil)
+			date := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
+			tagCommit := internal.GithubTagCommit{
+				Tag:  "0.11.0",
+				SHA:  "some-sha",
+				Date: date,
+			}
+			fakeGithubClient.GetTagCommitReturns(tagCommit, nil)
 
-			releaseDate, err := github.GetReleaseDate("1.0.1")
+			actualReleaseDate, err := github.GetReleaseDate("0.11.0")
 			require.NoError(err)
 
-			orgArg, repoArg := fakeGithubClient.GetReleaseTagsArgsForCall(0)
-			assert.Equal("alanxz", orgArg)
-			assert.Equal("rabbitmq-c", repoArg)
-
-			assert.Equal("2020-06-29T00:00:00Z", releaseDate.Format(time.RFC3339))
+			assert.Equal("2020-12-31T00:00:00Z", actualReleaseDate.Format(time.RFC3339))
 		})
 	})
 }
