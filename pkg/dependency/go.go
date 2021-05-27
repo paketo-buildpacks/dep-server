@@ -92,7 +92,7 @@ func (g Go) GetReleaseDate(version string) (*time.Time, error) {
 		return nil, fmt.Errorf("could not find release date")
 	}
 
-	releaseDate, err := time.Parse("2006/01/02", match[1])
+	releaseDate, err := time.Parse("2006-01-02", match[1])
 	if err != nil {
 		return nil, fmt.Errorf("error parsing release date: %w", err)
 	}

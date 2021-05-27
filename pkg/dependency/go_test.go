@@ -44,19 +44,19 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.14">go1.14 (released 2020/02/25)</h2>
+	<h2 id="go1.14">go1.14 (released 2020-02-25)</h2>
 		<p>
 		go1.14.1
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
-	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09-03)</h2>
 		<p>
 		go1.13.8
-		(released 2020/02/12)
+		(released 2020-02-12)
 		</p>
 		<p>
 		go1.13.9
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
 `), nil)
 
@@ -83,13 +83,13 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09-03)</h2>
 		<p>
 		go1.13.8
-		(released 2020/02/12)
+		(released 2020-02-12)
 		</p>
 		<p>
-	<h2 id="go1.2">go1.2 (released 2013/12/01)</h2>
+	<h2 id="go1.2">go1.2 (released 2013-12-01)</h2>
 `), nil)
 
 			fakeWebClient.GetReturnsOnCall(1, []byte(`
@@ -126,23 +126,23 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(1, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.14">go1.14 (released 2020/02/25)</h2>
+	<h2 id="go1.14">go1.14 (released 2020-02-25)</h2>
 		<p>
 		go1.14.1
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
-	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09-03)</h2>
 		<p>
 		go1.13.1
-		(released 2019/09/25)
+		(released 2019-09-25)
 		</p>
 		<p>
 		go1.13.2
-		(released 2019/10/17)
+		(released 2019-10-17)
 		</p>
 		<p>
 		go1.13.9
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
 `), nil)
 
@@ -176,10 +176,10 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09-03)</h2>
 		<p>
 		go1.13.9
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
 `), nil)
 
@@ -218,10 +218,10 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.14">go1.14 (released 2020/02/25)</h2>
+	<h2 id="go1.14">go1.14 (released 2020-02-25)</h2>
 		<p>
 		go1.14.1
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
 `), nil)
 
@@ -238,23 +238,23 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 <!DOCTYPE html>
 <html lang="en">
-	<h2 id="go1.14">go1.14 (released 2020/02/25)</h2>
+	<h2 id="go1.14">go1.14 (released 2020-02-25)</h2>
 		<p>
 		go1.14.1
 		(released 2020/03/19)
 		</p>
-	<h2 id="go1.13">go1.13 (released 2019/09/03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09/03)</h2>
 		<p>
 		go1.13.1
-		(released 2019/09/25)
+		(released 2019-09-25)
 		</p>
 		<p>
 		go1.13.2
-		(released 2019/10/17)
+		(released 2019-10-17)
 		</p>
 		<p>
 		go1.13.9
-		(released 2020/03/19)
+		(released 2020-03-19)
 		</p>
 `), nil)
 		})
