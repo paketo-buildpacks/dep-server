@@ -1,0 +1,52 @@
+name: Php Get New Versions
+"on":
+  workflow_dispatch: {}
+  schedule:
+  - cron: '*/15 * * * *'
+env:
+  DEP_NAME: php
+  GCP_BUCKET: ${{ secrets.DEPENDENCY_ARTIFACTS_BUCKET }}
+jobs:
+  check-php:
+    name: Check for new versions
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        repository: cloudfoundry/buildpacks-ci
+        path: buildpacks-ci/
+    
+    - name: Turnstyle
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT }}
+        service_account_key: ${{ secrets.GAE_KEY }}
+    
+    - name: Get New Versions
+      id: new-versions
+      run: |
+    
+    - name: Dispatch to buildpacks-ci repo
+    # OUTPUTS: Dispatch which contains a list of php extensions and any new
+    # versions of them
+    # e.g. {
+    #   "amqp": ["new_version1"],
+    #   "odbc": ["new_version1"]
+    # }
+
+    - name: Send PHP Extensions Update
+    - uses: paketo-buildpacks/.../dispatch
+    - with:
+        repos:
+        token:
+        event:
+        payload:

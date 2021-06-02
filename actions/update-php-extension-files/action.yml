@@ -1,0 +1,31 @@
+name: 'Update PHP Extension versions'
+description: |
+  List new versions of upstream PHP extensions
+
+inputs:
+  php-yml-folder:
+    description: path to directory containing metadata files for PHP extensions
+    required: true
+
+outputs:
+  new-versions:
+    description: JSON object containing updated dependency metadata
+
+runs:
+  using: 'composite'
+  steps:
+   - id: new-versions
+    shell: bash
+    run: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      cd "${{ github.action_path }}/entrypoint"
+      go build -o ./entrypoint
+
+      new_versions="$(./entrypoint \
+        --folder "${{ inputs.php-yml-folder }}"
+      )"
+
+      echo "::set-output name=new-versions:"${new_versions}")"
+      rm -f ./entrypoint 

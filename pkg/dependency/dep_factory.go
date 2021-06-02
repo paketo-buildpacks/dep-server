@@ -117,7 +117,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			githubClient: d.githubClient,
 			webClient:    d.webClient,
 		}, nil
-	case "apc", "apcu":
+	case "apc", "apcu", "maxminddb":
 		return Pecl{
 			productName: name,
 			checksummer: d.checksummer,
