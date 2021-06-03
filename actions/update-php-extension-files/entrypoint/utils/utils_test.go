@@ -1,14 +1,15 @@
 package utils_test
 
 import (
-	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils"
-	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils/utilsfakes"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils"
+	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils/utilsfakes"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
@@ -161,6 +162,24 @@ extensions:
 			})
 		})
 
-		context("GenerateJSONPayload", func() {})
+		context("GenerateJSONPayload", func() {
+			var (
+				phpYMLFilesDir string
+			)
+
+			it.Before(func() {
+				// create a temp dir
+				// create example yml files on-the-fly
+			})
+
+			it("", func() {
+				expectedJson := `{"Data":{"php-7":[{"Name":"1","Version":"1","MD5":"1"},{"Name":"2","Version":"2","MD5":"2"}],"php-8":[{"Name":"10","Version":"10","MD5":"10"},{"Name":"4","Version":"4","MD5":"4"}]}}`
+
+				jsonObj, err := phpUtils.GenerateJSONPayload(phpYMLFilesDir)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(jsonObj).To(Equal(expectedJson))
+			})
+
+		})
 	})
 }

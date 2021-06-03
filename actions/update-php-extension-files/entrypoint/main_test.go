@@ -45,22 +45,24 @@ func TestEntrypoint(t *testing.T) {
 
 				//TODO: Check that the output matches the following structure:
 				//{
-				//  php-8-yml:
-				//  [
-				//   {
-				//      name: amqp
-				//      version: 1.1.1
-				//      md5: 12355
-				//   } ,
-				//   {
-				//      name: redis
-				//      version: 0.1.0
-				//      md5: 5436346
-				//   }
-				//  ],
-				//  php-7-yml:
-				//  [
-				//  ]
+				//  data: {
+				//    php-8-yml:
+				//    [
+				//     {
+				//        name: amqp
+				//        version: 1.1.1
+				//        md5: 12355
+				//     } ,
+				//     {
+				//        name: redis
+				//        version: 0.1.0
+				//        d5: 5436346
+				//     }
+				//
+				//    php-7-yml:
+				//    [
+				//    ]
+				//  }
 				//}
 
 				Eventually(session).Should(gexec.Exit(0), func() string { return fmt.Sprintf("output:\n%s\n", buffer.Contents()) })

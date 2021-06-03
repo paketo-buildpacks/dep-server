@@ -15,10 +15,6 @@ type ChecksummerPHP interface {
 type Checksummer struct {
 }
 
-func NewPHPChecksummer() Checksummer {
-	return Checksummer{}
-}
-
 func (c Checksummer) GetMD5(path string) (string, error) {
 	file, err := os.Open(path)
 	if err != nil {

@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/jessevdk/go-flags"
 	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
-	"os"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 
 	depFactory := dependency.NewDependencyFactory("")
 	webClient := utils.NewPHPExtensionsWebClient()
-	checkSummer := utils.NewPHPChecksummer()
+	checkSummer := utils.Checksummer{}
 
 	phpExtensionsUtils := utils.NewPHPExtensionsUtils(depFactory, webClient, checkSummer)
 	results, err := phpExtensionsUtils.GenerateJSONPayload(opts.Folder)
@@ -31,8 +32,4 @@ func main() {
 	}
 
 	fmt.Println(results)
-	// Map of deps to new versions
-	// Marshal to JSON
-	// Attach JSON as payload for GH dispatch
-	// Refer to: github-config/actions/dispatch
 }
