@@ -3,9 +3,9 @@ package utils
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -35,9 +35,14 @@ func (w WebClient) DownloadExtensionsSource(url, filename string) error {
 		return err
 	}
 
+	if response.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(response.Body)
+		return fmt.Errorf("got unsuccessful response: status code: %d, body: %s", response.StatusCode, body)
+	}
+
 	defer response.Body.Close()
 
-	file, err := os.OpenFile(filepath.Join("/tmp", filename), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}

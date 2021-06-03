@@ -30,6 +30,7 @@ func testUtils(t *testing.T, context spec.G, it spec.S) {
 		fakeGithubClient        *dependencyfakes.FakeGithubClient
 		fakeDepFactoryWebClient *dependencyfakes.FakeWebClient
 		fakePHPExtensionsClient *utilsfakes.FakePHPExtensionsWebClient
+		fakeCheckSummerPHP      *utilsfakes.FakeChecksummerPHP
 		depFactory              dependency.DepFactory
 	)
 
@@ -39,8 +40,9 @@ func testUtils(t *testing.T, context spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeDepFactoryWebClient = &dependencyfakes.FakeWebClient{}
 		fakePHPExtensionsClient = &utilsfakes.FakePHPExtensionsWebClient{}
+		fakeCheckSummerPHP = &utilsfakes.FakeChecksummerPHP{}
 		depFactory = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeDepFactoryWebClient)
-		phpUtils = utils.NewPHPExtensionsUtils(depFactory, fakePHPExtensionsClient)
+		phpUtils = utils.NewPHPExtensionsUtils(depFactory, fakePHPExtensionsClient, fakeCheckSummerPHP)
 	})
 
 	context("When given a folder containing PHP extension metadata files", func() {
@@ -118,7 +120,31 @@ extensions:
 
 		context("GetLatestUpstreamVersion", func() {
 			it.Before(func() {
-				//fakePHPExtensionsClient.DownloadExtensionsSourceReturns()
+				fakeDepFactoryWebClient.GetReturns([]byte(`<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://purl.org/rss/1.0/"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <item rdf:about="https://pecl.php.net/package-changelog.php?package=APC&amp;release=3.1.1">
+            <title>APC 3.1.1</title>
+            <link>https://pecl.php.net/package-changelog.php?package=APC&amp;amp;release=3.1.1</link>
+            <dc:date>2011-05-14T18:15:04-05:00</dc:date>
+        </item>
+            <item rdf:about="https://pecl.php.net/package-changelog.php?package=APC&amp;release=3.1.11">
+            <title>APC 3.1.11</title>
+            <link>https://pecl.php.net/package-changelog.php?package=APC&amp;amp;release=3.1.11</link>
+            <dc:date>2012-07-19T18:11:06-05:00</dc:date>
+        </item>
+            <item rdf:about="https://pecl.php.net/package-changelog.php?package=APC&amp;release=3.1.10">
+            <title>APC 3.1.10</title>
+            <link>https://pecl.php.net/package-changelog.php?package=APC&amp;amp;release=3.1.10</link>
+            <dc:date>2012-04-11T07:48:07-05:00</dc:date>
+        </item>
+</rdf:RDF>`), nil)
+				fakeDepFactoryWebClient.DownloadReturns(nil)
+				fakePHPExtensionsClient.DownloadExtensionsSourceReturns(nil)
+				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeCheckSummerPHP.GetMD5Returns("some-md5", nil)
 
 			})
 
@@ -129,7 +155,7 @@ extensions:
 
 				Expect(depVersion).To(Equal(utils.ExtensionVersion{
 					Name:    "apcu",
-					Version: "some-version",
+					Version: "3.1.11",
 					MD5:     "some-md5",
 				}))
 			})

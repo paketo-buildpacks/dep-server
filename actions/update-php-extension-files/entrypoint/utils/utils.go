@@ -1,11 +1,9 @@
 package utils
 
 import (
-	"crypto/md5"
 	"fmt"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"gopkg.in/yaml.v2"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -30,12 +28,17 @@ type ExtensionVersion struct {
 }
 
 type PHPExtensionsUtils struct {
-	factory   dependency.DepFactory
-	webClient PHPExtensionsWebClient
+	factory     dependency.DepFactory
+	webClient   PHPExtensionsWebClient
+	checkSummer ChecksummerPHP
 }
 
-func NewPHPExtensionsUtils(factory dependency.DepFactory, webClient PHPExtensionsWebClient) PHPExtensionsUtils {
-	return PHPExtensionsUtils{factory: factory, webClient: webClient}
+func NewPHPExtensionsUtils(factory dependency.DepFactory, webClient PHPExtensionsWebClient, checkSummer ChecksummerPHP) PHPExtensionsUtils {
+	return PHPExtensionsUtils{
+		factory:     factory,
+		webClient:   webClient,
+		checkSummer: checkSummer,
+	}
 }
 
 func (p PHPExtensionsUtils) ParseYML(YMLFile string) (PHPExtMetadataFile, error) {
@@ -115,17 +118,5 @@ func (p PHPExtensionsUtils) GenerateJSONPayload(folder string) (string, error) {
 }
 
 func (p PHPExtensionsUtils) GetMD5(path string) (string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "nil", fmt.Errorf("failed to open file: %w", err)
-	}
-	defer file.Close()
-
-	hash := md5.New()
-	_, err = io.Copy(hash, file)
-	if err != nil {
-		return "nil", fmt.Errorf("failed to calculate MD5: %w", err)
-	}
-
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+	return p.checkSummer.GetMD5(path)
 }

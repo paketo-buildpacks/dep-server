@@ -21,8 +21,9 @@ func main() {
 
 	depFactory := dependency.NewDependencyFactory("")
 	webClient := utils.NewPHPExtensionsWebClient()
+	checkSummer := utils.NewPHPChecksummer()
 
-	phpExtensionsUtils := utils.NewPHPExtensionsUtils(depFactory, webClient)
+	phpExtensionsUtils := utils.NewPHPExtensionsUtils(depFactory, webClient, checkSummer)
 	results, err := phpExtensionsUtils.GenerateJSONPayload(opts.Folder)
 	if err != nil {
 		fmt.Println(err.Error())
