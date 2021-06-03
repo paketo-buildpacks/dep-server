@@ -13,6 +13,15 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PHPExtUtils
+type PHPExtUtils interface {
+	GetPHPExtensionsYMLFiles(folder string) (map[string]PHPExtMetadataFile, error)
+	ParseYML(YMLFile string) (PHPExtMetadataFile, error)
+	GetLatestUpstreamVersion(depName string) (ExtensionVersion, error)
+	GetUpdatedMetadataFile(file PHPExtMetadataFile) (PHPExtMetadataFile, error)
+	GetUpdatedExtensions(currentExtensions []PHPExtension) ([]PHPExtension, error)
+}
+
 type PHPExtension struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
@@ -35,6 +44,10 @@ type PHPExtensionsUtils struct {
 	factory     dependency.DepFactory
 	webClient   PHPExtensionsWebClient
 	checkSummer ChecksummerPHP
+}
+
+type JSONPayload struct {
+	Data map[string]PHPExtMetadataFile `json:"data"`
 }
 
 func NewPHPExtensionsUtils(factory dependency.DepFactory, webClient PHPExtensionsWebClient, checkSummer ChecksummerPHP) PHPExtensionsUtils {
@@ -115,46 +128,55 @@ func (p PHPExtensionsUtils) GetLatestUpstreamVersion(depName string) (ExtensionV
 	}, nil
 }
 
-func (p PHPExtensionsUtils) getUpdatedExtensions(file PHPExtMetadataFile) ([]PHPExtension, err) {
-	for _, dep
+func (p PHPExtensionsUtils) GetUpdatedMetadataFile(file PHPExtMetadataFile) (PHPExtMetadataFile, error) {
 
-	nativeModules := 
-	extensions := 
-}
-
-func (p PHPExtensionsUtils) GenerateJSONPayload(folder string) (string, error) {
-
-	ymlFiles := getPHPExtensionsYMLFiles(folder)
-
-	for _, ymlFile := range ymlFiles {
-		updatedExtensions := p.getUpdatedExtensions(ymlFile.Nati)
+	nativeModulesUpdated, err := p.GetUpdatedExtensions(file.NativeModules)
+	if err != nil {
+		return PHPExtMetadataFile{}, err
 	}
-	// Walk folder to find php extension ymls
-	// Parse each yml
-	// For each extension and native module, get the latest upstream version
-	// compare the latest upstream to the current extension version
 
-	// If latest is greater, add it as an ExtensionVersion to a struct in the
-	// following format:
+	extensionsUpdated, err := p.GetUpdatedExtensions(file.Extensions)
+	if err != nil {
+		return PHPExtMetadataFile{}, err
+	}
 
-	// type Payload struct {
-	//   Data map[string][]PHPExtMetadataFile
-	//  }
-
-	// Example:
-	// p.Data["php-8-yml"] = append(p.Data["php-8-yml"], newExtVersion)
-
-	// Marshal into JSON, return JSON as string or empty string and an error
-
-	//extensionVersion, err := GetLatestUpstreamVersion(dep,token)
-
-	return "", nil
+	return PHPExtMetadataFile{
+		NativeModules: nativeModulesUpdated,
+		Extensions:    extensionsUpdated,
+	}, nil
 }
 
-func (p PHPExtensionsUtils) getPHPExtensionsYMLFiles(folder string) ([]PHPExtMetadataFile, error) {
+func (p PHPExtensionsUtils) GetUpdatedExtensions(currentExtensions []PHPExtension) ([]PHPExtension, error) {
+
+	var extensionsUpdated []PHPExtension
+
+	for _, nativeModule := range currentExtensions {
+
+		latestUpstreamVersion, err := p.GetLatestUpstreamVersion(nativeModule.Name)
+		if err != nil {
+			return []PHPExtension{}, err
+		}
+
+		actualSemverVersion, err := semver.NewVersion(nativeModule.Version)
+		latestSemverVersion, err := semver.NewVersion(latestUpstreamVersion.Version)
+
+		if actualSemverVersion.LessThan(latestSemverVersion) {
+			extensionsUpdated = append(extensionsUpdated, PHPExtension{
+				Name:    latestUpstreamVersion.Name,
+				Version: latestUpstreamVersion.Version,
+				MD5:     latestUpstreamVersion.MD5,
+				Klass:   nativeModule.Klass,
+			})
+		}
+	}
+
+	return extensionsUpdated, nil
+}
+
+func (p PHPExtensionsUtils) GetPHPExtensionsYMLFiles(folder string) (map[string]PHPExtMetadataFile, error) {
 
 	var (
-		YMLFiles []PHPExtMetadataFile
+		YMLFiles map[string]PHPExtMetadataFile
 	)
 
 	err := filepath.WalkDir(folder, func(path string, info fs.DirEntry, err error) error {
@@ -168,14 +190,14 @@ func (p PHPExtensionsUtils) getPHPExtensionsYMLFiles(folder string) ([]PHPExtMet
 
 				return err
 			}
-			YMLFiles = append(YMLFiles, YMLFile)
+			YMLFiles[info.Name()] = YMLFile
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return []PHPExtMetadataFile{}, err
+		return nil, err
 	}
 
 	return YMLFiles, nil

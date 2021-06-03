@@ -2,92 +2,144 @@ package main_test
 
 import (
 	"fmt"
-	"os/exec"
+	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils"
 	"testing"
-	"time"
 
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
-	"github.com/onsi/gomega/gexec"
+	main "github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint"
+	"github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint/utils/utilsfakes"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
+
+	. "github.com/onsi/gomega"
 )
 
-var entrypoint string
+func TestUtils(t *testing.T) {
+	spec.Run(t, "MainTest", mainTest, spec.Report(report.Terminal{}), spec.Parallel())
+}
 
-func TestEntrypoint(t *testing.T) {
-	var Expect = NewWithT(t).Expect
+func mainTest(t *testing.T, context spec.G, it spec.S) {
+	var (
+		Expect   = NewWithT(t).Expect
+		phpUtils *utilsfakes.FakePHPExtUtils
+	)
 
-	SetDefaultEventuallyTimeout(5 * time.Second)
+	it.Before(func() {
+		phpUtils = &utilsfakes.FakePHPExtUtils{}
+	})
 
-	var err error
-	entrypoint, err = gexec.Build("github.com/paketo-buildpacks/dep-server/actions/update-php-extension-files/entrypoint")
-	Expect(err).NotTo(HaveOccurred())
-
-	spec.Run(t, "dispatch", func(t *testing.T, context spec.G, it spec.S) {
+	context("GenerateJSONPayload", func() {
 		var (
-			Expect     = NewWithT(t).Expect
-			Eventually = NewWithT(t).Eventually
+			phpYMLFilesDir string
 		)
 
-		context("", func() {
-			var phpYMLFolder string
+		it.Before(func() {
+			// create a temp dir
+			// create example yml files on-the-fly
+			phpUtils.GetPHPExtensionsYMLFilesReturns(map[string]utils.PHPExtMetadataFile{
+				"php-7": {
+					NativeModules: []utils.PHPExtension{
+						{
+							Name:    "1",
+							Version: "1",
+							MD5:     "1",
+							Klass:   "1",
+						},
+						{
+							Name:    "2",
+							Version: "2",
+							MD5:     "2",
+							Klass:   "2",
+						},
+					},
+					Extensions: []utils.PHPExtension{
+						{
+							Name:    "3",
+							Version: "3",
+							MD5:     "3",
+							Klass:   "3",
+						},
+						{
+							Name:    "4",
+							Version: "4",
+							MD5:     "4",
+							Klass:   "4",
+						},
+					},
+				},
+				"php-8": {
+					NativeModules: []utils.PHPExtension{
+						{
+							Name:    "5",
+							Version: "5",
+							MD5:     "5",
+							Klass:   "5",
+						},
+						{
+							Name:    "6",
+							Version: "6",
+							MD5:     "6",
+							Klass:   "6",
+						},
+					},
+					Extensions: []utils.PHPExtension{
+						{
+							Name:    "7",
+							Version: "7",
+							MD5:     "7",
+							Klass:   "7",
+						},
+						{
+							Name:    "8",
+							Version: "8",
+							MD5:     "8",
+							Klass:   "8",
+						},
+					},
+				},
+			}, nil)
 
-			it("sends a repository_dispatch webhook to a repo", func() {
-				command := exec.Command(
-					entrypoint,
-					"--folder", phpYMLFolder,
-				)
-				buffer := gbytes.NewBuffer()
+			phpUtils.GetUpdatedMetadataFileReturnsOnCall(0, utils.PHPExtMetadataFile{
+				NativeModules: []utils.PHPExtension{},
+				Extensions: []utils.PHPExtension{
+					{
+						Name:    "3",
+						Version: "3-UPDATED",
+						MD5:     "3-MD5-UPDATED",
+						Klass:   "3",
+					},
+				},
+			}, nil)
 
-				session, err := gexec.Start(command, buffer, buffer)
-				Expect(err).NotTo(HaveOccurred())
+			phpUtils.GetUpdatedMetadataFileReturnsOnCall(1, utils.PHPExtMetadataFile{
+				NativeModules: []utils.PHPExtension{
+					{
+						Name:    "6",
+						Version: "6-UPDATED",
+						MD5:     "6-MD5-UPDATED",
+						Klass:   "6",
+					},
+				},
+				Extensions: []utils.PHPExtension{
+					{
+						Name:    "8",
+						Version: "8-UPDATED",
+						MD5:     "8-MD5-UPDATED",
+						Klass:   "8",
+					},
+				},
+			}, nil)
 
-				//TODO: Check that the output matches the following structure:
-				//{
-				//  data: {
-				//    php-8-yml:
-				//    [
-				//     {
-				//        name: amqp
-				//        version: 1.1.1
-				//        md5: 12355
-				//     } ,
-				//     {
-				//        name: redis
-				//        version: 0.1.0
-				//        d5: 5436346
-				//     }
-				//
-				//    php-7-yml:
-				//    [
-				//    ]
-				//  }
-				//}
-
-				Eventually(session).Should(gexec.Exit(0), func() string { return fmt.Sprintf("output:\n%s\n", buffer.Contents()) })
-				//
-				//Expect(buffer).To(gbytes.Say(`Success!`))
-
-			})
-
-			context("failure cases", func() {
-				context("when the --folder flag is missing", func() {
-					it("prints an error message and exits non-zero", func() {
-						command := exec.Command(
-							entrypoint,
-						)
-						buffer := gbytes.NewBuffer()
-
-						session, err := gexec.Start(command, buffer, buffer)
-						Expect(err).NotTo(HaveOccurred())
-
-						Eventually(session).Should(gexec.Exit(1), func() string { return fmt.Sprintf("output:\n%s\n", buffer.Contents()) })
-
-						Expect(buffer).To(gbytes.Say("the required flag `-f, --folder' was not specified"))
-					})
-				})
-			})
 		})
-	}, spec.Report(report.Terminal{}), spec.Parallel())
+
+		it("", func() {
+			expectedJson := `{"data":{"php-7":{"NativeModules":[],"Extensions":[{"Name":"3","Version":"3-UPDATED","MD5":"3-MD5-UPDATED","Klass":"3"}]},"php-8":{"NativeModules":[{"Name":"6","Version":"6-UPDATED","MD5":"6-MD5-UPDATED","Klass":"6"}],"Extensions":[{"Name":"8","Version":"8-UPDATED","MD5":"8-MD5-UPDATED","Klass":"8"}]}}}`
+
+			jsonObj, err := main.GenerateJSONPayload(phpUtils, phpYMLFilesDir)
+			fmt.Println(jsonObj)
+			fmt.Println(expectedJson)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(jsonObj).To(Equal(expectedJson))
+		})
+
+	})
 }
