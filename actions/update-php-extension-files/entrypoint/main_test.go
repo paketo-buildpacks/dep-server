@@ -64,20 +64,16 @@ func TestEntrypoint(t *testing.T) {
 				//}
 
 				Eventually(session).Should(gexec.Exit(0), func() string { return fmt.Sprintf("output:\n%s\n", buffer.Contents()) })
-
-				Expect(buffer).To(gbytes.Say(`Success!`))
+				//
+				//Expect(buffer).To(gbytes.Say(`Success!`))
 
 			})
 
 			context("failure cases", func() {
-				context("when the --event flag is missing", func() {
+				context("when the --folder flag is missing", func() {
 					it("prints an error message and exits non-zero", func() {
 						command := exec.Command(
 							entrypoint,
-							"--endpoint", api.URL,
-							"--repos", "some-org/some-repo",
-							"--token", "some-github-token",
-							"--payload", "{}",
 						)
 						buffer := gbytes.NewBuffer()
 
@@ -86,10 +82,9 @@ func TestEntrypoint(t *testing.T) {
 
 						Eventually(session).Should(gexec.Exit(1), func() string { return fmt.Sprintf("output:\n%s\n", buffer.Contents()) })
 
-						Expect(buffer).To(gbytes.Say(`Error: missing required input "event"`))
+						Expect(buffer).To(gbytes.Say("the required flag `-f, --folder' was not specified"))
 					})
 				})
-
 			})
 		})
 	}, spec.Report(report.Terminal{}), spec.Parallel())
