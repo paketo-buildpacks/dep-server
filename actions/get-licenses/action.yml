@@ -1,0 +1,24 @@
+name: 'Get Licenses'
+description: |
+  Gets dependency licenses from dependency tar file
+
+inputs:
+  dependency_name:
+    description: dependency name
+    required: true
+  url:
+    description: URL of source code for dependency
+    required: true
+
+outputs:
+  licenses:
+    description: Dependency licenses
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  - "--dependency-name"
+  - ${{ inputs.dependency_name }}
+  - "--url"
+  - ${{ inputs.url }}
