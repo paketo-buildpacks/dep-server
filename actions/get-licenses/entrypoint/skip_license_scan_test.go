@@ -33,7 +33,7 @@ func testSkipLicenseScanCase(t *testing.T, context spec.G, it spec.S) {
 
 			Expect(buffer).To(gbytes.Say("Skipping license retrieval for CAAPM"))
 			Expect(buffer).To(gbytes.Say("License is not automatically retrievable and may need to be looked up manually"))
-			Eventually(buffer).Should(gbytes.Say(`::set-output name=licenses::nil`))
+			Eventually(buffer).Should(gbytes.Say(`::set-output name=licenses::\[\]`))
 		})
 	})
 
@@ -53,7 +53,7 @@ func testSkipLicenseScanCase(t *testing.T, context spec.G, it spec.S) {
 
 			Expect(buffer).To(gbytes.Say("Skipping license retrieval for composer"))
 			Expect(buffer).To(gbytes.Say("License is not automatically retrievable and may need to be looked up manually"))
-			Eventually(buffer).Should(gbytes.Say(`::set-output name=licenses::nil`))
+			Eventually(buffer).Should(gbytes.Say(`::set-output name=licenses::\[\]`))
 		})
 	})
 

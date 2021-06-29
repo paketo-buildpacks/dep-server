@@ -42,7 +42,7 @@ func main() {
 	if options.DependencyName == "CAAPM" || options.DependencyName == "composer" {
 		fmt.Printf("Skipping license retrieval for %s\n", options.DependencyName)
 		fmt.Println("License is not automatically retrievable and may need to be looked up manually")
-		fmt.Println("::set-output name=licenses::nil")
+		fmt.Printf("::set-output name=licenses::%v\n", []string{})
 
 		os.Exit(0)
 	}
