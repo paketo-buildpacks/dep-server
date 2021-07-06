@@ -21,13 +21,14 @@ func TestDotnetSDK(t *testing.T) {
 
 func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		dotnetSDK        dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		dotnetSDK            dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -35,9 +36,10 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		dotnetSDK, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("dotnet-sdk")
+		dotnetSDK, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("dotnet-sdk")
 		require.NoError(err)
 	})
 
@@ -320,6 +322,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 			require.NoError(err)
@@ -331,6 +334,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -429,6 +433,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("5.0.201")
 				require.NoError(err)
@@ -440,6 +445,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net:5.0.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -490,6 +496,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
@@ -501,6 +508,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -577,6 +585,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
@@ -588,6 +597,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -619,6 +629,8 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
 
@@ -629,6 +641,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -661,6 +674,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.1.201")
 				require.NoError(err)
@@ -672,6 +686,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.1.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -704,6 +719,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
@@ -715,6 +731,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 			})

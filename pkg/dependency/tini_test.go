@@ -20,19 +20,21 @@ func TestTini(t *testing.T) {
 
 func testTini(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		tini             dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		tini                 dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		tini, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, fakeGithubClient, nil).NewDependency("tini")
+		tini, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, fakeGithubClient, nil, fakeLicenseRetriever).NewDependency("tini")
 		require.NoError(err)
 	})
 
@@ -83,6 +85,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 			}, nil)
 			fakeGithubClient.DownloadSourceTarballReturns("some-tarball-url", nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := tini.GetDependencyVersion("v1.0.0")
 			require.NoError(err)
@@ -95,6 +98,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:tini_project:tini:1.0.0:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDep, actualDep)

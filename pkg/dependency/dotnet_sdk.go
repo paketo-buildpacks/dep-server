@@ -2,14 +2,16 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type DotnetSDK struct {
-	checksummer Checksummer
-	webClient   WebClient
+	checksummer      Checksummer
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type dotnetSDKType struct{}
@@ -24,9 +26,11 @@ func (d DotnetSDK) GetAllVersionRefs() ([]string, error) {
 
 func (d DotnetSDK) GetDependencyVersion(version string) (DepVersion, error) {
 	return dotnet{
-		dotnetType:  dotnetSDKType{},
-		checksummer: d.checksummer,
-		webClient:   d.webClient,
+		dotnetType:       dotnetSDKType{},
+		checksummer:      d.checksummer,
+		webClient:        d.webClient,
+		licenseRetriever: d.licenseRetriever,
+		name:             "dotnet-sdk",
 	}.GetDependencyVersion(version)
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type DotnetASPNETCore struct {
-	checksummer Checksummer
-	webClient   WebClient
+	checksummer      Checksummer
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type dotnetASPNETCoreType struct{}
@@ -23,9 +24,11 @@ func (d DotnetASPNETCore) GetAllVersionRefs() ([]string, error) {
 
 func (d DotnetASPNETCore) GetDependencyVersion(version string) (DepVersion, error) {
 	return dotnet{
-		dotnetType:  dotnetASPNETCoreType{},
-		checksummer: d.checksummer,
-		webClient:   d.webClient,
+		dotnetType:       dotnetASPNETCoreType{},
+		checksummer:      d.checksummer,
+		webClient:        d.webClient,
+		licenseRetriever: d.licenseRetriever,
+		name:             "dotnet-aspnetcore",
 	}.GetDependencyVersion(version)
 }
 

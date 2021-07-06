@@ -20,13 +20,14 @@ func TestRust(t *testing.T) {
 
 func testRust(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		rust             dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		rust                 dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -34,9 +35,10 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		rust, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("rust")
+		rust, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("rust")
 		require.NoError(err)
 	})
 
@@ -75,6 +77,7 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDepVersion, err := rust.GetDependencyVersion("1.49.0")
 			require.NoError(err)
@@ -86,6 +89,7 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &tagCommit.Date,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:rust-lang:rust:1.49.0:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)
 

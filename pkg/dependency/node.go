@@ -9,9 +9,10 @@ import (
 )
 
 type Node struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type NodeRelease struct {
@@ -110,14 +111,20 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not parse release date: %w", err)
 	}
+	depURL := n.dependencyURL(release.Version)
+	licenses, err := n.licenseRetriever.LookupLicenses("node", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
 
 	return DepVersion{
 		Version:         release.Version,
-		URI:             n.dependencyURL(release.Version),
+		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     &releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(release.Version, "v")),
+		Licenses:        licenses,
 	}, nil
 }
 

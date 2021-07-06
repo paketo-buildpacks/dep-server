@@ -13,9 +13,10 @@ import (
 type PyPi struct {
 	productName string
 
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type PyPiRelease struct {
@@ -117,12 +118,18 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 				cpe = fmt.Sprintf("cpe:2.3:a:pypa:pip:%s:*:*:*:*:python:*:*", version)
 			}
 
+			licenses, err := p.licenseRetriever.LookupLicenses("pypi", release.URL)
+			if err != nil {
+				return nil, fmt.Errorf("could not get retrieve licenses: %w", err)
+			}
+
 			releases = append(releases, DepVersion{
 				Version:     version,
 				URI:         release.URL,
 				SHA256:      release.Digests["sha256"],
 				ReleaseDate: &uploadTime,
 				CPE:         cpe,
+				Licenses:    licenses,
 			})
 		}
 	}

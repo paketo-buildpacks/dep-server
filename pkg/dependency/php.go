@@ -11,9 +11,10 @@ import (
 )
 
 type Php struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type PhpSource struct {
@@ -74,6 +75,11 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 
 	deprecationDate := p.calculateDeprecationDate(*releaseDate)
 
+	licenses, err := p.licenseRetriever.LookupLicenses("php", dependencyURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
@@ -81,6 +87,7 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:php:php:%s:*:*:*:*:*:*:*", version),
+		Licenses:        licenses,
 	}, nil
 }
 

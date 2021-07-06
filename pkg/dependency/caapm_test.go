@@ -18,21 +18,23 @@ func TestCAAPM(t *testing.T) {
 
 func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		caapm           dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		caapm                dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		caapm, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("CAAPM")
+		caapm, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("CAAPM")
 		require.NoError(err)
 	})
 
@@ -72,6 +74,7 @@ func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 	when("GetDependencyVersion", func() {
 		it("returns the correct caapm version", func() {
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDepVersion, err := caapm.GetDependencyVersion("20.1.0")
 			require.NoError(err)
@@ -82,6 +85,7 @@ func testCAAPM(t *testing.T, when spec.G, it spec.S) {
 				SHA256:          "some-source-sha",
 				ReleaseDate:     nil,
 				DeprecationDate: nil,
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)

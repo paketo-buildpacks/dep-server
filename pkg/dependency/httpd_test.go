@@ -21,12 +21,13 @@ func TestHttpd(t *testing.T) {
 
 func testHttpd(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		httpd           dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		httpd                dependency.Dependency
 	)
 
 	removeLinesContaining := func(s, pattern string) string {
@@ -38,9 +39,10 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		httpd, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("httpd")
+		httpd, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("httpd")
 		require.NoError(err)
 	})
 
@@ -75,6 +77,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-sha256 *httpd-2.4.43.tar.bz2"), nil)
 
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 			actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 			require.NoError(err)
 
@@ -85,6 +89,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)
@@ -105,6 +110,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 				actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 				require.NoError(err)
 
@@ -115,6 +122,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -163,6 +171,8 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 				actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 				require.NoError(err)
 
@@ -173,6 +183,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)
@@ -216,6 +227,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 			it("returns the correct httpd version without verifying the checksum", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(httpdIndex2_2_3), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := httpd.GetDependencyVersion("2.2.3")
 				require.NoError(err)
@@ -228,6 +240,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate223,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.2.3:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
 				assert.Equal(expectedDepVersion, actualDepVersion)

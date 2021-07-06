@@ -1,7 +1,6 @@
-package main
+package licenses
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,83 +13,65 @@ import (
 	"github.com/paketo-buildpacks/packit/vacation"
 )
 
-type Options struct {
-	DependencyName string
-	URL            string
+type LicenseRetriever struct{}
+
+func NewLicenseRetriever() LicenseRetriever {
+	return LicenseRetriever{}
 }
 
-func main() {
-	var options Options
-
-	flag.StringVar(&options.DependencyName, "dependency-name", "", "Dependency name")
-	flag.StringVar(&options.URL, "url", "", "Dependency source URL")
-	flag.Parse()
-
-	requiredFlags := map[string]string{
-		"--dependency-name": options.DependencyName,
-		"--url":             options.URL,
-	}
-
-	for name, value := range requiredFlags {
-		if value == "" {
-			fail(fmt.Errorf("missing required flag %s", name))
-		}
-	}
-
+func (LicenseRetriever) LookupLicenses(dependencyName, sourceURL string) ([]string, error) {
 	// CAAPM dependency does not have an auto-retrievable license
 	// Exit the function and leave the license blank
-	if options.DependencyName == "CAAPM" || options.DependencyName == "composer" {
-		fmt.Printf("Skipping license retrieval for %s\n", options.DependencyName)
-		fmt.Println("License is not automatically retrievable and may need to be looked up manually")
-		fmt.Printf("::set-output name=licenses::%v\n", []string{})
-
-		os.Exit(0)
+	if dependencyName == "CAAPM" || dependencyName == "composer" {
+		// skipping license retrieval
+		// license is not automatically retrievable and may need to be looked up manually
+		return []string{}, nil
 	}
 
-	fmt.Printf("Getting the dependency artifact from %s\n", options.URL)
-	url := options.URL
+	// getting the dependency artifact from sourceURL
+	url := sourceURL
 	resp, err := http.Get(url)
 	if err != nil {
-		fail(fmt.Errorf("failed to query url: %w", err))
+		return []string{}, fmt.Errorf("failed to query url: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		fail(fmt.Errorf("failed to query url %s with: status code %d", url, resp.StatusCode))
+		return []string{}, fmt.Errorf("failed to query url %s with: status code %d", url, resp.StatusCode)
 	}
 
-	fmt.Println("Decompressing the dependency artifact")
+	// decompressing the dependency artifact
 	tempDir, err := os.MkdirTemp("", "destination")
 	if err != nil {
-		fail(err)
+		return []string{}, err
 	}
 	defer os.RemoveAll(tempDir)
 
-	switch options.DependencyName {
+	switch dependencyName {
 	case "bundler":
 		err := bundlerDecompress(resp.Body, tempDir)
 		if err != nil {
-			fail(err)
+			return []string{}, err
 		}
 	case "dotnet-runtime", "dotnet-aspnetcore", "dotnet-sdk":
 		err := defaultDecompress(resp.Body, tempDir, 0)
 		if err != nil {
-			fail(err)
+			return []string{}, err
 		}
 	default:
 		err := defaultDecompress(resp.Body, tempDir, 1)
 		if err != nil {
-			fail(err)
+			return []string{}, err
 		}
 	}
 
-	fmt.Println("Scanning artifact for license file")
+	// scanning artifact for license file
 	filer, err := filer.FromDirectory(tempDir)
 	if err != nil {
-		fail(fmt.Errorf("failed to setup a licensedb filer: %w", err))
+		return []string{}, fmt.Errorf("failed to setup a licensedb filer: %w", err)
 	}
 
 	licenses, err := licensedb.Detect(filer)
 	if err != nil {
-		fail(fmt.Errorf("failed to detect licenses: %w", err))
+		return []string{}, fmt.Errorf("failed to detect licenses: %w", err)
 	}
 
 	// Only return the license IDs, in alphabetical order
@@ -100,8 +81,7 @@ func main() {
 	}
 	sort.Strings(licenseIDs)
 
-	fmt.Printf("::set-output name=licenses::%v\n", licenseIDs)
-	fmt.Println("Licenses found!")
+	return licenseIDs, nil
 }
 
 func defaultDecompress(artifact io.Reader, destination string, stripComponents int) error {
@@ -132,9 +112,4 @@ func bundlerDecompress(artifact io.Reader, destination string) error {
 	}
 
 	return nil
-}
-
-func fail(err error) {
-	fmt.Printf("Error: %s", err)
-	os.Exit(1)
 }

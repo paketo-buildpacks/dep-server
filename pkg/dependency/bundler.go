@@ -8,9 +8,10 @@ import (
 )
 
 type Bundler struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type BundlerRelease struct {
@@ -46,6 +47,11 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 
 	depURL := b.getDependencyURL(version)
 
+	licenses, err := b.licenseRetriever.LookupLicenses("bundler", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	for _, release := range bundlerReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse(time.RFC3339Nano, release.Date)
@@ -59,6 +65,7 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:bundler:bundler:%s:*:*:*:*:ruby:*:*", version),
+				Licenses:        licenses,
 			}, nil
 		}
 	}

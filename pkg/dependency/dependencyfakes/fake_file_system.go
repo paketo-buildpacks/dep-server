@@ -31,16 +31,15 @@ func (fake *FakeFileSystem) WriteFile(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.WriteFileStub
-	fakeReturns := fake.writeFileReturns
 	fake.recordInvocation("WriteFile", []interface{}{arg1, arg2})
 	fake.writeFileMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.WriteFileStub != nil {
+		return fake.WriteFileStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
+	fakeReturns := fake.writeFileReturns
 	return fakeReturns.result1
 }
 
