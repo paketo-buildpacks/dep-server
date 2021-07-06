@@ -13,9 +13,10 @@ import (
 )
 
 type Ruby struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type RubyRelease struct {
@@ -48,6 +49,11 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, err
 	}
 
+	licenses, err := r.licenseRetriever.LookupLicenses("ruby", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	for _, release := range rubyReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse("2006-01-02", release.Date)
@@ -62,6 +68,7 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:ruby-lang:ruby:%s:*:*:*:*:*:*:*", version),
+				Licenses:        licenses,
 			}, nil
 		}
 	}

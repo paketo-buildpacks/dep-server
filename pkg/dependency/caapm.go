@@ -12,9 +12,10 @@ import (
 )
 
 type CAAPM struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (c CAAPM) GetAllVersionRefs() ([]string, error) {
@@ -58,12 +59,18 @@ func (c CAAPM) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get SHA256: %w", err)
 	}
 
+	licenses, err := c.licenseRetriever.LookupLicenses("CAAPM", dependencyURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
 		SHA256:          dependencySHA,
 		ReleaseDate:     nil,
 		DeprecationDate: nil,
+		Licenses:        licenses,
 	}, nil
 }
 

@@ -12,9 +12,10 @@ import (
 )
 
 type Python struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (p Python) GetAllVersionRefs() ([]string, error) {
@@ -52,6 +53,11 @@ func (p Python) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get release deprecation date: %w", err)
 	}
 
+	licenses, err := p.licenseRetriever.LookupLicenses("python", sourceURI)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             sourceURI,
@@ -59,6 +65,7 @@ func (p Python) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:python:python:%s:*:*:*:*:*:*:*", version),
+		Licenses:        licenses,
 	}, nil
 }
 

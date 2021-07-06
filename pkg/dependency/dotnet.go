@@ -69,9 +69,11 @@ type dotnetType interface {
 }
 
 type dotnet struct {
-	dotnetType  dotnetType
-	checksummer Checksummer
-	webClient   WebClient
+	dotnetType       dotnetType
+	checksummer      Checksummer
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
+	name             string
 }
 
 func (d dotnet) GetAllVersionRefs() ([]string, error) {
@@ -123,12 +125,19 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get cpe: %w", err)
 	}
+
+	licenses, err := d.licenseRetriever.LookupLicenses(d.name, releaseFile.URL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get licenses: %w", err)
+	}
+
 	depVersion := DepVersion{
 		Version:     version,
 		URI:         releaseFile.URL,
 		SHA256:      sha256,
 		ReleaseDate: releaseDate,
 		CPE:         cpe,
+		Licenses:    licenses,
 	}
 	if channel.EOLDate != "" {
 		deprecationDate, err := time.Parse("2006-01-02", channel.EOLDate)

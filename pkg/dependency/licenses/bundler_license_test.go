@@ -1,4 +1,4 @@
-package main_test
+package licenses_test
 
 import (
 	"archive/tar"
@@ -7,27 +7,26 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
-	"github.com/onsi/gomega/gbytes"
-	"github.com/onsi/gomega/gexec"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"
+	licenses "github.com/paketo-buildpacks/dep-server/pkg/dependency/licenses"
 )
 
 func testBundlerLicenseCase(t *testing.T, context spec.G, it spec.S) {
 	var (
-		Expect     = NewWithT(t).Expect
-		Eventually = NewWithT(t).Eventually
+		Expect = NewWithT(t).Expect
 
-		mockServer *httptest.Server
+		mockServer       *httptest.Server
+		licenseRetriever licenses.LicenseRetriever
 	)
 
 	it.Before(func() {
 		var err error
+		licenseRetriever = licenses.NewLicenseRetriever()
 		// Set up tar files
 		buffer := bytes.NewBuffer(nil)
 		tw := tar.NewWriter(buffer)
@@ -120,77 +119,34 @@ func testBundlerLicenseCase(t *testing.T, context spec.G, it spec.S) {
 
 	context("given a bundler dependency URL to get the license for", func() {
 		it("gets the artifact and retrieves the license from it", func() {
-			command := exec.Command(
-				entrypoint,
-				"--dependency-name", "bundler",
-				"--url", fmt.Sprintf("%s/bundler-source-url.gem", mockServer.URL),
-			)
-
-			buffer := gbytes.NewBuffer()
-			session, err := gexec.Start(command, buffer, buffer)
+			licenses, err := licenseRetriever.LookupLicenses("bundler", fmt.Sprintf("%s/bundler-source-url.gem", mockServer.URL))
 			Expect(err).NotTo(HaveOccurred())
+			Expect(licenses).To(Equal([]string{"MIT", "MIT-0"}))
+		})
+	})
 
-			Eventually(session).Should(gexec.Exit(0), func() string { return string(buffer.Contents()) })
-
-			Expect(buffer).To(gbytes.Say(fmt.Sprintf("Getting the dependency artifact from %s/bundler-source-url.gem", mockServer.URL)))
-
-			Expect(buffer).To(gbytes.Say("Decompressing the dependency artifact"))
-			Expect(buffer).To(gbytes.Say("Scanning artifact for license file"))
-
-			Eventually(buffer).Should(gbytes.Say(`::set-output name=licenses::\[MIT MIT-0\]`))
-			Expect(buffer).To(gbytes.Say("Licenses found!"))
+	context("the artifact does not contain a license", func() {
+		it("returns an empty slice of licenses and no error", func() {
+			licenses, err := licenseRetriever.LookupLicenses("bundler", fmt.Sprintf("%s/no-license.tgz", mockServer.URL))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(licenses).To(Equal([]string{}))
 		})
 	})
 
 	context("failure cases", func() {
 		context("the outer artifact cannot be decompressed", func() {
-			it("returns an error and exits non-zero", func() {
-				command := exec.Command(
-					entrypoint,
-					"--dependency-name", "bundler",
-					"--url", fmt.Sprintf("%s/non-tar-file-outer-artifact", mockServer.URL),
-				)
-
-				buffer := gbytes.NewBuffer()
-				session, err := gexec.Start(command, buffer, buffer)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session).Should(gexec.Exit(1), func() string { return string(buffer.Contents()) })
-				Expect(buffer).To(gbytes.Say(`failed to decompress source file`))
+			it("returns an error", func() {
+				_, err := licenseRetriever.LookupLicenses("bundler", fmt.Sprintf("%s/non-tar-file-outer-artifact", mockServer.URL))
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(ContainSubstring("failed to decompress source file")))
 			})
 		})
 
 		context("the inner artifact cannot be decompressed", func() {
-			it("returns an error and exits non-zero", func() {
-				command := exec.Command(
-					entrypoint,
-					"--dependency-name", "bundler",
-					"--url", fmt.Sprintf("%s/non-tar-file-inner-artifact", mockServer.URL),
-				)
-
-				buffer := gbytes.NewBuffer()
-				session, err := gexec.Start(command, buffer, buffer)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session).Should(gexec.Exit(1), func() string { return string(buffer.Contents()) })
-				Expect(buffer).To(gbytes.Say(`failed to decompress inner source file`))
-			})
-		})
-
-		context("the bundler artifact does not contain a license", func() {
-			it("returns an error and exits non-zero", func() {
-				command := exec.Command(
-					entrypoint,
-					"--dependency-name", "bundler",
-					"--url", fmt.Sprintf("%s/no-license.tgz", mockServer.URL),
-				)
-
-				buffer := gbytes.NewBuffer()
-				session, err := gexec.Start(command, buffer, buffer)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session).Should(gexec.Exit(1), func() string { return string(buffer.Contents()) })
-				Expect(buffer).To(gbytes.Say(`failed to detect licenses: no license file was found`))
+			it("returns an error", func() {
+				_, err := licenseRetriever.LookupLicenses("bundler", fmt.Sprintf("%s/non-tar-file-inner-artifact", mockServer.URL))
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(ContainSubstring("failed to decompress inner source file")))
 			})
 		})
 	})

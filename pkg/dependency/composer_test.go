@@ -20,13 +20,14 @@ func TestComposer(t *testing.T) {
 
 func testComposer(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		composer         dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		composer             dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -34,9 +35,10 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		composer, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("composer")
+		composer, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("composer")
 		require.NoError(err)
 	})
 
@@ -107,6 +109,8 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0,
 				[]byte(`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  composer.phar`), nil)
 
+			fakeLicenseRetriever.LookupLicensesReturns([]string{}, nil)
+
 			actualDep, err := composer.GetDependencyVersion("1.0.1")
 			require.NoError(err)
 
@@ -117,6 +121,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
+				Licenses:        []string{},
 			}
 			assert.Equal(expectedDep, actualDep)
 
