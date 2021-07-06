@@ -604,6 +604,49 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 				assert.Equal(expectedDep, actualDep)
 			})
 		})
+
+		when("the dependency version is less than 2.*", func() {
+			it("returns does not get license metadata", func() {
+				fakeWebClient.GetReturns([]byte(`
+{
+  "eol-date": "2050-02-20",
+  "releases": [
+    {
+      "release-date": "2020-02-20",
+      "runtime": {
+        "version": "1.1.2",
+        "files": [
+          {
+            "name": "dotnet-runtime-linux-x64.tar.gz",
+            "rid": "linux-x64",
+            "url": "url-for-linux-x64-1.1.2",
+            "hash": "SHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA512"
+          }
+        ]
+      }
+    }
+  ]
+}
+`), nil)
+				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				actualDep, err := dotnetRuntime.GetDependencyVersion("1.1.2")
+				require.NoError(err)
+
+				licenseRetrieverCalls := fakeLicenseRetriever.LookupLicensesCallCount()
+				assert.Equal(licenseRetrieverCalls, 0)
+
+				expectedDep := dependency.DepVersion{
+					Version:         "1.1.2",
+					URI:             "url-for-linux-x64-1.1.2",
+					SHA256:          "some-sha256",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
+					CPE:             "cpe:2.3:a:microsoft:.net_core:1.1.2:*:*:*:*:*:*:*",
+					Licenses:        []string{},
+				}
+				assert.Equal(expectedDep, actualDep)
+			})
+		})
 	})
 
 	when("GetReleaseDate", func() {

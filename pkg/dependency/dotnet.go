@@ -126,9 +126,23 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get cpe: %w", err)
 	}
 
-	licenses, err := d.licenseRetriever.LookupLicenses(d.name, releaseFile.URL)
+	// version 1.* of dotnet does not have a retrievable license, so skip this
+
+	versionConstraint, err := semver.NewConstraint(">= 2.*")
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get licenses: %w", err)
+		return DepVersion{}, fmt.Errorf("could not get setup semver version constraint: %w", err)
+	}
+	semverVersion, err := semver.NewVersion(version)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get semver version: %w", err)
+	}
+
+	licenses := []string{}
+	if versionConstraint.Check(semverVersion) {
+		licenses, err = d.licenseRetriever.LookupLicenses(d.name, releaseFile.URL)
+		if err != nil {
+			return DepVersion{}, fmt.Errorf("could not get licenses: %w", err)
+		}
 	}
 
 	depVersion := DepVersion{

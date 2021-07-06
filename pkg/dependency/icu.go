@@ -135,7 +135,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		return DepVersion{}, fmt.Errorf("could not get SHA256: %w", err)
 	}
 
-	licenses, err := i.licenseRetriever.LookupLicenses("icu", assetUrl)
+	licenses, err := i.licenseRetriever.LookupLicenses("icu", asset.BrowserDownloadUrl)
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
