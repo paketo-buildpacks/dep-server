@@ -36,7 +36,6 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 		dependencies = []string{
 			"apcu",
 			"bundler",
-			"CAAPM",
 			"composer",
 			"curl",
 			"dotnet-aspnetcore",
