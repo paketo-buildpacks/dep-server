@@ -21,7 +21,6 @@ dependency metadata.
 
 ## Supported Dependencies
 * bundler
-* CAAPM
 * composer
 * curl
 * dotnet-aspnetcore

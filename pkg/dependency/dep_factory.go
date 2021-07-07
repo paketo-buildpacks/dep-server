@@ -111,12 +111,6 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:  d.fileSystem,
 			webClient:   d.webClient,
 		}, nil
-	case "CAAPM":
-		return CAAPM{
-			checksummer: d.checksummer,
-			fileSystem:  d.fileSystem,
-			webClient:   d.webClient,
-		}, nil
 	case "composer":
 		return Composer{
 			checksummer:  d.checksummer,
