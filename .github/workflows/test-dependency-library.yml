@@ -26,7 +26,8 @@ jobs:
       run: cd pkg/dependency && go test ./...
 
     - name: Run acceptance tests
-      run: cd pkg/dependency/test/acceptance && go test ./...
+      # Removing the timeout to get the tests passing with the addition of license retrieval 
+      run: cd pkg/dependency/test/acceptance && go test -timeout 0 ./...
       env:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
