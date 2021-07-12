@@ -2,10 +2,6 @@
   requires: ruby
   stacks:
     - id: io.buildpacks.stacks.bionic
-- name: CAAPM
-  skip_test: true
-  stacks:
-    - id: io.buildpacks.stacks.bionic
 - name: composer
   skip_test: true
   stacks:
