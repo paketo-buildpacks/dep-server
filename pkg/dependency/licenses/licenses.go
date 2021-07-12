@@ -20,9 +20,9 @@ func NewLicenseRetriever() LicenseRetriever {
 }
 
 func (LicenseRetriever) LookupLicenses(dependencyName, sourceURL string) ([]string, error) {
-	// CAAPM dependency does not have an auto-retrievable license
+	// composer dependency does not have an auto-retrievable license
 	// Exit the function and leave the license blank
-	if dependencyName == "CAAPM" || dependencyName == "composer" {
+	if dependencyName == "composer" {
 		// skipping license retrieval
 		// license is not automatically retrievable and may need to be looked up manually
 		return []string{}, nil
