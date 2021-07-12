@@ -16,6 +16,8 @@ name: Dotnet-runtime Test and Upload Metadata
         required: true
       CPE:
         required: true
+      LICENSES:
+        required: true
   repository_dispatch:
     types:
     - dotnet-runtime-test
@@ -29,6 +31,7 @@ env:
   SOURCE_SHA256: ${{ github.event.client_payload.source_sha256 }}
   DEPRECATION_DATE: ${{ github.event.client_payload.deprecation_date }}
   CPE: ${{ github.event.client_payload.cpe }}
+  LICENSES: ${{ github.event.client_payload.licenses }}
 jobs:
   test-upload-metadata:
     name: Test Dependency and Upload Metadata
@@ -44,6 +47,7 @@ jobs:
           echo "SOURCE_SHA256=${{ github.event.inputs.source_sha256 }}" >> $GITHUB_ENV
           echo "DEPRECATION_DATE=${{ github.event.inputs.deprecation_date }}" >> $GITHUB_ENV
           echo "CPE=${{ github.event.inputs.cpe }}" >> $GITHUB_ENV
+          echo "LICENSES=${{ github.event.inputs.licenses }}" >> $GITHUB_ENV
         fi
     - name: Get required dependency
       id: required-dependency
@@ -81,3 +85,4 @@ jobs:
         source-sha256: ${{ env.SOURCE_SHA256 }}
         deprecation-date: ${{ env.DEPRECATION_DATE }}
         cpe: ${{ steps.modify-cpe.outputs.cpe }}
+        licenses: '{{ env.LICENSES }}'
