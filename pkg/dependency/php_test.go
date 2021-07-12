@@ -19,21 +19,23 @@ func TestPhp(t *testing.T) {
 
 func testPhp(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		php             dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		php                  dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		php, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("php")
+		php, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("php")
 		require.NoError(err)
 	})
 
@@ -151,6 +153,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
  ]
 }
 `), nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDepVersion, err := php.GetDependencyVersion("7.4.4")
 			require.NoError(err)
@@ -164,6 +167,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)
@@ -188,6 +192,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
@@ -201,6 +206,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -228,6 +234,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := php.GetDependencyVersion("5.3.25")
 				require.NoError(err)
@@ -241,6 +248,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.3.25:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -262,6 +270,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := php.GetDependencyVersion("5.1.6")
 				require.NoError(err)
@@ -275,6 +284,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:php:php:5.1.6:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 

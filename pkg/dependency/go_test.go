@@ -21,21 +21,23 @@ func TestGo(t *testing.T) {
 
 func testGo(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		golang          dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		golang               dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		golang, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("go")
+		golang, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("go")
 		require.NoError(err)
 	})
 
@@ -146,6 +148,8 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 		</p>
 `), nil)
 
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 			actualDep, err := golang.GetDependencyVersion("go1.13.9")
 			require.NoError(err)
 
@@ -156,6 +160,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -184,6 +189,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 
 				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := golang.GetDependencyVersion("go1.13.9")
 				require.NoError(err)
@@ -195,6 +201,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 

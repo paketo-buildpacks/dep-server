@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"io"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type Curl struct {
-	checksummer Checksummer
-	webClient   WebClient
+	checksummer      Checksummer
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type CurlRelease struct {
@@ -124,12 +126,16 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get curl sha: %w", err)
 	}
 
+	depURL := c.dependencyURL(release)
+	licenses, err := c.licenseRetriever.LookupLicenses("curl", depURL)
+
 	return DepVersion{
 		Version:     release.Version,
-		URI:         c.dependencyURL(release),
+		URI:         depURL,
 		SHA256:      sha,
 		ReleaseDate: &release.Date,
 		CPE:         fmt.Sprintf("cpe:2.3:a:haxx:curl:%s:*:*:*:*:*:*:*", release.Version),
+		Licenses:    licenses,
 	}, nil
 }
 

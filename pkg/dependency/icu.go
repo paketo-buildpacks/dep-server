@@ -16,10 +16,11 @@ import (
 )
 
 type ICU struct {
-	checksummer  Checksummer
-	fileSystem   FileSystem
-	githubClient GithubClient
-	webClient    WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	githubClient     GithubClient
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (i ICU) GetAllVersionRefs() ([]string, error) {
@@ -134,6 +135,11 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		return DepVersion{}, fmt.Errorf("could not get SHA256: %w", err)
 	}
 
+	licenses, err := i.licenseRetriever.LookupLicenses("icu", asset.BrowserDownloadUrl)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
@@ -141,6 +147,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		ReleaseDate:     &release.CreatedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf(`cpe:2.3:a:icu-project:international_components_for_unicode:%s:*:*:*:*:c\/c\+\+:*:*`, version),
+		Licenses:        licenses,
 	}, nil
 }
 

@@ -14,9 +14,10 @@ import (
 type Pecl struct {
 	productName string
 
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type PeclVersion struct {
@@ -64,12 +65,18 @@ func (p Pecl) GetDependencyVersion(version string) (DepVersion, error) {
 				return DepVersion{}, fmt.Errorf("failed to generate dependency checksum: %w", err)
 			}
 
+			licenses, err := p.licenseRetriever.LookupLicenses("pecl", dependencyURL)
+			if err != nil {
+				return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+			}
+
 			return DepVersion{
 				Version:         currVersion.Version,
 				URI:             dependencyURL,
 				SHA256:          dependencySHA,
 				ReleaseDate:     currVersion.ReleaseDate,
 				DeprecationDate: nil,
+				Licenses:        licenses,
 			}, nil
 		}
 	}

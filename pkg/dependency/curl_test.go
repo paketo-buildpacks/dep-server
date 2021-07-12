@@ -1,14 +1,15 @@
 package dependency_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/dependencyfakes"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func TestCurl(t *testing.T) {
@@ -17,19 +18,21 @@ func TestCurl(t *testing.T) {
 
 func testCurl(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		curl            dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		curl                 dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		curl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, nil, fakeWebClient).NewDependency("curl")
+		curl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("curl")
 		require.NoError(err)
 	})
 
@@ -69,6 +72,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(2, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := curl.GetDependencyVersion("7.73.0")
 			require.NoError(err)
@@ -80,6 +84,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				SHA256:      "some-source-sha",
 				ReleaseDate: &expectedReleaseDate,
 				CPE:         "cpe:2.3:a:haxx:curl:7.73.0:*:*:*:*:*:*:*",
+				Licenses:    []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDep, actualDep)

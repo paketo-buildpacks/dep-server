@@ -56,16 +56,15 @@ func (fake *FakeDependency) GetAllVersionRefs() ([]string, error) {
 	ret, specificReturn := fake.getAllVersionRefsReturnsOnCall[len(fake.getAllVersionRefsArgsForCall)]
 	fake.getAllVersionRefsArgsForCall = append(fake.getAllVersionRefsArgsForCall, struct {
 	}{})
-	stub := fake.GetAllVersionRefsStub
-	fakeReturns := fake.getAllVersionRefsReturns
 	fake.recordInvocation("GetAllVersionRefs", []interface{}{})
 	fake.getAllVersionRefsMutex.Unlock()
-	if stub != nil {
-		return stub()
+	if fake.GetAllVersionRefsStub != nil {
+		return fake.GetAllVersionRefsStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getAllVersionRefsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -113,16 +112,15 @@ func (fake *FakeDependency) GetDependencyVersion(arg1 string) (dependency.DepVer
 	fake.getDependencyVersionArgsForCall = append(fake.getDependencyVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetDependencyVersionStub
-	fakeReturns := fake.getDependencyVersionReturns
 	fake.recordInvocation("GetDependencyVersion", []interface{}{arg1})
 	fake.getDependencyVersionMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetDependencyVersionStub != nil {
+		return fake.GetDependencyVersionStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getDependencyVersionReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -177,16 +175,15 @@ func (fake *FakeDependency) GetReleaseDate(arg1 string) (*time.Time, error) {
 	fake.getReleaseDateArgsForCall = append(fake.getReleaseDateArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetReleaseDateStub
-	fakeReturns := fake.getReleaseDateReturns
 	fake.recordInvocation("GetReleaseDate", []interface{}{arg1})
 	fake.getReleaseDateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
+	if fake.GetReleaseDateStub != nil {
+		return fake.GetReleaseDateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getReleaseDateReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

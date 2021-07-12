@@ -21,21 +21,23 @@ func TestPython(t *testing.T) {
 
 func testPython(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		python          dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		python               dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		python, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("python")
+		python, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("python")
 		require.NoError(err)
 	})
 
@@ -72,6 +74,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte(python378DownloadPage), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte(fullPythonIndex), nil)
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDepVersion, err := python.GetDependencyVersion("3.7.8")
 			require.NoError(err)
@@ -85,6 +88,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:python:python:3.7.8:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDepVersion, actualDepVersion)

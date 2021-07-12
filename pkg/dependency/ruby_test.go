@@ -19,21 +19,23 @@ func TestRuby(t *testing.T) {
 
 func testRuby(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert          = assert.New(t)
-		require         = require.New(t)
-		fakeChecksummer *dependencyfakes.FakeChecksummer
-		fakeFileSystem  *dependencyfakes.FakeFileSystem
-		fakeWebClient   *dependencyfakes.FakeWebClient
-		ruby            dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		ruby                 dependency.Dependency
 	)
 
 	it.Before(func() {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		ruby, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient).NewDependency("ruby")
+		ruby, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("ruby")
 		require.NoError(err)
 	})
 
@@ -138,6 +140,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
     xz: some-other-sha-256-xz
     zip: some-other-sha-256-zip
 `), nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := ruby.GetDependencyVersion("3.0.0")
 				require.NoError(err)
@@ -150,6 +153,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:3.0.0:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -180,6 +184,8 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 ruby-1.6.7	https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz	some-sha-1	some-sha-256	some-sha-512
 `), nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 				actualDepVersion, err := ruby.GetDependencyVersion("1.6.7")
 				require.NoError(err)
 
@@ -191,6 +197,7 @@ ruby-1.6.7	https://cache.ruby-lang.org/pub/ruby/1.6/ruby-1.6.7.tar.gz	some-sha-1
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:1.6.7:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -243,6 +250,7 @@ ruby-2.6.6	https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz	some-sha-1
 ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.bz	some-sha-1	some-other-sha-256-bz	some-sha-512
 ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1	some-other-sha-256-gz	some-sha-512
 `), nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDepVersion, err := ruby.GetDependencyVersion("2.6.6")
 				require.NoError(err)
@@ -255,6 +263,7 @@ ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:2.6.6:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -316,6 +325,7 @@ ruby-2.7.1	https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.1.tar.gz	some-sha-1
 					fakeWebClient.GetReturnsOnCall(2, []byte(`
 ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-sha-1	some-sha-256	some-sha-512
 `), nil)
+					fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 					actualDepVersion, err := ruby.GetDependencyVersion("1.9.0")
 					require.NoError(err)
@@ -328,6 +338,7 @@ ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-s
 						ReleaseDate:     &expectedReleaseDate,
 						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.0:*:*:*:*:*:*:*",
+						Licenses:        []string{"MIT", "MIT-2"},
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)
 
@@ -390,6 +401,7 @@ ruby-1.9.0-0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.0-0.tar.gz	some-s
 					fakeWebClient.GetReturnsOnCall(2, []byte(`
 ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some-sha-1	some-sha-256	some-sha-512
 `), nil)
+					fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 					actualDepVersion, err := ruby.GetDependencyVersion("1.9.1")
 					require.NoError(err)
@@ -402,6 +414,7 @@ ruby-1.9.1-p0	https://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz	some
 						ReleaseDate:     &expectedReleaseDate,
 						DeprecationDate: nil,
 						CPE:             "cpe:2.3:a:ruby-lang:ruby:1.9.1:*:*:*:*:*:*:*",
+						Licenses:        []string{"MIT", "MIT-2"},
 					}
 					assert.Equal(expectedDepVersion, actualDepVersion)
 

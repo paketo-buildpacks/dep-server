@@ -11,10 +11,11 @@ import (
 )
 
 type Rust struct {
-	checksummer  Checksummer
-	fileSystem   FileSystem
-	githubClient GithubClient
-	webClient    WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	githubClient     GithubClient
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (r Rust) GetAllVersionRefs() ([]string, error) {
@@ -52,6 +53,11 @@ func (r Rust) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get rust sha: %w", err)
 	}
 
+	licenses, err := r.licenseRetriever.LookupLicenses("rust", dependencyURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
@@ -59,6 +65,7 @@ func (r Rust) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:rust-lang:rust:%s:*:*:*:*:*:*:*", version),
+		Licenses:        licenses,
 	}, nil
 }
 
