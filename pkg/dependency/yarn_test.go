@@ -23,13 +23,14 @@ func TestYarn(t *testing.T) {
 
 func testYarn(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		yarn             dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		yarn                 dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -37,9 +38,10 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		yarn, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("yarn")
+		yarn, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("yarn")
 		require.NoError(err)
 	})
 
@@ -98,6 +100,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetReleaseAssetReturns([]byte("some-signature"), nil)
 			fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := yarn.GetDependencyVersion("1.0.0")
 			require.NoError(err)
@@ -110,6 +113,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:yarnpkg:yarn:1.0.0:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDep, actualDep)

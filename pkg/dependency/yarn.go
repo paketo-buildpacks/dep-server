@@ -18,10 +18,11 @@ import (
 )
 
 type Yarn struct {
-	checksummer  Checksummer
-	fileSystem   FileSystem
-	githubClient GithubClient
-	webClient    WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	githubClient     GithubClient
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type YarnRelease struct {
@@ -140,6 +141,11 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		return DepVersion{}, fmt.Errorf("could not get SHA256: %w", err)
 	}
 
+	licenses, err := y.licenseRetriever.LookupLicenses("yarn", asset.BrowserDownloadUrl)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
@@ -147,5 +153,6 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:yarnpkg:yarn:%s:*:*:*:*:*:*:*", version),
+		Licenses:        licenses,
 	}, nil
 }

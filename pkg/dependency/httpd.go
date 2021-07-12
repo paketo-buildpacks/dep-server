@@ -15,9 +15,10 @@ import (
 )
 
 type Httpd struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type HttpdRelease struct {
@@ -59,12 +60,19 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get sha256 for dependency: %w", err)
 	}
 
+	depURL := release.dependencyURL
+	licenses, err := h.licenseRetriever.LookupLicenses("httpd", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:     version,
-		URI:         release.dependencyURL,
+		URI:         depURL,
 		SHA256:      sha,
 		ReleaseDate: &release.releaseDate,
 		CPE:         fmt.Sprintf("cpe:2.3:a:apache:http_server:%s:*:*:*:*:*:*:*", version),
+		Licenses:    licenses,
 	}, nil
 }
 

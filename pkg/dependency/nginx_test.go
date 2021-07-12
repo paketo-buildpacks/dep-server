@@ -20,13 +20,14 @@ func TestNginx(t *testing.T) {
 
 func testNginx(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		nginx            dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		nginx                dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -34,9 +35,10 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		nginx, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("nginx")
+		nginx, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("nginx")
 		require.NoError(err)
 	})
 
@@ -71,6 +73,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDepVersion, err := nginx.GetDependencyVersion("1.0.0")
 			require.NoError(err)
@@ -83,6 +86,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:nginx:nginx:1.0.0:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)
 

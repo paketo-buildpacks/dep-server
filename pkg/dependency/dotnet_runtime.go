@@ -2,14 +2,16 @@ package dependency
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
 	"strings"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type DotnetRuntime struct {
-	checksummer Checksummer
-	webClient   WebClient
+	checksummer      Checksummer
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type dotnetRuntimeType struct{}
@@ -24,9 +26,11 @@ func (d DotnetRuntime) GetAllVersionRefs() ([]string, error) {
 
 func (d DotnetRuntime) GetDependencyVersion(version string) (DepVersion, error) {
 	return dotnet{
-		dotnetType:  dotnetRuntimeType{},
-		checksummer: d.checksummer,
-		webClient:   d.webClient,
+		dotnetType:       dotnetRuntimeType{},
+		checksummer:      d.checksummer,
+		webClient:        d.webClient,
+		licenseRetriever: d.licenseRetriever,
+		name:             "dotnet-runtime",
 	}.GetDependencyVersion(version)
 }
 

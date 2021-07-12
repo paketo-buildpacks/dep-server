@@ -23,13 +23,14 @@ func TestICU(t *testing.T) {
 
 func testICU(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		icu              dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		icu                  dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -37,9 +38,10 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		icu, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("icu")
+		icu, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("icu")
 		require.NoError(err)
 	})
 
@@ -96,6 +98,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeChecksummer.SplitPGPKeysReturns([]string{"some-gpg-key"})
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := icu.GetDependencyVersion("66.1")
 			require.NoError(err)
@@ -108,6 +111,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:66.1:*:*:*:*:c\/c\+\+:*:*`,
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
 			assert.Equal(expectedDep, actualDep)
@@ -147,6 +151,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				fakeGithubClient.GetReleaseAssetReturns([]byte("some-signature"), nil)
 				fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
 				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := icu.GetDependencyVersion("4.8.2")
 				require.NoError(err)
@@ -159,6 +164,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:4.8.2:*:*:*:*:c\/c\+\+:*:*`,
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
 				assert.Equal(expectedDep, actualDep)

@@ -15,9 +15,10 @@ import (
 )
 
 type Go struct {
-	checksummer Checksummer
-	fileSystem  FileSystem
-	webClient   WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 type GoReleaseWithFiles struct {
@@ -69,13 +70,21 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get dependency SHA256: %w", err)
 	}
 
+	depURL := g.dependencyURL(version)
+
+	licenses, err := g.licenseRetriever.LookupLicenses("go", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
-		URI:             g.dependencyURL(version),
+		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     releaseDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:golang:go:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "go")),
+		Licenses:        licenses,
 	}, nil
 }
 

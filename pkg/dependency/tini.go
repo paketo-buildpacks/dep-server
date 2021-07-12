@@ -12,8 +12,9 @@ import (
 )
 
 type Tini struct {
-	checksummer  Checksummer
-	githubClient GithubClient
+	checksummer      Checksummer
+	githubClient     GithubClient
+	licenseRetriever LicenseRetriever
 }
 
 func (t Tini) GetAllVersionRefs() ([]string, error) {
@@ -81,6 +82,11 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		return DepVersion{}, fmt.Errorf("could not get SHA256: %w", err)
 	}
 
+	licenses, err := t.licenseRetriever.LookupLicenses("tini", tarballURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             tarballURL,
@@ -88,5 +94,6 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:tini_project:tini:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),
+		Licenses:        licenses,
 	}, nil
 }

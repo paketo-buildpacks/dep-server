@@ -11,10 +11,11 @@ import (
 )
 
 type Composer struct {
-	checksummer  Checksummer
-	fileSystem   FileSystem
-	githubClient GithubClient
-	webClient    WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	githubClient     GithubClient
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (c Composer) GetAllVersionRefs() ([]string, error) {
@@ -76,12 +77,17 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get sha: %w", err)
 	}
+
+	depURL := c.dependencyURL(release.TagName)
+	licenses, err := c.licenseRetriever.LookupLicenses("composer", depURL)
+
 	return DepVersion{
 		Version:         release.TagName,
-		URI:             c.dependencyURL(release.TagName),
+		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
+		Licenses:        licenses,
 	}, nil
 }
 

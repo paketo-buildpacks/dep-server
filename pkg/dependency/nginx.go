@@ -9,10 +9,11 @@ import (
 )
 
 type Nginx struct {
-	checksummer  Checksummer
-	fileSystem   FileSystem
-	githubClient GithubClient
-	webClient    WebClient
+	checksummer      Checksummer
+	fileSystem       FileSystem
+	githubClient     GithubClient
+	webClient        WebClient
+	licenseRetriever LicenseRetriever
 }
 
 func (n Nginx) GetAllVersionRefs() ([]string, error) {
@@ -42,6 +43,11 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get nginx sha: %w", err)
 	}
 
+	licenses, err := n.licenseRetriever.LookupLicenses("nginx", dependencyURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+	}
+
 	return DepVersion{
 		Version:         version,
 		URI:             dependencyURL,
@@ -49,6 +55,7 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     &tagCommit.Date,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nginx:nginx:%s:*:*:*:*:*:*:*", version),
+		Licenses:        licenses,
 	}, nil
 }
 

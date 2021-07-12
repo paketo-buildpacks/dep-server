@@ -21,13 +21,14 @@ func TestDotnetASPNETCore(t *testing.T) {
 
 func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		dotnetASPNETCore dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		dotnetASPNETCore     dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -35,9 +36,10 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		dotnetASPNETCore, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("dotnet-aspnetcore")
+		dotnetASPNETCore, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("dotnet-aspnetcore")
 		require.NoError(err)
 	})
 
@@ -255,6 +257,8 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 			actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 			require.NoError(err)
 
@@ -265,6 +269,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -314,6 +319,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
@@ -325,6 +331,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -401,6 +408,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
@@ -412,6 +420,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -443,6 +452,8 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
 
@@ -453,6 +464,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -486,6 +498,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.2")
 				require.NoError(err)
@@ -497,6 +510,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 			})

@@ -21,13 +21,14 @@ func TestDotnetRuntime(t *testing.T) {
 
 func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 	var (
-		assert           = assert.New(t)
-		require          = require.New(t)
-		fakeChecksummer  *dependencyfakes.FakeChecksummer
-		fakeFileSystem   *dependencyfakes.FakeFileSystem
-		fakeGithubClient *dependencyfakes.FakeGithubClient
-		fakeWebClient    *dependencyfakes.FakeWebClient
-		dotnetRuntime    dependency.Dependency
+		assert               = assert.New(t)
+		require              = require.New(t)
+		fakeChecksummer      *dependencyfakes.FakeChecksummer
+		fakeFileSystem       *dependencyfakes.FakeFileSystem
+		fakeGithubClient     *dependencyfakes.FakeGithubClient
+		fakeWebClient        *dependencyfakes.FakeWebClient
+		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		dotnetRuntime        dependency.Dependency
 	)
 
 	it.Before(func() {
@@ -35,9 +36,10 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
+		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
 
 		var err error
-		dotnetRuntime, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient).NewDependency("dotnet-runtime")
+		dotnetRuntime, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("dotnet-runtime")
 		require.NoError(err)
 	})
 
@@ -254,6 +256,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 			actualDep, err := dotnetRuntime.GetDependencyVersion("2.0.1")
 			require.NoError(err)
@@ -265,6 +268,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
 
@@ -342,6 +346,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetRuntime.GetDependencyVersion("5.0.1")
 				require.NoError(err)
@@ -353,6 +358,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net:5.0.1:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -403,6 +409,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetRuntime.GetDependencyVersion("2.0.1")
 				require.NoError(err)
@@ -414,6 +421,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -490,6 +498,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetRuntime.GetDependencyVersion("2.0.1")
 				require.NoError(err)
@@ -501,6 +510,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -532,6 +542,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 				actualDep, err := dotnetRuntime.GetDependencyVersion("2.0.1")
 				require.NoError(err)
 
@@ -542,6 +553,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.1:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 
@@ -575,6 +587,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
 				actualDep, err := dotnetRuntime.GetDependencyVersion("2.0.2")
 				require.NoError(err)
@@ -586,6 +599,7 @@ func testDotnetRuntime(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.2:*:*:*:*:*:*:*",
+					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
 			})

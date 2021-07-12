@@ -131,16 +131,15 @@ func (fake *FakeGithubClient) DownloadReleaseAsset(arg1 string, arg2 string, arg
 		arg4 string
 		arg5 string
 	}{arg1, arg2, arg3, arg4, arg5})
-	stub := fake.DownloadReleaseAssetStub
-	fakeReturns := fake.downloadReleaseAssetReturns
 	fake.recordInvocation("DownloadReleaseAsset", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.downloadReleaseAssetMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4, arg5)
+	if fake.DownloadReleaseAssetStub != nil {
+		return fake.DownloadReleaseAssetStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.downloadReleaseAssetReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -198,16 +197,15 @@ func (fake *FakeGithubClient) DownloadSourceTarball(arg1 string, arg2 string, ar
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.DownloadSourceTarballStub
-	fakeReturns := fake.downloadSourceTarballReturns
 	fake.recordInvocation("DownloadSourceTarball", []interface{}{arg1, arg2, arg3, arg4})
 	fake.downloadSourceTarballMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.DownloadSourceTarballStub != nil {
+		return fake.DownloadSourceTarballStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.downloadSourceTarballReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -265,16 +263,15 @@ func (fake *FakeGithubClient) GetReleaseAsset(arg1 string, arg2 string, arg3 str
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
-	stub := fake.GetReleaseAssetStub
-	fakeReturns := fake.getReleaseAssetReturns
 	fake.recordInvocation("GetReleaseAsset", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getReleaseAssetMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+	if fake.GetReleaseAssetStub != nil {
+		return fake.GetReleaseAssetStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getReleaseAssetReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -331,16 +328,15 @@ func (fake *FakeGithubClient) GetReleaseDate(arg1 string, arg2 string, arg3 stri
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.GetReleaseDateStub
-	fakeReturns := fake.getReleaseDateReturns
 	fake.recordInvocation("GetReleaseDate", []interface{}{arg1, arg2, arg3})
 	fake.getReleaseDateMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.GetReleaseDateStub != nil {
+		return fake.GetReleaseDateStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getReleaseDateReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -396,16 +392,15 @@ func (fake *FakeGithubClient) GetReleaseTags(arg1 string, arg2 string) ([]intern
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetReleaseTagsStub
-	fakeReturns := fake.getReleaseTagsReturns
 	fake.recordInvocation("GetReleaseTags", []interface{}{arg1, arg2})
 	fake.getReleaseTagsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetReleaseTagsStub != nil {
+		return fake.GetReleaseTagsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getReleaseTagsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -462,16 +457,15 @@ func (fake *FakeGithubClient) GetTagCommit(arg1 string, arg2 string, arg3 string
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
-	stub := fake.GetTagCommitStub
-	fakeReturns := fake.getTagCommitReturns
 	fake.recordInvocation("GetTagCommit", []interface{}{arg1, arg2, arg3})
 	fake.getTagCommitMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2, arg3)
+	if fake.GetTagCommitStub != nil {
+		return fake.GetTagCommitStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getTagCommitReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -527,16 +521,15 @@ func (fake *FakeGithubClient) GetTags(arg1 string, arg2 string) ([]string, error
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetTagsStub
-	fakeReturns := fake.getTagsReturns
 	fake.recordInvocation("GetTags", []interface{}{arg1, arg2})
 	fake.getTagsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
+	if fake.GetTagsStub != nil {
+		return fake.GetTagsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
+	fakeReturns := fake.getTagsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
