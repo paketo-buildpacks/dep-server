@@ -110,7 +110,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
-				Version:         "66.1",
+				Version:         "66.1.0",
 				URI:             "some-source-url",
 				SHA256:          "some-source-sha",
 				ReleaseDate:     &expectedReleaseDate,
@@ -142,6 +142,66 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 			releaseAssetSignatureArg, _, gpgKeysArg := fakeChecksummer.VerifyASCArgsForCall(0)
 			assert.Equal("some-signature", releaseAssetSignatureArg)
 			assert.Equal([]string{"some-gpg-key"}, gpgKeysArg)
+		})
+
+		when("a non-official ICU semveric version is passed in", func() {
+			it("returns the correct ICU version", func() {
+				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+					{TagName: "release-67-1", CreatedDate: time.Date(2020, 04, 22, 17, 49, 10, 0, time.UTC)},
+					{TagName: "release-66-1", CreatedDate: time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)},
+					{TagName: "release-65-1", CreatedDate: time.Date(2020, 10, 02, 21, 30, 54, 0, time.UTC)},
+				}, nil)
+				assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
+				fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
+				fakeWebClient.GetReturnsOnCall(1, []byte(assetUrlContent), nil)
+				fakeGithubClient.GetReleaseAssetReturns([]byte("some-signature"), nil)
+				fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
+				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+				fakeChecksummer.SplitPGPKeysReturns([]string{"some-gpg-key"})
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/icu@66.1?checksum=some-source-sha&download_url=some-source-url")
+
+				actualDep, err := icu.GetDependencyVersion("66.1.0")
+				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
+				expectedReleaseDate := time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)
+				expectedDep := dependency.DepVersion{
+					Version:         "66.1.0",
+					URI:             "some-source-url",
+					SHA256:          "some-source-sha",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
+					CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:66.1:*:*:*:*:c\/c\+\+:*:*`,
+					PURL:            "pkg:generic/icu@66.1?checksum=some-source-sha&download_url=some-source-url",
+					Licenses:        []string{"MIT", "MIT-2"},
+				}
+
+				assert.Equal(expectedDep, actualDep)
+
+				url, _ := fakeWebClient.GetArgsForCall(0)
+				assert.Equal("https://raw.githubusercontent.com/unicode-org/icu/master/KEYS", url)
+
+				orgArg, repoArg, versionArg, filenameArg, _ := fakeGithubClient.DownloadReleaseAssetArgsForCall(0)
+				assert.Equal("unicode-org", orgArg)
+				assert.Equal("icu", repoArg)
+				assert.Equal("release-66-1", versionArg)
+				assert.Equal("icu4c-66_1-src.tgz", filenameArg)
+
+				orgArg, repoArg, versionArg, filenameArg = fakeGithubClient.GetReleaseAssetArgsForCall(0)
+				assert.Equal("unicode-org", orgArg)
+				assert.Equal("icu", repoArg)
+				assert.Equal("release-66-1", versionArg)
+				assert.Equal("icu4c-66_1-src.tgz.asc", filenameArg)
+
+				assert.Equal("some-gpg-key", fakeChecksummer.SplitPGPKeysArgsForCall(0))
+
+				releaseAssetSignatureArg, _, gpgKeysArg := fakeChecksummer.VerifyASCArgsForCall(0)
+				assert.Equal("some-signature", releaseAssetSignatureArg)
+				assert.Equal([]string{"some-gpg-key"}, gpgKeysArg)
+			})
+
 		})
 
 		when("getting a version prior to 49", func() {

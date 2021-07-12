@@ -98,7 +98,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
-				Version:         "v1.0.0",
+				Version:         "1.0.0",
 				URI:             "some-tarball-url",
 				SHA256:          "some-source-sha",
 				ReleaseDate:     &expectedReleaseDate,
@@ -114,6 +114,50 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("krallin", orgArg)
 			assert.Equal("tini", repoArg)
 			assert.Equal("v1.0.0", versionArg)
+		})
+
+		when("passed a non-official semantic version", func() {
+			it("returns the correct tini version", func() {
+				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+					{
+						TagName:       "v2.0.0",
+						PublishedDate: time.Date(2020, 6, 28, 0, 0, 0, 0, time.UTC),
+					},
+					{
+						TagName:       "v1.0.0",
+						PublishedDate: time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC),
+					},
+				}, nil)
+				fakeGithubClient.DownloadSourceTarballReturns("some-tarball-url", nil)
+
+				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/tini@v1.0.0?checksum=some-source-sha&download_url=some-tarball-url")
+
+				actualDep, err := tini.GetDependencyVersion("1.0.0")
+				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
+				expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
+				expectedDep := dependency.DepVersion{
+					Version:         "1.0.0",
+					URI:             "some-tarball-url",
+					SHA256:          "some-source-sha",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: nil,
+					CPE:             "cpe:2.3:a:tini_project:tini:1.0.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/tini@v1.0.0?checksum=some-source-sha&download_url=some-tarball-url",
+					Licenses:        []string{"MIT", "MIT-2"},
+				}
+
+				assert.Equal(expectedDep, actualDep)
+
+				orgArg, repoArg, versionArg, _ := fakeGithubClient.DownloadSourceTarballArgsForCall(0)
+				assert.Equal("krallin", orgArg)
+				assert.Equal("tini", repoArg)
+				assert.Equal("v1.0.0", versionArg)
+			})
 		})
 	})
 

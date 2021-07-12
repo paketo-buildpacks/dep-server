@@ -118,7 +118,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 			expectedReleaseDate := time.Date(2020, 02, 20, 0, 0, 0, 0, time.UTC)
 			expectedDeprecationDate := time.Date(2020, 06, 01, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
-				Version:         "v13.9.0",
+				Version:         "13.9.0",
 				URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
 				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
@@ -134,6 +134,64 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 			assert.Equal("https://nodejs.org/dist/index.json", urlArg)
 		})
 
+		when("a non-offical semveric version is passed in", func() {
+			it("returns the correct node version", func() {
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
+[
+ {"version": "v14.0.0", "date": "2020-01-30"},
+ {"version": "v13.9.0", "date": "2020-02-20"},
+ {"version": "v13.8.0", "date": "2020-02-20"}
+]`), nil)
+
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "v13": {
+   "start": "2019-10-22",
+   "maintenance": "2020-04-01",
+   "end": "2020-06-01"
+ },
+ "v14": {
+   "start": "2020-04-21",
+   "lts": "2020-10-20",
+   "maintenance": "2021-10-19",
+   "end": "2023-04-30",
+   "codename": ""
+ }
+}`), nil)
+
+				fakeWebClient.GetReturnsOnCall(2, []byte(`
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.tar.gz
+`), nil)
+
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/node@v13.9.0?checksum=aaaaa&download_url=https://nodejs.org")
+
+				actualDep, err := node.GetDependencyVersion("13.9.0")
+
+				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
+				expectedReleaseDate := time.Date(2020, 02, 20, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2020, 06, 01, 0, 0, 0, 0, time.UTC)
+				expectedDep := dependency.DepVersion{
+					Version:         "13.9.0",
+					URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
+					SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					ReleaseDate:     &expectedReleaseDate,
+					DeprecationDate: &expectedDeprecationDate,
+					CPE:             "cpe:2.3:a:nodejs:node.js:13.9.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/node@v13.9.0?checksum=aaaaa&download_url=https://nodejs.org",
+					Licenses:        []string{"MIT", "MIT-2"},
+				}
+
+				assert.Equal(expectedDep, actualDep)
+
+				urlArg, _ := fakeWebClient.GetArgsForCall(0)
+				assert.Equal("https://nodejs.org/dist/index.json", urlArg)
+			})
+
+		})
 		when("the major version is 0", func() {
 			it("pulls the correct release schedule", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
@@ -162,7 +220,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v0.8.0.ta
 				expectedReleaseDate := time.Date(2015, 01, 30, 0, 0, 0, 0, time.UTC)
 				expectedDeprecationDate := time.Date(2016, 06, 01, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
-					Version:         "v0.8.0",
+					Version:         "0.8.0",
 					URI:             "https://nodejs.org/dist/v0.8.0/node-v0.8.0.tar.gz",
 					SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     &expectedReleaseDate,
@@ -202,7 +260,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  node-v13.9.0.t
 
 				expectedReleaseDate := time.Date(2020, 01, 30, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
-					Version:         "v13.9.0",
+					Version:         "13.9.0",
 					URI:             "https://nodejs.org/dist/v13.9.0/node-v13.9.0.tar.gz",
 					SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					ReleaseDate:     &expectedReleaseDate,

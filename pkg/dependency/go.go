@@ -56,6 +56,13 @@ func (g Go) GetAllVersionRefs() ([]string, error) {
 }
 
 func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
+	// We expect an official Go version (ex. go1.16) to be passed in.
+	// Safeguard incase a non-official semver-compatible version is passed in (ex. 1.16.0)
+	version, err := convertToGoVersion(version)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not convert to Go version: %w", err)
+	}
+
 	goReleasesWithFiles, err := g.getGoReleasesWithFiles()
 	if err != nil {
 		return DepVersion{}, err
@@ -75,11 +82,16 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 
 	licenses, err := g.licenseRetriever.LookupLicenses("go", depURL)
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+		return DepVersion{}, fmt.Errorf("could not convert to SemVer: %w", err)
+	}
+
+	semVersion, err := convertToSemVer(version)
+	if err != nil {
+		return DepVersion{}, err
 	}
 
 	return DepVersion{
-		Version:         version,
+		Version:         semVersion,
 		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     releaseDate,
@@ -217,4 +229,24 @@ func (g Go) getGoReleasesWithFiles() ([]GoReleaseWithFiles, error) {
 
 func (g Go) dependencyURL(version string) string {
 	return fmt.Sprintf("https://dl.google.com/go/%s.src.tar.gz", version)
+}
+
+// If a user passes in the semantic version rather than the goX.X.X version
+// The GetDependencyVersion function will fail since we can't easily query the
+// Go release pages
+func convertToGoVersion(version string) (string, error) {
+	// if trailing .0, remove it
+	reg, err := regexp.Compile(`\.0`)
+	if err != nil {
+		return "", err
+	}
+
+	version = reg.ReplaceAllString(version, "")
+
+	// add a `go` prefix
+	if !strings.Contains(version, "go") {
+		version = "go" + version
+	}
+
+	return version, nil
 }
