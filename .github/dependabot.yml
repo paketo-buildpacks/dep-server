@@ -10,3 +10,8 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+- package-ecosystem: gomod
+  directory: "/actions/list-new-upstream-dependency-versions/entrypoint/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
