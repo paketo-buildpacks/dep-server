@@ -73,6 +73,6 @@ jobs:
             "source_uri": "${{ steps.upstream.outputs.uri }}",
             "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
             "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
-            "cpe": "${{ steps.modify-cpe.outputs.cpe }}"
-            "licenses": "${{ steps.upstream.outputs.licenses }}"
+            "cpe": "${{ steps.modify-cpe.outputs.cpe }}",
+            "licenses": ${{ steps.upstream.outputs.licenses }}
           }
