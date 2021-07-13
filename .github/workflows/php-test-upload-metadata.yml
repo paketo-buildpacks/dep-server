@@ -41,4 +41,4 @@ jobs:
         source-sha256: ${{ github.event.client_payload.source_sha256 }}
         deprecation-date: ${{ github.event.client_payload.deprecation_date }}
         cpe: ${{ steps.modify-cpe.outputs.cpe }}
-        licenses: '{{ github.event.client_payload.licenses }}'
+        licenses: ${{ github.event.client_payload.licenses }}
