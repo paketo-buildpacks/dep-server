@@ -78,6 +78,7 @@ runs:
           "cpe": "${cpe}"
           "licenses": "${{ inputs.licenses }}",
         }
+        EOF
         )"
 
         updated_metadata="$(jq \
