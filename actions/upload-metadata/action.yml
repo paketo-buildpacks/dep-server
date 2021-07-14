@@ -64,6 +64,7 @@ runs:
         cpe="$(echo '${{ inputs.cpe }}' | sed 's|\\|\\\\|g')"
 
         licenses="$(echo '${{ inputs.licenses }}' | jq -Rc 'split(",")')"
+        echo ${licenses}
 
         metadata="$(cat << EOF
         {
