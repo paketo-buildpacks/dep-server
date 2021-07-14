@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/errors"
 )
 
@@ -48,7 +49,11 @@ func (g Go) GetAllVersionRefs() ([]string, error) {
 
 	var versions []string
 	for _, release := range goReleases {
-		versions = append(versions, release.Version)
+		version, err := convertToSemVer(release.Version)
+		if err != nil {
+			return nil, err
+		}
+		versions = append(versions, version)
 	}
 
 	return versions, nil
@@ -74,11 +79,16 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 
 	licenses, err := g.licenseRetriever.LookupLicenses("go", depURL)
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
+		return DepVersion{}, fmt.Errorf("could not conver to SemVer: %w", err)
+	}
+
+	semVersion, err := convertToSemVer(version)
+	if err != nil {
+		return DepVersion{}, err
 	}
 
 	return DepVersion{
-		Version:         version,
+		Version:         semVersion,
 		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     releaseDate,
@@ -215,4 +225,14 @@ func (g Go) getGoReleasesWithFiles() ([]GoReleaseWithFiles, error) {
 
 func (g Go) dependencyURL(version string) string {
 	return fmt.Sprintf("https://dl.google.com/go/%s.src.tar.gz", version)
+}
+
+// Strip the `go` prefix off the version and ensure that the new trimmed
+// version is semver-compatible
+func convertToSemVer(version string) (string, error) {
+	semverVersion, err := semver.NewVersion(strings.TrimPrefix(version, "go"))
+	if err != nil {
+		return "", err
+	}
+	return semverVersion.String(), nil
 }

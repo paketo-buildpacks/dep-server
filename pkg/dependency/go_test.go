@@ -75,7 +75,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 
 			require.NoError(err)
 
-			assert.Equal([]string{"go1.14.1", "go1.13.9", "go1.14", "go1.13.8", "go1.13"}, versions)
+			assert.Equal([]string{"1.14.1", "1.13.9", "1.14.0", "1.13.8", "1.13.0"}, versions)
 
 			urlArg, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://golang.org/doc/devel/release.html", urlArg)
@@ -104,7 +104,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 
 			require.NoError(err)
 
-			assert.Equal([]string{"go1.13.8", "go1.13"}, versions)
+			assert.Equal([]string{"1.13.8", "1.13.0"}, versions)
 
 			urlArg, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://golang.org/doc/devel/release.html", urlArg)
@@ -154,7 +154,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			require.NoError(err)
 
 			expectedDep := dependency.DepVersion{
-				Version:         "go1.13.9",
+				Version:         "1.13.9",
 				URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 				SHA256:          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				ReleaseDate:     &expectedReleaseDate,
@@ -195,7 +195,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				require.NoError(err)
 
 				expectedDep := dependency.DepVersion{
-					Version:         "go1.13.9",
+					Version:         "1.13.9",
 					URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 					SHA256:          "some-source-sha",
 					ReleaseDate:     &expectedReleaseDate,
