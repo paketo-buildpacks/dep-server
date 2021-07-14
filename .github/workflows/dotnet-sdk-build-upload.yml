@@ -59,6 +59,11 @@ jobs:
       run: |
         cpe="$(echo '${{ steps.upstream.outputs.cpe }}' | sed 's|\\|\\\\|g')"
         echo "::set-output name=cpe::${cpe}"
+    - name: Flatten Licenses
+      id: flatten-licenses
+      run: |
+        licenses="$(echo '${{ steps.upstream.outputs.licenses }}' | sed -e 's/"//g' -e 's/[][]//g')"
+        echo "::set-output name=licenses::${licenses}"
     - name: Trigger Tests
       uses: paketo-buildpacks/github-config/actions/dispatch@main
       with:
@@ -74,5 +79,5 @@ jobs:
             "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
             "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
             "cpe": "${{ steps.modify-cpe.outputs.cpe }}",
-            "licenses": ${{ steps.upstream.outputs.licenses }}
+            "licenses": "${{ steps.flatten-licenses.outputs.licenses }}"
           }
