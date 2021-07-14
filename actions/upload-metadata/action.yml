@@ -75,8 +75,8 @@ runs:
           "deprecation_date": "${{ inputs.deprecation-date }}",
           "created_at": "${created_at}",
           "modified_at": "${now}",
-          "cpe": "${cpe}"
-          "licenses": "${{ inputs.licenses }}",
+          "cpe": "${cpe}",
+          "licenses": "${{ inputs.licenses }}"
         }
         EOF
         )"
