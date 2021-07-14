@@ -63,6 +63,8 @@ runs:
 
         cpe="$(echo '${{ inputs.cpe }}' | sed 's|\\|\\\\|g')"
 
+        licenses="$(echo '${{ inputs.licenses }}' | jq -Rc 'split(",")')"
+
         metadata="$(cat << EOF
         {
           "name": "${{ inputs.dependency-name }}",
@@ -76,7 +78,7 @@ runs:
           "created_at": "${created_at}",
           "modified_at": "${now}",
           "cpe": "${cpe}",
-          "licenses": "${{ inputs.licenses }}"
+          "licenses": "${licenses}"
         }
         EOF
         )"
