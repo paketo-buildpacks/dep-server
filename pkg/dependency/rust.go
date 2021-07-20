@@ -16,6 +16,7 @@ type Rust struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (r Rust) GetAllVersionRefs() ([]string, error) {
@@ -65,6 +66,7 @@ func (r Rust) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:rust-lang:rust:%s:*:*:*:*:*:*:*", version),
+		PURL:            r.purlGenerator.Generate("rust", version, sha, dependencyURL),
 		Licenses:        licenses,
 	}, nil
 }

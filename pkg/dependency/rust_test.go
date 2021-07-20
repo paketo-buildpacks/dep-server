@@ -27,6 +27,7 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		rust                 dependency.Dependency
 	)
 
@@ -36,9 +37,10 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		rust, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("rust")
+		rust, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("rust")
 		require.NoError(err)
 	})
 
@@ -76,12 +78,16 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 			fakeGithubClient.GetTagCommitReturns(tagCommit, nil)
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
+
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/rust@1.49.0?checksum=some-source-sha&download_url=https://static.rust-lang.org")
 
 			actualDepVersion, err := rust.GetDependencyVersion("1.49.0")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "1.49.0",
 				URI:             "https://static.rust-lang.org/dist/rustc-1.49.0-src.tar.gz",
@@ -89,6 +95,7 @@ func testRust(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &tagCommit.Date,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:rust-lang:rust:1.49.0:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/rust@1.49.0?checksum=some-source-sha&download_url=https://static.rust-lang.org",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)

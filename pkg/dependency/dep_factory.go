@@ -127,6 +127,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "bundler":
 		return Bundler{
@@ -198,6 +199,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			githubClient:     d.githubClient,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "node":
 		return Node{
@@ -205,6 +207,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "php":
 		return Php{
@@ -212,6 +215,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "pip", "pipenv":
 		return PyPi{
@@ -220,6 +224,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "python":
 		return Python{
@@ -227,6 +232,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "ruby":
 		return Ruby{
@@ -234,6 +240,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "rust":
 		return Rust{
@@ -242,12 +249,14 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			githubClient:     d.githubClient,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "tini":
 		return Tini{
 			checksummer:      d.checksummer,
 			githubClient:     d.githubClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "yarn":
 		return Yarn{
@@ -256,6 +265,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			githubClient:     d.githubClient,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	default:
 		return nil, fmt.Errorf("dependency type '%s' is not supported", name)

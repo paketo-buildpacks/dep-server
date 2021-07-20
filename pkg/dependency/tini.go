@@ -15,6 +15,7 @@ type Tini struct {
 	checksummer      Checksummer
 	githubClient     GithubClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (t Tini) GetAllVersionRefs() ([]string, error) {
@@ -94,6 +95,7 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:tini_project:tini:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "v")),
+		PURL:            t.purlGenerator.Generate("tini", version, dependencySHA, tarballURL),
 		Licenses:        licenses,
 	}, nil
 }

@@ -13,6 +13,7 @@ type Node struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type NodeRelease struct {
@@ -124,6 +125,7 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 		ReleaseDate:     &releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nodejs:node.js:%s:*:*:*:*:*:*:*", strings.TrimPrefix(release.Version, "v")),
+		PURL:            n.purlGenerator.Generate("node", release.Version, sha, depURL),
 		Licenses:        licenses,
 	}, nil
 }
