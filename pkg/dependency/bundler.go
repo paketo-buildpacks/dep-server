@@ -12,6 +12,7 @@ type Bundler struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type BundlerRelease struct {
@@ -65,6 +66,7 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:bundler:bundler:%s:*:*:*:*:ruby:*:*", version),
+				PURL:            b.purlGenerator.Generate("bundler", version, release.SHA, depURL),
 				Licenses:        licenses,
 			}, nil
 		}

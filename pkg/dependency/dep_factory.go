@@ -6,6 +6,7 @@ import (
 
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/licenses"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/purl"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Dependency
@@ -22,6 +23,7 @@ type DepVersion struct {
 	ReleaseDate     *time.Time `json:"release_date,omitempty"`
 	DeprecationDate *time.Time `json:"deprecation_date,omitempty"`
 	CPE             string     `json:"cpe"`
+	PURL            string     `json:"purl"`
 	Licenses        []string   `json:"licenses"`
 }
 
@@ -39,6 +41,11 @@ type Checksummer interface {
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . LicenseRetriever
 type LicenseRetriever interface {
 	LookupLicenses(dependencyName, sourceURL string) ([]string, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PURLGenerator
+type PURLGenerator interface {
+	Generate(dependencyName, dependencyVersion, sourceSHA, sourceURL string) string
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FileSystem
@@ -69,15 +76,17 @@ type DepFactory struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
-func NewCustomDependencyFactory(checksum Checksummer, fileSystem FileSystem, githubClient GithubClient, webClient WebClient, licenseRetriever LicenseRetriever) DepFactory {
+func NewCustomDependencyFactory(checksum Checksummer, fileSystem FileSystem, githubClient GithubClient, webClient WebClient, licenseRetriever LicenseRetriever, purlGenerator PURLGenerator) DepFactory {
 	return DepFactory{
 		checksummer:      checksum,
 		fileSystem:       fileSystem,
 		githubClient:     githubClient,
 		webClient:        webClient,
 		licenseRetriever: licenseRetriever,
+		purlGenerator:    purlGenerator,
 	}
 }
 
@@ -87,6 +96,7 @@ func NewDependencyFactory(accessToken string) DepFactory {
 	webClient := internal.NewWebClient()
 	githubClient := internal.NewGithubClient(webClient, accessToken)
 	licenseRetriever := licenses.NewLicenseRetriever()
+	purlGenerator := purl.NewPURLGenerator()
 
 	return DepFactory{
 		checksummer:      checksummer,
@@ -94,6 +104,7 @@ func NewDependencyFactory(accessToken string) DepFactory {
 		githubClient:     githubClient,
 		webClient:        webClient,
 		licenseRetriever: licenseRetriever,
+		purlGenerator:    purlGenerator,
 	}
 }
 
@@ -123,6 +134,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			fileSystem:       d.fileSystem,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "composer":
 		return Composer{
@@ -131,6 +143,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			githubClient:     d.githubClient,
 			webClient:        d.webClient,
 			licenseRetriever: d.licenseRetriever,
+			purlGenerator:    d.purlGenerator,
 		}, nil
 	case "curl":
 		return Curl{
