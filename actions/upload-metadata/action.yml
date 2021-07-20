@@ -33,6 +33,9 @@ inputs:
   cpe:
     description: NVD identifier in CPE 2.3 notation
     required: true
+  purl:
+    description: Package URL
+    required: true
   licenses:
     description: Source dependency licenses
     required: true

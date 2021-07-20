@@ -29,6 +29,9 @@ outputs:
   cpe:
     description: NVD identifier
     value: ${{ steps.upstream-dependency.outputs.cpe }}
+  purl:
+    description: Package URL
+    value: ${{ steps.upstream-dependency.outputs.purl }}
   licenses:
     description: Dependency licenses
     value: ${{ steps.upstream-dependency.outputs.licenses }}
@@ -57,6 +60,7 @@ runs:
         echo "::set-output name=release-date::$(jq -r '.release_date // empty' <<< "${metadata}")"
         echo "::set-output name=deprecation-date::$(jq -r '.deprecation_date // empty' <<< "${metadata}")"
         echo "::set-output name=cpe::$(jq -r .cpe <<< "${metadata}")"
+        echo "::set-output name=purl::$(jq -r .purl <<< "${metadata}")"
         echo "::set-output name=licenses::$(jq -c .licenses <<< "${metadata}")"
 
         rm -f ./entrypoint
