@@ -73,6 +73,7 @@ type dotnet struct {
 	checksummer      Checksummer
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 	name             string
 }
 
@@ -137,6 +138,7 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		SHA256:      sha256,
 		ReleaseDate: releaseDate,
 		CPE:         cpe,
+		PURL:        d.purlGenerator.Generate(d.name, version, sha256, releaseFile.URL),
 		Licenses:    licenses,
 	}
 	if channel.EOLDate != "" {

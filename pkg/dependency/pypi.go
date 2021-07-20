@@ -17,6 +17,7 @@ type PyPi struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type PyPiRelease struct {
@@ -129,6 +130,7 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 				SHA256:      release.Digests["sha256"],
 				ReleaseDate: &uploadTime,
 				CPE:         cpe,
+				PURL:        p.purlGenerator.Generate(p.productName, version, release.Digests["sha256"], release.URL),
 				Licenses:    licenses,
 			})
 		}

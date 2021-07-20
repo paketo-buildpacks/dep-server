@@ -16,6 +16,7 @@ type Composer struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (c Composer) GetAllVersionRefs() ([]string, error) {
@@ -80,6 +81,9 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 
 	depURL := c.dependencyURL(release.TagName)
 	licenses, err := c.licenseRetriever.LookupLicenses("composer", depURL)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not find license metadata: %w", err)
+	}
 
 	return DepVersion{
 		Version:         release.TagName,
@@ -87,6 +91,7 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 		SHA256:          sha,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
+		PURL:            c.purlGenerator.Generate("composer", release.TagName, sha, depURL),
 		Licenses:        licenses,
 	}, nil
 }

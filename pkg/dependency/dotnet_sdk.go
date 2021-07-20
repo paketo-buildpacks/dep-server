@@ -12,6 +12,7 @@ type DotnetSDK struct {
 	checksummer      Checksummer
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type dotnetSDKType struct{}
@@ -30,6 +31,7 @@ func (d DotnetSDK) GetDependencyVersion(version string) (DepVersion, error) {
 		checksummer:      d.checksummer,
 		webClient:        d.webClient,
 		licenseRetriever: d.licenseRetriever,
+		purlGenerator:    d.purlGenerator,
 		name:             "dotnet-sdk",
 	}.GetDependencyVersion(version)
 }

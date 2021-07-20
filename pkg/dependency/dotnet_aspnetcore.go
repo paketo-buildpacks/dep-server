@@ -10,6 +10,7 @@ type DotnetASPNETCore struct {
 	checksummer      Checksummer
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type dotnetASPNETCoreType struct{}
@@ -28,6 +29,7 @@ func (d DotnetASPNETCore) GetDependencyVersion(version string) (DepVersion, erro
 		checksummer:      d.checksummer,
 		webClient:        d.webClient,
 		licenseRetriever: d.licenseRetriever,
+		purlGenerator:    d.purlGenerator,
 		name:             "dotnet-aspnetcore",
 	}.GetDependencyVersion(version)
 }

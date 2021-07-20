@@ -19,6 +19,7 @@ type Httpd struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type HttpdRelease struct {
@@ -72,6 +73,7 @@ func (h Httpd) GetDependencyVersion(version string) (DepVersion, error) {
 		SHA256:      sha,
 		ReleaseDate: &release.releaseDate,
 		CPE:         fmt.Sprintf("cpe:2.3:a:apache:http_server:%s:*:*:*:*:*:*:*", version),
+		PURL:        h.purlGenerator.Generate("httpd", version, sha, depURL),
 		Licenses:    licenses,
 	}, nil
 }

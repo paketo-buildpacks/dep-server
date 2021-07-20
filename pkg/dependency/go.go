@@ -19,6 +19,7 @@ type Go struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type GoReleaseWithFiles struct {
@@ -84,6 +85,7 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:golang:go:%s:*:*:*:*:*:*:*", strings.TrimPrefix(version, "go")),
+		PURL:            g.purlGenerator.Generate("go", version, sha, depURL),
 		Licenses:        licenses,
 	}, nil
 }

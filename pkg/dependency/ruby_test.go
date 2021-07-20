@@ -25,6 +25,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		ruby                 dependency.Dependency
 	)
 
@@ -33,9 +34,10 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		ruby, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("ruby")
+		ruby, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("ruby")
 		require.NoError(err)
 	})
 
@@ -141,10 +143,13 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
     zip: some-other-sha-256-zip
 `), nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/ruby@3.0.0?checksum=some-sha-256-gz&download_url=https://cache.ruby-lang.org")
 
 				actualDepVersion, err := ruby.GetDependencyVersion("3.0.0")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedReleaseDate := time.Date(2020, 12, 25, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "3.0.0",
@@ -153,6 +158,7 @@ func testRuby(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:ruby-lang:ruby:3.0.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/ruby@3.0.0?checksum=some-sha-256-gz&download_url=https://cache.ruby-lang.org",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDepVersion, actualDepVersion)

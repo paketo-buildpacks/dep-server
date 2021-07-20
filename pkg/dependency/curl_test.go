@@ -23,6 +23,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 		fakeChecksummer      *dependencyfakes.FakeChecksummer
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		curl                 dependency.Dependency
 	)
 
@@ -30,9 +31,10 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		curl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("curl")
+		curl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("curl")
 		require.NoError(err)
 	})
 
@@ -73,9 +75,13 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(2, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/curl@7.73.0?checksum=some-source-sha&download_url=https://curl.se")
 
 			actualDep, err := curl.GetDependencyVersion("7.73.0")
 			require.NoError(err)
+
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 			expectedReleaseDate := time.Date(2020, 10, 14, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
@@ -84,6 +90,7 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				SHA256:      "some-source-sha",
 				ReleaseDate: &expectedReleaseDate,
 				CPE:         "cpe:2.3:a:haxx:curl:7.73.0:*:*:*:*:*:*:*",
+				PURL:        "pkg:generic/curl@7.73.0?checksum=some-source-sha&download_url=https://curl.se",
 				Licenses:    []string{"MIT", "MIT-2"},
 			}
 
@@ -115,9 +122,14 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 65;7.28.1;52;2012-11-20;8.1 years;41;2982;31;4522;3;308;
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
+				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/curl@7.29.0?checksum=some-source-sha&download_url=https://curl.se")
 
 				actualDep, err := curl.GetDependencyVersion("7.29.0")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedReleaseDate := time.Date(2013, 02, 06, 0, 0, 0, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
@@ -126,6 +138,8 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 					SHA256:      "some-source-sha",
 					ReleaseDate: &expectedReleaseDate,
 					CPE:         "cpe:2.3:a:haxx:curl:7.29.0:*:*:*:*:*:*:*",
+					PURL:        "pkg:generic/curl@7.29.0?checksum=some-source-sha&download_url=https://curl.se",
+					Licenses:    []string{"MIT", "MIT-2"},
 				}
 
 				assert.Equal(expectedDep, actualDep)

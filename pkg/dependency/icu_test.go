@@ -30,6 +30,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		icu                  dependency.Dependency
 	)
 
@@ -39,9 +40,10 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		icu, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("icu")
+		icu, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("icu")
 		require.NoError(err)
 	})
 
@@ -99,10 +101,13 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeChecksummer.SplitPGPKeysReturns([]string{"some-gpg-key"})
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/icu@66.1?checksum=some-source-sha&download_url=some-source-url")
 
 			actualDep, err := icu.GetDependencyVersion("66.1")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 03, 11, 17, 21, 07, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "66.1",
@@ -111,6 +116,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:66.1:*:*:*:*:c\/c\+\+:*:*`,
+				PURL:            "pkg:generic/icu@66.1?checksum=some-source-sha&download_url=some-source-url",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
@@ -152,10 +158,13 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 				fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
 				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/icu@4.8.2?checksum=some-source-sha&download_url=some-source-url")
 
 				actualDep, err := icu.GetDependencyVersion("4.8.2")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedReleaseDate := time.Date(2019, 04, 11, 18, 17, 52, 0, time.UTC)
 				expectedDep := dependency.DepVersion{
 					Version:         "4.8.2",
@@ -164,6 +173,7 @@ func testICU(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             `cpe:2.3:a:icu-project:international_components_for_unicode:4.8.2:*:*:*:*:c\/c\+\+:*:*`,
+					PURL:            "pkg:generic/icu@4.8.2?checksum=some-source-sha&download_url=some-source-url",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 

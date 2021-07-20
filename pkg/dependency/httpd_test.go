@@ -27,6 +27,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		httpd                dependency.Dependency
 	)
 
@@ -40,9 +41,10 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		httpd, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("httpd")
+		httpd, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("httpd")
 		require.NoError(err)
 	})
 
@@ -78,10 +80,13 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-sha256 *httpd-2.4.43.tar.bz2"), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist")
 
 			actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "2.4.43",
 				URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
@@ -89,6 +94,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 
@@ -111,10 +117,13 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist")
 
 				actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
@@ -122,6 +131,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
@@ -172,10 +182,13 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist")
 
 				actualDepVersion, err := httpd.GetDependencyVersion("2.4.43")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "2.4.43",
 					URI:             "http://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2",
@@ -183,6 +196,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/httpd@2.4.43?checksum=some-sha256&download_url=http://archive.apache.org/dist",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 
@@ -228,9 +242,13 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 				fakeWebClient.GetReturnsOnCall(0, []byte(httpdIndex2_2_3), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/httpd@2.2.3?checksum=some-sha256&download_url=http://archive.apache.org/dist")
 
 				actualDepVersion, err := httpd.GetDependencyVersion("2.2.3")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedReleaseDate223 := time.Date(2006, 07, 27, 17, 39, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
@@ -240,6 +258,7 @@ func testHttpd(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate223,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:apache:http_server:2.2.3:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/httpd@2.2.3?checksum=some-sha256&download_url=http://archive.apache.org/dist",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 

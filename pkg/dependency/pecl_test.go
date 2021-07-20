@@ -26,6 +26,7 @@ func testPecl(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		pecl                 dependency.Dependency
 	)
 
@@ -35,9 +36,10 @@ func testPecl(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		pecl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("apc")
+		pecl, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("apc")
 		require.NoError(err)
 	})
 
@@ -156,6 +158,7 @@ func testPecl(t *testing.T, when spec.G, it spec.S) {
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/pecl@3.1.6?checksum=some-sha256&download_url=https://pecl.php.net")
 
 			actualDep, err := pecl.GetDependencyVersion("3.1.6")
 			require.NoError(err)
@@ -163,12 +166,15 @@ func testPecl(t *testing.T, when spec.G, it spec.S) {
 			expectedReleaseDate, err := time.Parse(time.RFC3339, "2010-11-30T05:21:42-05:00")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDep := dependency.DepVersion{
 				Version:         "3.1.6",
 				URI:             "https://pecl.php.net/get/APC-3.1.6",
 				SHA256:          "some-sha256",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
+				PURL:            "pkg:generic/pecl@3.1.6?checksum=some-sha256&download_url=https://pecl.php.net",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)

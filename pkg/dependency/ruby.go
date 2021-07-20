@@ -17,6 +17,7 @@ type Ruby struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type RubyRelease struct {
@@ -68,6 +69,7 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 				ReleaseDate:     &releaseDate,
 				DeprecationDate: nil,
 				CPE:             fmt.Sprintf("cpe:2.3:a:ruby-lang:ruby:%s:*:*:*:*:*:*:*", version),
+				PURL:            r.purlGenerator.Generate("ruby", version, depSHA, depURL),
 				Licenses:        licenses,
 			}, nil
 		}

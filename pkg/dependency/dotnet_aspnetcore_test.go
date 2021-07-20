@@ -28,6 +28,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		dotnetASPNETCore     dependency.Dependency
 	)
 
@@ -37,9 +38,10 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		dotnetASPNETCore, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("dotnet-aspnetcore")
+		dotnetASPNETCore, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("dotnet-aspnetcore")
 		require.NoError(err)
 	})
 
@@ -258,10 +260,13 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1")
 
 			actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDep := dependency.DepVersion{
 				Version:         "2.0.1",
 				URI:             "url-for-linux-x64-2.0.1",
@@ -269,6 +274,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -320,9 +326,13 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1")
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.1",
@@ -331,6 +341,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -409,9 +420,13 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1")
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.1",
@@ -420,6 +435,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -453,9 +469,13 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1")
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.1")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.1",
@@ -464,6 +484,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -499,9 +520,13 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1")
 
 				actualDep, err := dotnetASPNETCore.GetDependencyVersion("2.0.2")
 				require.NoError(err)
+
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.2",
@@ -510,6 +535,7 @@ func testDotnetASPNETCore(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:asp.net_core:2.0:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-aspnetcore@2.0.1?checksum=some-sha256&download_url=url-for-linux-x64-2.0.1",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
