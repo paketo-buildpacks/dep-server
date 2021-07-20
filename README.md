@@ -68,7 +68,11 @@ dependency metadata.
     "deprecation_date": "",
     "created_at": "2021-03-11T20:20:29+00:00",
     "modified_at": "2021-03-11T20:20:29+00:00",
-    "cpe": "cpe:2.3:a:golang:go:1.16.2:*:*:*:*:*:*:*"
+    "cpe": "cpe:2.3:a:golang:go:1.16.2:*:*:*:*:*:*:*",
+    "purl": "pkg:generic/go@go1.16.2?download_url=https://dl.google.com/go/go1.16.2.src.tar.gz&checksum=sha256:abd965e71fad990d13d26e737c25a57184a33969e302d723c2b156c84dc619a5",
+    "licenses": [
+      "BSD-3-Clause"
+    ]
   },
   {
     "name": "go",
@@ -88,7 +92,11 @@ dependency metadata.
     "deprecation_date": "",
     "created_at": "2021-03-11T20:20:26+00:00",
     "modified_at": "2021-03-11T20:20:26+00:00",
-    "cpe": "cpe:2.3:a:golang:go:1.15.10:*:*:*:*:*:*:*"
+    "cpe": "cpe:2.3:a:golang:go:1.15.10:*:*:*:*:*:*:*",
+    "purl": "pkg:generic/go@go1.15.10?download_url=https://dl.google.com/go/go1.15.10.src.tar.gz&checksum=sha256:abd965e71fad990d13d26e737c25a57184a33969e302d723c2b156c84dc619a5",
+    "licenses": [
+      "BSD-3-Clause"
+    ]
   }
 ]
 ```
