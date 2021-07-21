@@ -29,6 +29,9 @@ jobs:
           cd "${{ github.workspace }}/actions/list-new-upstream-dependency-versions/entrypoint"
           go mod tidy
 
+          cd "${{ github.workspace }}/pkg/dependency/tests/acceptance"
+          go mod tidy
+
       - name: Commit
         id: commit
         uses: paketo-buildpacks/github-config/actions/pull-request/create-commit@main
