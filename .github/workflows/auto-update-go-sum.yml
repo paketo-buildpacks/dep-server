@@ -34,7 +34,7 @@ jobs:
           cd "${{ github.workspace }}/actions/list-new-upstream-dependency-versions/entrypoint"
           go mod tidy
 
-          cd "${{ github.workspace }}/pkg/dependency/tests/acceptance"
+          cd "${{ github.workspace }}/pkg/dependency/test/acceptance"
           go mod tidy
 
       - name: Commit
