@@ -81,6 +81,7 @@ runs:
           "created_at": "${created_at}",
           "modified_at": "${now}",
           "cpe": "${cpe}",
+          "purl": "${purl}",
           "licenses": ${licenses}
         }
         EOF
