@@ -25,6 +25,7 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		bundler              dependency.Dependency
 	)
 
@@ -33,9 +34,10 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		bundler, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("bundler")
+		bundler, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("bundler")
 		require.NoError(err)
 	})
 
@@ -270,10 +272,13 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/bundler@2.1.3?checksum=9b9a9a&download_url=https://rubygems.org")
 
 			actualDepVersion, err := bundler.GetDependencyVersion("2.1.3")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 01, 02, 12, 29, 43, 745000000, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "2.1.3",
@@ -282,6 +287,7 @@ func testBundler(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:bundler:bundler:2.1.3:*:*:*:*:ruby:*:*",
+				PURL:            "pkg:generic/bundler@2.1.3?checksum=9b9a9a&download_url=https://rubygems.org",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)

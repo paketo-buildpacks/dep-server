@@ -27,6 +27,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		golang               dependency.Dependency
 	)
 
@@ -35,9 +36,10 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		golang, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("go")
+		golang, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("go")
 		require.NoError(err)
 	})
 
@@ -149,10 +151,13 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/go@go1.13.9?checksum=bbbbbb&download_url=https://dl.google.com/go")
 
 			actualDep, err := golang.GetDependencyVersion("go1.13.9")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDep := dependency.DepVersion{
 				Version:         "go1.13.9",
 				URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
@@ -160,6 +165,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/go@go1.13.9?checksum=bbbbbb&download_url=https://dl.google.com/go",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -190,10 +196,13 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 
 				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/go@go1.13.9?checksum=some-source-sha&download_url=https://dl.google.com/go")
 
 				actualDep, err := golang.GetDependencyVersion("go1.13.9")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "go1.13.9",
 					URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
@@ -201,6 +210,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/go@go1.13.9?checksum=some-source-sha&download_url=https://dl.google.com/go",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)

@@ -17,6 +17,7 @@ type Curl struct {
 	checksummer      Checksummer
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type CurlRelease struct {
@@ -135,6 +136,7 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 		SHA256:      sha,
 		ReleaseDate: &release.Date,
 		CPE:         fmt.Sprintf("cpe:2.3:a:haxx:curl:%s:*:*:*:*:*:*:*", release.Version),
+		PURL:        c.purlGenerator.Generate("curl", release.Version, sha, depURL),
 		Licenses:    licenses,
 	}, nil
 }

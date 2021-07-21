@@ -12,6 +12,7 @@ type DotnetRuntime struct {
 	checksummer      Checksummer
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type dotnetRuntimeType struct{}
@@ -30,6 +31,7 @@ func (d DotnetRuntime) GetDependencyVersion(version string) (DepVersion, error) 
 		checksummer:      d.checksummer,
 		webClient:        d.webClient,
 		licenseRetriever: d.licenseRetriever,
+		purlGenerator:    d.purlGenerator,
 		name:             "dotnet-runtime",
 	}.GetDependencyVersion(version)
 }

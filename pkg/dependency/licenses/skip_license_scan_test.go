@@ -3,7 +3,7 @@ package licenses_test
 import (
 	"testing"
 
-	licenses "github.com/paketo-buildpacks/dep-server/pkg/dependency/licenses"
+	"github.com/paketo-buildpacks/dep-server/pkg/dependency/licenses"
 	"github.com/sclevine/spec"
 
 	. "github.com/onsi/gomega"

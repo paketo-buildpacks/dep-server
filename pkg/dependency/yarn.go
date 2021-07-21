@@ -23,6 +23,7 @@ type Yarn struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type YarnRelease struct {
@@ -153,6 +154,7 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:yarnpkg:yarn:%s:*:*:*:*:*:*:*", version),
+		PURL:            y.purlGenerator.Generate("yarn", version, dependencySHA, asset.BrowserDownloadUrl),
 		Licenses:        licenses,
 	}, nil
 }

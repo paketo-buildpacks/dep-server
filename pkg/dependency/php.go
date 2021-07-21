@@ -15,6 +15,7 @@ type Php struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type PhpSource struct {
@@ -87,6 +88,7 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:php:php:%s:*:*:*:*:*:*:*", version),
+		PURL:            p.purlGenerator.Generate("php", version, dependencySHA, dependencyURL),
 		Licenses:        licenses,
 	}, nil
 }

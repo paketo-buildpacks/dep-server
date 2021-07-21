@@ -30,6 +30,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		yarn                 dependency.Dependency
 	)
 
@@ -39,9 +40,10 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		yarn, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("yarn")
+		yarn, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("yarn")
 		require.NoError(err)
 	})
 
@@ -97,14 +99,18 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 			assetUrlContent := `{"browser_download_url":"some-source-url", "key":"some_value"}`
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte(assetUrlContent), nil)
+
 			fakeGithubClient.GetReleaseAssetReturns([]byte("some-signature"), nil)
 			fakeGithubClient.DownloadReleaseAssetReturns("some-asset-url", nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/yarn@1.0.0?checksum=some-source-sha&download_url=some-source-url")
 
 			actualDep, err := yarn.GetDependencyVersion("1.0.0")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.0",
@@ -113,6 +119,7 @@ func testYarn(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:yarnpkg:yarn:1.0.0:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/yarn@1.0.0?checksum=some-source-sha&download_url=some-source-url",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 

@@ -28,6 +28,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		dotnetSDK            dependency.Dependency
 	)
 
@@ -37,9 +38,10 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		dotnetSDK, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("dotnet-sdk")
+		dotnetSDK, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("dotnet-sdk")
 		require.NoError(err)
 	})
 
@@ -323,10 +325,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 			actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDep := dependency.DepVersion{
 				Version:         "2.0.201",
 				URI:             "url-for-linux-x64-2.0.201",
@@ -334,6 +339,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -434,10 +440,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@5.0.201?checksum=some-sha256&download_url=url-for-linux-x64-5.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("5.0.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "5.0.201",
 					URI:             "url-for-linux-x64-5.0.201",
@@ -445,6 +454,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net:5.0.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@5.0.201?checksum=some-sha256&download_url=url-for-linux-x64-5.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -497,10 +507,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.201",
 					URI:             "url-for-ubuntu-x64-2.0.201",
@@ -508,6 +521,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -586,10 +600,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.201",
 					URI:             "url-for-linux-x64-2.0.201",
@@ -597,6 +614,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -630,10 +648,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.201",
 					URI:             "url-for-linux-x64-2.0.201",
@@ -641,6 +662,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -675,10 +697,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.1.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "2.1.201",
 					URI:             "url-for-linux-x64-2.1.201",
@@ -686,6 +711,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.1.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -720,10 +746,13 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+				fakePURLGenerator.GenerateReturns("pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201")
 
 				actualDep, err := dotnetSDK.GetDependencyVersion("2.0.201")
 				require.NoError(err)
 
+				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
 					Version:         "2.0.201",
 					URI:             "url-for-linux-x64-2.0.201",
@@ -731,6 +760,7 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: nil,
 					CPE:             "cpe:2.3:a:microsoft:.net_core:2.0.201:*:*:*:*:*:*:*",
+					PURL:            "pkg:generic/dotnet-sdk@2.0.201?checksum=some-sha256&download_url=url-for-linux-x64-2.0.201",
 					Licenses:        []string{"MIT", "MIT-2"},
 				}
 				assert.Equal(expectedDep, actualDep)
@@ -748,8 +778,8 @@ func testDotnetSDK(t *testing.T, when spec.G, it spec.S) {
       "release-date": "2020-02-22",
       "sdk": {
         "version": "2.0.202",
-        "files": [
-          {
+				"files": [
+					{
             "name": "dotnet-sdk-linux-x64.tar.gz",
             "rid": "linux-x64",
             "url": "url-for-linux-x64-2.0.202",

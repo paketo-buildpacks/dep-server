@@ -26,6 +26,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		pypi                 dependency.Dependency
 	)
 
@@ -35,9 +36,10 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("pip")
+		pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("pip")
 		require.NoError(err)
 	})
 
@@ -121,10 +123,13 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 }}`), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/pip@2.0.0?checksum=some-sha-256gz&download_url=some-url")
 
 			actualDep, err := pypi.GetDependencyVersion("2.0.0")
 			require.NoError(err)
 
+			assert.Equal(3, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(3, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2010, 5, 1, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "2.0.0",
@@ -133,6 +138,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:pypa:pip:2.0.0:*:*:*:*:python:*:*",
+				PURL:            "pkg:generic/pip@2.0.0?checksum=some-sha-256gz&download_url=some-url",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -144,7 +150,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 		when("the product is not pip", func() {
 			it.Before(func() {
 				var err error
-				pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("pipenv")
+				pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("pipenv")
 				require.NoError(err)
 			})
 			it("the CPE field is empty", func() {

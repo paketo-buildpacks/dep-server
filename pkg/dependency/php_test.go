@@ -25,6 +25,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		php                  dependency.Dependency
 	)
 
@@ -33,9 +34,10 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		php, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("php")
+		php, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("php")
 		require.NoError(err)
 	})
 
@@ -153,11 +155,15 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
  ]
 }
 `), nil)
+
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/php@7.4.4?checksum=aaaaaa&download_url=https://www.php.net")
 
 			actualDepVersion, err := php.GetDependencyVersion("7.4.4")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
 			expectedDeprecationDate := time.Date(2023, 03, 19, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
@@ -167,6 +173,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:php:php:7.4.4:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/php@7.4.4?checksum=aaaaaa&download_url=https://www.php.net",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 

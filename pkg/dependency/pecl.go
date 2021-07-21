@@ -18,6 +18,7 @@ type Pecl struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 type PeclVersion struct {
@@ -76,6 +77,7 @@ func (p Pecl) GetDependencyVersion(version string) (DepVersion, error) {
 				SHA256:          dependencySHA,
 				ReleaseDate:     currVersion.ReleaseDate,
 				DeprecationDate: nil,
+				PURL:            p.purlGenerator.Generate(currVersion.Name, version, dependencySHA, dependencyURL),
 				Licenses:        licenses,
 			}, nil
 		}

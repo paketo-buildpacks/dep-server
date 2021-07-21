@@ -25,6 +25,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 		fakeChecksummer      *dependencyfakes.FakeChecksummer
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		tini                 dependency.Dependency
 	)
 
@@ -32,9 +33,10 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 		fakeChecksummer = &dependencyfakes.FakeChecksummer{}
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		tini, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, fakeGithubClient, nil, fakeLicenseRetriever).NewDependency("tini")
+		tini, err = dependency.NewCustomDependencyFactory(fakeChecksummer, nil, fakeGithubClient, nil, fakeLicenseRetriever, fakePURLGenerator).NewDependency("tini")
 		require.NoError(err)
 	})
 
@@ -84,12 +86,16 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 				},
 			}, nil)
 			fakeGithubClient.DownloadSourceTarballReturns("some-tarball-url", nil)
+
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/tini@v1.0.0?checksum=some-source-sha&download_url=some-tarball-url")
 
 			actualDep, err := tini.GetDependencyVersion("v1.0.0")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "v1.0.0",
@@ -98,6 +104,7 @@ func testTini(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:tini_project:tini:1.0.0:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/tini@v1.0.0?checksum=some-source-sha&download_url=some-tarball-url",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 

@@ -93,5 +93,6 @@ jobs:
             "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
             "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
             "cpe": "${{ steps.modify-cpe.outputs.cpe }}",
+            "purl": "${{ steps.upstream.outputs.purl }}",
             "licenses": "${{ steps.flatten-licenses.outputs.licenses }}"
           }

@@ -16,6 +16,7 @@ type Python struct {
 	fileSystem       FileSystem
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (p Python) GetAllVersionRefs() ([]string, error) {
@@ -65,6 +66,7 @@ func (p Python) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     releaseDate,
 		DeprecationDate: deprecationDate,
 		CPE:             fmt.Sprintf("cpe:2.3:a:python:python:%s:*:*:*:*:*:*:*", version),
+		PURL:            p.purlGenerator.Generate("python", version, sha256, sourceURI),
 		Licenses:        licenses,
 	}, nil
 }

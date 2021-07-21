@@ -1,6 +1,7 @@
 package dependency_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -27,6 +28,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		composer             dependency.Dependency
 	)
 
@@ -36,9 +38,10 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		composer, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("composer")
+		composer, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("composer")
 		require.NoError(err)
 	})
 
@@ -110,10 +113,13 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				[]byte(`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  composer.phar`), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/composer@1.0.1?checksum=aaaaaaaa&download_url=https://getcomposer.org")
 
 			actualDep, err := composer.GetDependencyVersion("1.0.1")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 6, 29, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
 				Version:         "1.0.1",
@@ -121,6 +127,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
+				PURL:            "pkg:generic/composer@1.0.1?checksum=aaaaaaaa&download_url=https://getcomposer.org",
 				Licenses:        []string{},
 			}
 			assert.Equal(expectedDep, actualDep)
@@ -144,6 +151,33 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				assert.Error(err)
 
 				assert.Contains(err.Error(), "could not get SHA256 from file")
+			})
+		})
+
+		when("the licenses cannot be found", func() {
+			it("returns an error", func() {
+				fakeGithubClient.GetReleaseTagsReturns([]internal.GithubRelease{
+					{
+						TagName:       "3.0.0",
+						PublishedDate: time.Date(2020, 06, 30, 0, 0, 0, 0, time.UTC),
+					},
+					{
+						TagName:       "1.0.1",
+						PublishedDate: time.Date(2020, 06, 29, 0, 0, 0, 0, time.UTC),
+					},
+					{
+						TagName:       "2.0.0",
+						PublishedDate: time.Date(2020, 06, 28, 0, 0, 0, 0, time.UTC),
+					},
+				}, nil)
+				fakeWebClient.GetReturnsOnCall(0,
+					[]byte(`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  composer.phar`), nil)
+
+				fakeLicenseRetriever.LookupLicensesReturns([]string{}, errors.New("failed licenses scan"))
+				_, err := composer.GetDependencyVersion("3.0.0")
+				assert.Error(err)
+
+				assert.Contains(err.Error(), "could not find license metadata")
 			})
 		})
 	})

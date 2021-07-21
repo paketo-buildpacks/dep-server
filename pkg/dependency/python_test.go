@@ -27,6 +27,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem       *dependencyfakes.FakeFileSystem
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		python               dependency.Dependency
 	)
 
@@ -35,9 +36,10 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 		fakeFileSystem = &dependencyfakes.FakeFileSystem{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		python, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever).NewDependency("python")
+		python, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, nil, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("python")
 		require.NoError(err)
 	})
 
@@ -73,12 +75,16 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 		it("returns the correct python version", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(python378DownloadPage), nil)
 			fakeWebClient.GetReturnsOnCall(1, []byte(fullPythonIndex), nil)
+
 			fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/python@3.7.8?checksum=some-sha-256&download_url=https://www.python.org")
 
 			actualDepVersion, err := python.GetDependencyVersion("3.7.8")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDeprecationDate := time.Date(2023, 6, 27, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
@@ -88,6 +94,7 @@ func testPython(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
 				CPE:             "cpe:2.3:a:python:python:3.7.8:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/python@3.7.8?checksum=some-sha-256&download_url=https://www.python.org",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 

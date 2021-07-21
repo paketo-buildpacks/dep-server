@@ -27,6 +27,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient     *dependencyfakes.FakeGithubClient
 		fakeWebClient        *dependencyfakes.FakeWebClient
 		fakeLicenseRetriever *dependencyfakes.FakeLicenseRetriever
+		fakePURLGenerator    *dependencyfakes.FakePURLGenerator
 		nginx                dependency.Dependency
 	)
 
@@ -36,9 +37,10 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 		fakeGithubClient = &dependencyfakes.FakeGithubClient{}
 		fakeWebClient = &dependencyfakes.FakeWebClient{}
 		fakeLicenseRetriever = &dependencyfakes.FakeLicenseRetriever{}
+		fakePURLGenerator = &dependencyfakes.FakePURLGenerator{}
 
 		var err error
-		nginx, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever).NewDependency("nginx")
+		nginx, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("nginx")
 		require.NoError(err)
 	})
 
@@ -74,10 +76,13 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
+			fakePURLGenerator.GenerateReturns("pkg:generic/nginx@1.0.0?checksum=some-source-sha&download_url=http://nginx.org")
 
 			actualDepVersion, err := nginx.GetDependencyVersion("1.0.0")
 			require.NoError(err)
 
+			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
+			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2020, 06, 17, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "1.0.0",
@@ -86,6 +91,7 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
 				CPE:             "cpe:2.3:a:nginx:nginx:1.0.0:*:*:*:*:*:*:*",
+				PURL:            "pkg:generic/nginx@1.0.0?checksum=some-source-sha&download_url=http://nginx.org",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDepVersion, actualDepVersion)

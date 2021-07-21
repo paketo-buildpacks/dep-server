@@ -21,6 +21,7 @@ type ICU struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (i ICU) GetAllVersionRefs() ([]string, error) {
@@ -147,6 +148,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		ReleaseDate:     &release.CreatedDate,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf(`cpe:2.3:a:icu-project:international_components_for_unicode:%s:*:*:*:*:c\/c\+\+:*:*`, version),
+		PURL:            i.purlGenerator.Generate("icu", version, dependencySHA, asset.BrowserDownloadUrl),
 		Licenses:        licenses,
 	}, nil
 }

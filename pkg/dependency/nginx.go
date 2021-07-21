@@ -14,6 +14,7 @@ type Nginx struct {
 	githubClient     GithubClient
 	webClient        WebClient
 	licenseRetriever LicenseRetriever
+	purlGenerator    PURLGenerator
 }
 
 func (n Nginx) GetAllVersionRefs() ([]string, error) {
@@ -55,6 +56,7 @@ func (n Nginx) GetDependencyVersion(version string) (DepVersion, error) {
 		ReleaseDate:     &tagCommit.Date,
 		DeprecationDate: nil,
 		CPE:             fmt.Sprintf("cpe:2.3:a:nginx:nginx:%s:*:*:*:*:*:*:*", version),
+		PURL:            n.purlGenerator.Generate("nginx", version, sha, dependencyURL),
 		Licenses:        licenses,
 	}, nil
 }
