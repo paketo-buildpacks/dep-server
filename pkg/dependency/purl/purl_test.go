@@ -26,9 +26,9 @@ func testPURLGenerator(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		it("returns a PURL", func() {
-			purl := purlGenerator.Generate("dependencyName", "dependencyVersion", "dependencySourceSHA", "dependencySource")
-			Expect(purl).To(Equal("pkg:generic/dependencyName@dependencyVersion?checksum=dependencySourceSHA&download_url=dependencySource"))
+			purl := purlGenerator.Generate("dependencyName", "dependencyVersion", "dependencySourceSHA", "http://dependencySource")
+			Expect(purl).To(Equal("pkg:generic/dependencyName@dependencyVersion?checksum=dependencySourceSHA&download_url=http://dependencySource"))
 		})
-	})
 
+	})
 }
