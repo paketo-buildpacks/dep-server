@@ -32,7 +32,7 @@ jobs:
         echo "::set-output name=known-versions::"$(gsutil cat "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json")""
     - name: Get New Versions
       id: get-new-versions
-      uses: ./actions/list-new-upstream-dependency-versions
+      uses: paketo-buildpacks/dep-server/actions/list-new-upstream-dependency-versions@main
       with:
         name: ${{ env.DEP_NAME }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
