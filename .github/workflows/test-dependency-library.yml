@@ -22,11 +22,8 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
-    - name: Run tests
+    - name: Run unit and acceptance tests
       run: cd pkg/dependency && go test ./...
-
-    - name: Run acceptance tests
-      run: cd pkg/dependency/test/acceptance && go test ./...
       env:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
