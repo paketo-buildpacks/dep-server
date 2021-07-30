@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run unit and acceptance tests
-      run: cd pkg/dependency && go test ./...
+      run: cd pkg/dependency && go test ./... -v
       env:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
