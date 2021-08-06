@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/go-enry/go-license-detector/v4 v4.3.0
 	github.com/mmcdole/gofeed v1.1.3
-	github.com/onsi/gomega v1.14.0
+	github.com/onsi/gomega v1.15.0
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/paketo-buildpacks/packit v0.14.3
 	github.com/sclevine/spec v1.4.0
