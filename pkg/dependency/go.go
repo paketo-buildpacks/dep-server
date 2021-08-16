@@ -82,7 +82,7 @@ func (g Go) GetDependencyVersion(version string) (DepVersion, error) {
 
 	licenses, err := g.licenseRetriever.LookupLicenses("go", depURL)
 	if err != nil {
-		return DepVersion{}, fmt.Errorf("could not convert to SemVer: %w", err)
+		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
 	semVersion, err := convertToSemVer(version)

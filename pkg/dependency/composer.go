@@ -85,8 +85,13 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 		return DepVersion{}, fmt.Errorf("could not find license metadata: %w", err)
 	}
 
+	semVersion, err := convertToSemVer(release.TagName)
+	if err != nil {
+		return DepVersion{}, err
+	}
+
 	return DepVersion{
-		Version:         release.TagName,
+		Version:         semVersion,
 		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     &release.PublishedDate,
