@@ -53,7 +53,14 @@ func (p PyPi) GetDependencyVersion(version string) (DepVersion, error) {
 	}
 
 	for _, release := range releases {
-		if release.Version == version {
+		// If the version passed in is not semantic, convert it since we are
+		// comparing to release.Version which will be semantic.
+		semVersion, err := convertToSemVer(version)
+		if err != nil {
+			return DepVersion{}, err
+		}
+
+		if release.Version == semVersion {
 			return release, nil
 		}
 	}
@@ -124,8 +131,13 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 				return nil, fmt.Errorf("could not get retrieve licenses: %w", err)
 			}
 
+			semVersion, err := convertToSemVer(version)
+			if err != nil {
+				return nil, err
+			}
+
 			releases = append(releases, DepVersion{
-				Version:     version,
+				Version:     semVersion,
 				URI:         release.URL,
 				SHA256:      release.Digests["sha256"],
 				ReleaseDate: &uploadTime,

@@ -61,9 +61,13 @@ func (r Ruby) GetDependencyVersion(version string) (DepVersion, error) {
 			if err != nil {
 				return DepVersion{}, fmt.Errorf("could not parse release date: %w", err)
 			}
+			semVersion, err := convertToSemVer(version)
+			if err != nil {
+				return DepVersion{}, err
+			}
 
 			return DepVersion{
-				Version:         version,
+				Version:         semVersion,
 				URI:             depURL,
 				SHA256:          depSHA,
 				ReleaseDate:     &releaseDate,

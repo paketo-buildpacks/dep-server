@@ -59,8 +59,13 @@ func (r Rust) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
+	semVersion, err := convertToSemVer(version)
+	if err != nil {
+		return DepVersion{}, err
+	}
+
 	return DepVersion{
-		Version:         version,
+		Version:         semVersion,
 		URI:             dependencyURL,
 		SHA256:          sha,
 		ReleaseDate:     releaseDate,

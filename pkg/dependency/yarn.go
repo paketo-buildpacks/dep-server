@@ -47,7 +47,7 @@ func (y Yarn) GetAllVersionRefs() ([]string, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse version: %w", err)
 		}
-		/** Versions less than 0.7.0 does not have source code and the version tag does not contains the "v" at the start*/
+		/** Versions less than 0.7.0 do not have source code and the version tag does not contains the "v" at the start*/
 		if version.LessThan(semver.MustParse("0.7.0")) {
 			continue
 		}
@@ -147,8 +147,13 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
+	semVersion, err := convertToSemVer(version)
+	if err != nil {
+		return DepVersion{}, err
+	}
+
 	return DepVersion{
-		Version:         version,
+		Version:         semVersion,
 		URI:             asset.BrowserDownloadUrl,
 		SHA256:          dependencySHA,
 		ReleaseDate:     &release.PublishedDate,

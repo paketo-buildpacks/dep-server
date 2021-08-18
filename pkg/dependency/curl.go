@@ -130,8 +130,13 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 	depURL := c.dependencyURL(release)
 	licenses, err := c.licenseRetriever.LookupLicenses("curl", depURL)
 
+	semVersion, err := convertToSemVer(release.Version)
+	if err != nil {
+		return DepVersion{}, err
+	}
+
 	return DepVersion{
-		Version:     release.Version,
+		Version:     semVersion,
 		URI:         depURL,
 		SHA256:      sha,
 		ReleaseDate: &release.Date,

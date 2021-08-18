@@ -2,8 +2,10 @@ package dependency
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/internal"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/licenses"
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency/purl"
@@ -116,6 +118,22 @@ func (d DepFactory) SupportsDependency(name string) bool {
 	}
 
 	return true
+}
+
+// Strip the any non-digit prefix off the version and ensure that the new
+// version is semver-compatible
+func convertToSemVer(version string) (string, error) {
+	reg, err := regexp.Compile(`([0-9]+.?)+`)
+	if err != nil {
+		return "", err
+	}
+
+	semanticVersion, err := semver.NewVersion(reg.FindAllString(version, 1)[0])
+	if err != nil {
+		return "", err
+	}
+
+	return semanticVersion.String(), nil
 }
 
 func (d DepFactory) NewDependency(name string) (Dependency, error) {
