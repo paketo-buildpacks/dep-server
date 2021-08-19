@@ -29,6 +29,6 @@ runs:
           --version "${{ inputs.version }}"
         )"
 
-        echo "::set-output name=sem-version::$(jq -r .uri <<< "${metadata}")"
+        echo "::set-output name=sem-version::"${metadata}""
 
         rm -f ./entrypoint
