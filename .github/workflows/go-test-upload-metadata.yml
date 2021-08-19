@@ -29,7 +29,7 @@ jobs:
         echo "::set-output name=cpe::${cpe}"
     - name: Convert Version to Semantic Version
       id: semantic-version
-      uses: paketo-buildpacks/dep-server/actions/convert-semver@semver-workflow-change
+      uses: paketo-buildpacks/dep-server/actions/convert-semver@main
       with:
         version: ${{ github.event.client_payload.version }}
     - name: Upload dependency metadata
