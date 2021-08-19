@@ -1,0 +1,34 @@
+name: 'Convert Version to Semantic Version'
+description: |
+ Takes a version and ensure it's in semantic version
+
+inputs:
+  version:
+    description: dependency version
+    required: true
+
+outputs:
+  sem-version:
+    description: semantic version
+    value: ${{ steps.convert-semver.outputs.sem-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: convert-semver
+      shell: bash
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        cd "${{ github.action_path }}/entrypoint"
+
+        go build -o ./entrypoint
+
+        metadata="$(./entrypoint \
+          --version "${{ inputs.version }}"
+        )"
+
+        echo "::set-output name=sem-version::$(jq -r .uri <<< "${metadata}")"
+
+        rm -f ./entrypoint
