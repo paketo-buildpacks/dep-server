@@ -53,11 +53,6 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	for _, release := range bundlerReleases {
 		if release.Version == version {
 			releaseDate, err := time.Parse(time.RFC3339Nano, release.Date)
@@ -65,7 +60,7 @@ func (b Bundler) GetDependencyVersion(version string) (DepVersion, error) {
 				return DepVersion{}, fmt.Errorf("could not parse release date: %w", err)
 			}
 			return DepVersion{
-				Version:         semVersion,
+				Version:         version,
 				URI:             depURL,
 				SHA256:          release.SHA,
 				ReleaseDate:     &releaseDate,

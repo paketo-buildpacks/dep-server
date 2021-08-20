@@ -159,7 +159,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
 			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 			expectedDep := dependency.DepVersion{
-				Version:         "1.13.9",
+				Version:         "go1.13.9",
 				URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 				SHA256:          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				ReleaseDate:     &expectedReleaseDate,
@@ -204,7 +204,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
 				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
 				expectedDep := dependency.DepVersion{
-					Version:         "1.13.9",
+					Version:         "go1.13.9",
 					URI:             "https://dl.google.com/go/go1.13.9.src.tar.gz",
 					SHA256:          "some-source-sha",
 					ReleaseDate:     &expectedReleaseDate,
@@ -220,54 +220,6 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 
 				urlArg, dependencyPathDownloadArg, _ := fakeWebClient.DownloadArgsForCall(0)
 				assert.Equal("https://dl.google.com/go/go1.13.9.src.tar.gz", urlArg)
-
-				assert.Equal(dependencyPathDownloadArg, fakeChecksummer.GetSHA256ArgsForCall(0))
-			})
-		})
-
-		when("the version passed in is already semver", func() {
-			it("returns the right go version", func() {
-				fakeWebClient.GetReturnsOnCall(0, []byte(`
-[
-{"version": "go1.13", "files": [{"sha256": "", "kind": "source"}]}
-]`), nil)
-
-				fakeWebClient.GetReturnsOnCall(1, []byte(`
-<!DOCTYPE html>
-<html lang="en">
-	<h2 id="go1.13">go1.13 (released 2020-03-19)</h2>
-		<p>
-		go1.13
-		(released 2020-03-19)
-		</p>
-`), nil)
-
-				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
-				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
-				fakePURLGenerator.GenerateReturns("pkg:generic/go@go1.13?checksum=some-source-sha&download_url=https://dl.google.com/go")
-
-				actualDep, err := golang.GetDependencyVersion("1.13.0")
-				require.NoError(err)
-
-				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
-				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
-				expectedDep := dependency.DepVersion{
-					Version:         "1.13.0",
-					URI:             "https://dl.google.com/go/go1.13.src.tar.gz",
-					SHA256:          "some-source-sha",
-					ReleaseDate:     &expectedReleaseDate,
-					DeprecationDate: nil,
-					CPE:             "cpe:2.3:a:golang:go:1.13:*:*:*:*:*:*:*",
-					PURL:            "pkg:generic/go@go1.13?checksum=some-source-sha&download_url=https://dl.google.com/go",
-					Licenses:        []string{"MIT", "MIT-2"},
-				}
-				assert.Equal(expectedDep, actualDep)
-
-				urlArg, _ := fakeWebClient.GetArgsForCall(0)
-				assert.Equal("https://golang.org/dl/?mode=json&include=all", urlArg)
-
-				urlArg, dependencyPathDownloadArg, _ := fakeWebClient.DownloadArgsForCall(0)
-				assert.Equal("https://dl.google.com/go/go1.13.src.tar.gz", urlArg)
 
 				assert.Equal(dependencyPathDownloadArg, fakeChecksummer.GetSHA256ArgsForCall(0))
 			})
@@ -308,7 +260,7 @@ func testGo(t *testing.T, when spec.G, it spec.S) {
 		go1.14.1
 		(released 2020/03/19)
 		</p>
-	<h2 id="go1.13">go1.13 (released 2019-09-03)</h2>
+	<h2 id="go1.13">go1.13 (released 2019-09/03)</h2>
 		<p>
 		go1.13.1
 		(released 2019-09-25)

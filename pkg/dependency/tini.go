@@ -38,10 +38,6 @@ func (t Tini) GetDependencyVersion(version string) (DepVersion, error) {
 	}
 
 	for _, release := range releases {
-		// We expect an official Tini version (ex. vX.X.X) to be passed in.
-		// Safeguard against user passing in a non-official semveric version
-		version = convertToTiniVersion(version)
-
 		if release.TagName == version {
 			depVersion, err := t.createDependencyVersion(version, release)
 			if err != nil {
@@ -69,11 +65,6 @@ func (t Tini) GetReleaseDate(version string) (*time.Time, error) {
 }
 
 func (t Tini) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {
-	// this function receives an official Tini version from
-	// GetAllDependencies usually, but if a user passes in a semantic version
-	// via a workflow this will convert the version to an official Tini version.
-	version = convertToTiniVersion(version)
-
 	tarballDir, err := ioutil.TempDir("", "tini")
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not create temp directory: %w", err)
@@ -97,13 +88,8 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	return DepVersion{
-		Version:         semVersion,
+		Version:         version,
 		URI:             tarballURL,
 		SHA256:          dependencySHA,
 		ReleaseDate:     &release.PublishedDate,
@@ -112,15 +98,4 @@ func (t Tini) createDependencyVersion(version string, release internal.GithubRel
 		PURL:            t.purlGenerator.Generate("tini", version, dependencySHA, tarballURL),
 		Licenses:        licenses,
 	}, nil
-}
-
-// If a user passes in the semantic version rather than the official vX.X.X
-// version, the GetDependencyVersion function will fail since we can't easily
-// query the Tini release pages
-func convertToTiniVersion(version string) string {
-	// add a `v` prefix
-	if !strings.Contains(version, "v") {
-		version = "v" + version
-	}
-	return version
 }

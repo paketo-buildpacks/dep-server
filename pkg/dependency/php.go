@@ -81,13 +81,8 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	return DepVersion{
-		Version:         semVersion,
+		Version:         version,
 		URI:             dependencyURL,
 		SHA256:          dependencySHA,
 		ReleaseDate:     releaseDate,

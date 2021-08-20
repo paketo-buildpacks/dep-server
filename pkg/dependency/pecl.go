@@ -70,13 +70,9 @@ func (p Pecl) GetDependencyVersion(version string) (DepVersion, error) {
 			if err != nil {
 				return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 			}
-			semVersion, err := convertToSemVer(currVersion.Version)
-			if err != nil {
-				return DepVersion{}, err
-			}
 
 			return DepVersion{
-				Version:         semVersion,
+				Version:         currVersion.Version,
 				URI:             dependencyURL,
 				SHA256:          dependencySHA,
 				ReleaseDate:     currVersion.ReleaseDate,

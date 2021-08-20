@@ -132,13 +132,8 @@ func (d dotnet) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, fmt.Errorf("could not get licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	depVersion := DepVersion{
-		Version:     semVersion,
+		Version:     version,
 		URI:         releaseFile.URL,
 		SHA256:      sha256,
 		ReleaseDate: releaseDate,
