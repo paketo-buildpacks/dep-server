@@ -77,10 +77,6 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
   "2.1.0": [
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}},
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z"}
-  ],
-  "1.1": [
-    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}},
-    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z"}
   ]
 }}`), nil)
 			versions, err := pypi.GetAllVersionRefs()
@@ -90,7 +86,6 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal([]string{
 				"2.1.0",
 				"1.20.0",
-				"1.1.0",
 				"2.0.0",
 				"1.10.0",
 				"1.2.0",
@@ -110,7 +105,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
   "1.0.0": [
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-01-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
   ],
-  "21.2": [
+  "2.0.0": [
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
     {
       "packagetype": "sdist",
@@ -128,79 +123,28 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 }}`), nil)
 
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
-			fakePURLGenerator.GenerateReturns("pkg:generic/pip@21.2?checksum=some-sha-256gz&download_url=some-url")
+			fakePURLGenerator.GenerateReturns("pkg:generic/pip@2.0.0?checksum=some-sha-256gz&download_url=some-url")
 
-			actualDep, err := pypi.GetDependencyVersion("21.2")
+			actualDep, err := pypi.GetDependencyVersion("2.0.0")
 			require.NoError(err)
 
 			assert.Equal(3, fakeLicenseRetriever.LookupLicensesCallCount())
 			assert.Equal(3, fakePURLGenerator.GenerateCallCount())
 			expectedReleaseDate := time.Date(2010, 5, 1, 0, 0, 0, 0, time.UTC)
 			expectedDep := dependency.DepVersion{
-				Version:         "21.2.0",
+				Version:         "2.0.0",
 				URI:             "some-url",
 				SHA256:          "some-sha256",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
-				CPE:             "cpe:2.3:a:pypa:pip:21.2:*:*:*:*:python:*:*",
-				PURL:            "pkg:generic/pip@21.2?checksum=some-sha-256gz&download_url=some-url",
+				CPE:             "cpe:2.3:a:pypa:pip:2.0.0:*:*:*:*:python:*:*",
+				PURL:            "pkg:generic/pip@2.0.0?checksum=some-sha-256gz&download_url=some-url",
 				Licenses:        []string{"MIT", "MIT-2"},
 			}
 			assert.Equal(expectedDep, actualDep)
 
 			urlArg, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://pypi.org/pypi/pip/json", urlArg)
-		})
-
-		when("a non-official semveric version is passed in", func() {
-			it("returns the correct version", func() {
-				fakeWebClient.GetReturns([]byte(`{
-"releases": {
-  "1.0.0": [
-    {"packagetype": "sdist", "upload_time_iso_8601": "2010-01-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
-  ],
-  "21.2": [
-    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
-    {
-      "packagetype": "sdist",
-      "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z",
-      "digests": {
-        "md5": "some-md5",
-        "sha256": "some-sha256"
-      },
-      "url": "some-url"
-    }
-  ],
-  "3.0.0": [
-    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
-  ]
-}}`), nil)
-
-				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
-				fakePURLGenerator.GenerateReturns("pkg:generic/pip@21.2?checksum=some-sha-256gz&download_url=some-url")
-
-				actualDep, err := pypi.GetDependencyVersion("21.2.0")
-				require.NoError(err)
-
-				assert.Equal(3, fakeLicenseRetriever.LookupLicensesCallCount())
-				assert.Equal(3, fakePURLGenerator.GenerateCallCount())
-				expectedReleaseDate := time.Date(2010, 5, 1, 0, 0, 0, 0, time.UTC)
-				expectedDep := dependency.DepVersion{
-					Version:         "21.2.0",
-					URI:             "some-url",
-					SHA256:          "some-sha256",
-					ReleaseDate:     &expectedReleaseDate,
-					DeprecationDate: nil,
-					CPE:             "cpe:2.3:a:pypa:pip:21.2:*:*:*:*:python:*:*",
-					PURL:            "pkg:generic/pip@21.2?checksum=some-sha-256gz&download_url=some-url",
-					Licenses:        []string{"MIT", "MIT-2"},
-				}
-				assert.Equal(expectedDep, actualDep)
-
-				urlArg, _ := fakeWebClient.GetArgsForCall(0)
-				assert.Equal("https://pypi.org/pypi/pip/json", urlArg)
-			})
-
 		})
 
 		when("the product is not pip", func() {

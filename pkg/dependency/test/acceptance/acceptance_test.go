@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -84,17 +83,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 
 						depVersions = append(depVersions, depVersion)
 
-						// some versions from GetAllVersionRefs are not semver compatible
-						// but the depVersion version is.
-						// To check theyre equivalent versions: chop off any leading
-						// non-digit or period characters and convert to semVer
-						reg, err := regexp.Compile(`([0-9]+.?)+`)
-						require.NoError(err)
-						semVersion, err := semver.NewVersion(reg.FindAllString(version, 1)[0])
-						require.NoError(err, "Invalid Semantic Version")
-
-						assert.Equal(semVersion.String(), depVersion.Version)
-
+						assert.Equal(version, depVersion.Version)
 						assert.Len(depVersion.SHA256, 64, "SHA256 did not have 64 characters for %s %s", depName, version)
 						assert.NotEmpty(depVersion.URI)
 

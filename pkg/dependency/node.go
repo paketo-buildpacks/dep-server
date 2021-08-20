@@ -44,10 +44,6 @@ func (n Node) GetAllVersionRefs() ([]string, error) {
 }
 
 func (n Node) GetDependencyVersion(version string) (DepVersion, error) {
-	// We expect an official Node version (ex. v13.6.1) to be passed in.
-	// Safeguard against user passing in a non-official semveric version (ex. 13.6.1)
-	version = convertToNodeVersion(version)
-
 	nodeReleases, err := n.getAllReleases()
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get releases: %w", err)
@@ -122,13 +118,8 @@ func (n Node) createDepVersion(release NodeRelease, releaseSchedule ReleaseSched
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(release.Version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	return DepVersion{
-		Version:         semVersion,
+		Version:         release.Version,
 		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     &releaseDate,
@@ -198,15 +189,4 @@ func (n Node) dependencyURL(version string) string {
 
 func (n Node) shaFileURL(version string) string {
 	return fmt.Sprintf("https://nodejs.org/dist/%s/SHASUMS256.txt", version)
-}
-
-// If a user passes in the semantic version rather than the Node vX.X.X version
-// The GetDependencyVersion function will fail since we can't easily query the
-// Go release pages
-func convertToNodeVersion(version string) string {
-	// add a `v` prefix
-	if !strings.Contains(version, "v") {
-		version = "v" + version
-	}
-	return version
 }

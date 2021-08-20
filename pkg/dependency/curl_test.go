@@ -46,7 +46,6 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 2;7.72.0;3;2020-08-19;3 months;49;161;100;342;3;13;
 3;7.71.1;4;2020-07-01;5 months;7;168;18;360;0;13;
 4;7.71.0;4;2020-06-24;5 months;56;224;136;496;4;17;
-5;7.8;5;2020-06-24;5 months;56;224;136;496;4;17;
 `), nil)
 
 			versions, err := curl.GetAllVersionRefs()
@@ -58,7 +57,6 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 				"7.72.0",
 				"7.71.1",
 				"7.71.0",
-				"7.8",
 			}, versions)
 
 			urlArg, _ := fakeWebClient.GetArgsForCall(0)
@@ -113,42 +111,6 @@ func testCurl(t *testing.T, when spec.G, it spec.S) {
 			releaseAssetSignatureArg, _, curlGPGKeyArg := fakeChecksummer.VerifyASCArgsForCall(0)
 			assert.Equal("some-signature", releaseAssetSignatureArg)
 			assert.Equal([]string{"some-gpg-key"}, curlGPGKeyArg)
-		})
-
-		when("the version is not semveric", func() {
-			it("returns the correct curl version", func() {
-				fakeWebClient.GetReturnsOnCall(0, []byte(`
-0;7.74.0;0;2020-12-09;0;56;56;107;107;1;1;
-1;7.73.0;3;2020-10-14;56 days;56;112;135;242;9;10;
-2;7.72.0;3;2020-08-19;3 months;49;161;100;342;3;13;
-3;7.8;4;2020-10-14;56 days;56;112;135;242;9;10;
-`), nil)
-				fakeWebClient.GetReturnsOnCall(1, []byte("some-gpg-key"), nil)
-				fakeWebClient.GetReturnsOnCall(2, []byte("some-signature"), nil)
-				fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
-				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
-				fakePURLGenerator.GenerateReturns("pkg:generic/curl@7.8?checksum=some-source-sha&download_url=https://curl.se")
-
-				actualDep, err := curl.GetDependencyVersion("7.8")
-				require.NoError(err)
-
-				assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
-				assert.Equal(1, fakePURLGenerator.GenerateCallCount())
-
-				expectedReleaseDate := time.Date(2020, 10, 14, 0, 0, 0, 0, time.UTC)
-				expectedDep := dependency.DepVersion{
-					Version:     "7.8.0",
-					URI:         "https://curl.se/download/archeology/curl-7.8.tar.gz",
-					SHA256:      "some-source-sha",
-					ReleaseDate: &expectedReleaseDate,
-					CPE:         "cpe:2.3:a:haxx:curl:7.8:*:*:*:*:*:*:*",
-					PURL:        "pkg:generic/curl@7.8?checksum=some-source-sha&download_url=https://curl.se",
-					Licenses:    []string{"MIT", "MIT-2"},
-				}
-
-				assert.Equal(expectedDep, actualDep)
-				assert.Equal(0, fakeChecksummer.VerifyASCCallCount())
-			})
 		})
 
 		when("the version is older then 7.3.30", func() {

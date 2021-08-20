@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -57,15 +56,7 @@ func (i ICU) GetDependencyVersion(version string) (DepVersion, error) {
 	}
 
 	for _, release := range releases {
-		// We expect an official ICU version (ex. 66.1) to be passed in.
-		// Safeguard against user passing in a non-official semveric version (ex. 66.1.0)
-		version, err := convertToICUVersion(version)
-		if err != nil {
-			return DepVersion{}, err
-		}
-
 		if tagToVersion(release.TagName) == version {
-
 			depVersion, err := i.createDependencyVersion(version, release)
 			if err != nil {
 				return DepVersion{}, fmt.Errorf("could not create ICU version: %w", err)
@@ -150,13 +141,8 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 		return DepVersion{}, fmt.Errorf("could not get retrieve licenses: %w", err)
 	}
 
-	semVersion, err := convertToSemVer(version)
-	if err != nil {
-		return DepVersion{}, err
-	}
-
 	return DepVersion{
-		Version:         semVersion,
+		Version:         version,
 		URI:             asset.BrowserDownloadUrl,
 		SHA256:          dependencySHA,
 		ReleaseDate:     &release.CreatedDate,
@@ -203,19 +189,4 @@ func (i ICU) getAllVersions() ([]internal.GithubRelease, error) {
 		}
 	}
 	return prunedReleases, nil
-}
-
-// If a user passes in the semantic version rather than the official ICU version
-// The GetDependencyVersion function will fail since we can't easily query the
-// ICU release pages
-func convertToICUVersion(version string) (string, error) {
-	// if trailing .0, remove it
-	reg, err := regexp.Compile(`\.0`)
-	if err != nil {
-		return "", err
-	}
-
-	version = reg.ReplaceAllString(version, "")
-
-	return version, nil
 }
