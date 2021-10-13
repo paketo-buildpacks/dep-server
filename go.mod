@@ -11,7 +11,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onsi/gomega v1.16.0
 	github.com/package-url/packageurl-go v0.1.0
-	github.com/paketo-buildpacks/packit v1.1.0
+	github.com/paketo-buildpacks/packit v1.2.0
 	github.com/sclevine/spec v1.4.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
