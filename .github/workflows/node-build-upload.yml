@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-18.04
     container:
       image: paketobuildpacks/build:base-cnb
+      options: --user 0
     steps:
     - name: Check out code
       uses: actions/checkout@v2
