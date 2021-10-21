@@ -14,6 +14,8 @@ jobs:
   build-upload:
     name: Build and Upload Dependency
     runs-on: ubuntu-18.04
+    container:
+      image: paketobuildpacks/build:base-cnb
     steps:
     - name: Check out code
       uses: actions/checkout@v2
