@@ -2,7 +2,7 @@ name: Php Get New Versions
 "on":
   workflow_dispatch: {}
   schedule:
-  - cron: '*/15 * * * *'
+  - cron: 0 * * * *
 env:
   DEP_NAME: php
   GCP_BUCKET: ${{ secrets.DEPENDENCY_ARTIFACTS_BUCKET }}
