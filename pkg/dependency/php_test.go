@@ -136,21 +136,41 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 	when("GetDependencyVersion", func() {
 		it("returns the correct php version", func() {
-			fakeWebClient.GetReturns([]byte(`
+			fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
- "date": "19 Mar 2020",
+ "date": "12 Mar 2020",
  "source": [
   {
    "filename": "php-7.4.4.tar.gz",
    "name": "PHP 7.4.4 (tar.gz)",
    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-   "date": "19 Mar 2020"
+   "date": "12 Mar 2020"
   },
   {
    "filename": "php-7.4.4.tar.bz",
    "name": "PHP 7.4.4 (tar.bz)",
    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-   "date": "19 Mar 2020"
+   "date": "12 Mar 2020"
+  }
+ ]
+}
+`), nil)
+
+			fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "date": "28 Nov 2019",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "28 Nov 2019"
+  },
+  {
+   "filename": "php-7.4.0.tar.bz",
+   "name": "PHP 7.4.0 (tar.bz)",
+   "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "date": "29 Nov 2019"
   }
  ]
 }
@@ -164,8 +184,8 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 			assert.Equal(1, fakeLicenseRetriever.LookupLicensesCallCount())
 			assert.Equal(1, fakePURLGenerator.GenerateCallCount())
-			expectedReleaseDate := time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
-			expectedDeprecationDate := time.Date(2023, 03, 19, 0, 0, 0, 0, time.UTC)
+			expectedReleaseDate := time.Date(2020, 03, 12, 0, 0, 0, 0, time.UTC)
+			expectedDeprecationDate := time.Date(2022, 11, 28, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "7.4.4",
 				URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
@@ -181,11 +201,14 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 			url, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.4", url)
+			url, _ = fakeWebClient.GetArgsForCall(1)
+			assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.*", url)
+			assert.Equal(2, fakeWebClient.GetCallCount())
 		})
 
 		when("the dependency has an MD5 instead of a SHA256", func() {
 			it("validates the MD5 and calculates the SHA256", func() {
-				fakeWebClient.GetReturns([]byte(`
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
  "date": "19 Mar 2020",
  "source": [
@@ -198,6 +221,19 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
  ]
 }
 `), nil)
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "date": "10 Nov 2019",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "md5": "some-md5",
+   "date": "10 Nov 2019"
+  }
+ ]
+}
+`), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
 				fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 
@@ -205,7 +241,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				require.NoError(err)
 
 				expectedReleaseDate := time.Date(2020, 03, 19, 0, 0, 0, 0, time.UTC)
-				expectedDeprecationDate := time.Date(2023, 03, 19, 0, 0, 0, 0, time.UTC)
+				expectedDeprecationDate := time.Date(2022, 11, 10, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "7.4.4",
 					URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
@@ -219,6 +255,9 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 				url, _, _ := fakeWebClient.DownloadArgsForCall(0)
 				assert.Equal("https://www.php.net/distributions/php-7.4.4.tar.gz", url)
+
+				url, _ = fakeWebClient.GetArgsForCall(1)
+				assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.*", url)
 
 				_, md5Arg := fakeChecksummer.VerifyMD5ArgsForCall(0)
 				assert.Equal("some-md5", md5Arg)
@@ -325,7 +364,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 		when("the release date has an unpadded day", func() {
 			it("properly parses the date", func() {
-				fakeWebClient.GetReturns([]byte(`
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
  "date": "1 Mar 2020",
  "source": [
@@ -339,16 +378,31 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "date": "1 Nov 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 Nov 2020"
+  }
+ ]
+}
+`), nil)
+
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
 				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
+				assert.Equal("2023-11-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
 			})
 		})
 
 		when("the release date has a full month name", func() {
 			it("properly parses the date", func() {
-				fakeWebClient.GetReturns([]byte(`
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
  "date": "01 March 2020",
  "source": [
@@ -362,16 +416,31 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "date": "01 November 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "01 November 2020"
+  }
+ ]
+}
+`), nil)
+
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
 				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
+				assert.Equal("2023-11-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
 			})
 		})
 
 		when("the release date has an unpadded day and a full month name", func() {
 			it("properly parses the date", func() {
-				fakeWebClient.GetReturns([]byte(`
+				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
  "date": "1 March 2020",
  "source": [
@@ -385,10 +454,25 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 }
 `), nil)
 
+				fakeWebClient.GetReturnsOnCall(1, []byte(`
+{
+ "date": "1 November 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 November 2020"
+  }
+ ]
+}
+`), nil)
+
 				depVersion, err := php.GetDependencyVersion("7.4.4")
 				require.NoError(err)
 
 				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
+				assert.Equal("2023-11-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
 			})
 		})
 
@@ -406,19 +490,19 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 		it("returns the correct php release date", func() {
 			fakeWebClient.GetReturns([]byte(`
 {
- "date": "19 Mar 2020",
+ "date": "28 Nov 2019",
  "source": [
   {
    "filename": "php-7.4.4.tar.gz",
    "name": "PHP 7.4.4 (tar.gz)",
    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-   "date": "19 Mar 2020"
+   "date": "28 Nov 2019"
   },
   {
    "filename": "php-7.4.4.tar.bz",
    "name": "PHP 7.4.4 (tar.bz)",
    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-   "date": "19 Mar 2020"
+   "date": "28 Nov 2019"
   }
  ]
 }
@@ -427,7 +511,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			releaseDate, err := php.GetReleaseDate("7.4.4")
 			require.NoError(err)
 
-			assert.Equal("2020-03-19T00:00:00Z", releaseDate.Format(time.RFC3339))
+			assert.Equal("2019-11-28T00:00:00Z", releaseDate.Format(time.RFC3339))
 		})
 
 		when("the release date has an unpadded day", func() {

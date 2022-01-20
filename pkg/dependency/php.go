@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/Masterminds/semver"
 )
 
 type Php struct {
@@ -69,12 +71,17 @@ func (p Php) GetDependencyVersion(version string) (DepVersion, error) {
 		return DepVersion{}, err
 	}
 
+	// releaseDate is the patch releaseDate
 	releaseDate, err := p.getReleaseDate(release)
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not get release date: %w", err)
 	}
 
-	deprecationDate := p.calculateDeprecationDate(*releaseDate)
+	// deprecationDate is the minor version line deprecation date
+	deprecationDate, err := p.getDeprecationDate(version)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("could not get version line deprecation date: %w", err)
+	}
 
 	licenses, err := p.licenseRetriever.LookupLicenses("php", dependencyURL)
 	if err != nil {
@@ -209,6 +216,25 @@ func (p Php) getReleaseDate(release PhpRawRelease) (*time.Time, error) {
 	}
 
 	return nil, fmt.Errorf("release date '%s' did not match any expected patterns", release.Date)
+}
+
+// getDeprecationDate of the minor version line (ex. 7.4.*)
+func (p Php) getDeprecationDate(version string) (*time.Time, error) {
+	semVer, err := semver.NewVersion(version)
+	if err != nil {
+		return nil, fmt.Errorf("could not calculate minor version line for %s: %w", version, err)
+	}
+
+	versionLine := fmt.Sprintf("%d.%d.*", semVer.Major(), semVer.Minor())
+	release, err := p.getRelease(versionLine)
+	if err != nil {
+		return nil, fmt.Errorf("could not get version-line release: %w", err)
+	}
+	versionLineReleaseDate, err := p.getReleaseDate(release)
+	if err != nil {
+		return nil, fmt.Errorf("could not get version-line release: %w", err)
+	}
+	return p.calculateDeprecationDate(*versionLineReleaseDate), nil
 }
 
 func (p Php) calculateDeprecationDate(releaseDate time.Time) *time.Time {
