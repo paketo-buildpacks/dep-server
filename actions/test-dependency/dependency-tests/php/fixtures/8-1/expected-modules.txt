@@ -14,7 +14,6 @@ exif
 fileinfo
 filter
 ftp
-gd
 gettext
 gmp
 hash
@@ -35,7 +34,6 @@ msgpack
 mysqli
 mysqlnd
 OAuth
-oci8
 odbc
 openssl
 pcntl
@@ -44,9 +42,7 @@ PDO
 PDO_Firebird
 pdo_mysql
 PDO_ODBC
-pdo_pgsql
 pdo_sqlite
-pgsql
 Phar
 phpiredis
 posix
