@@ -224,7 +224,7 @@ func (d DepFactory) NewDependency(name string) (Dependency, error) {
 			licenseRetriever: d.licenseRetriever,
 			purlGenerator:    d.purlGenerator,
 		}, nil
-	case "pip", "pipenv":
+	case "pip", "pipenv", "poetry":
 		return PyPi{
 			productName:      name,
 			checksummer:      d.checksummer,
