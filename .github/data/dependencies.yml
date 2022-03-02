@@ -60,6 +60,10 @@
   requires: python
   stacks:
     - id: io.buildpacks.stacks.bionic
+- name: poetry
+  requires: python
+  stacks:
+    - id: io.buildpacks.stacks.bionic
 - name: python
   stacks:
     - id: io.buildpacks.stacks.bionic
