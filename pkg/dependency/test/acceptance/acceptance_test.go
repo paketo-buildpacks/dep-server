@@ -49,6 +49,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 			"php",
 			"pip",
 			"pipenv",
+			"poetry",
 			"python",
 			"ruby",
 			"rust",
