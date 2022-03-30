@@ -250,7 +250,7 @@ func (p Php) dependencyURL(release PhpRawRelease, version string) string {
 		return fmt.Sprintf("https://museum.php.net/php%s/php-%s.tar.gz", majorVersion, version)
 	}
 
-	return fmt.Sprintf("https://www.php.net/distributions/php-%s.tar.gz", version)
+	return fmt.Sprintf("https://github.com/php/web-php-distributions/raw/master/php-%s.tar.gz", version)
 }
 
 func (p Php) parseReleaseDate(date string) (*time.Time, error) {

@@ -188,7 +188,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			expectedDeprecationDate := time.Date(2022, 11, 28, 0, 0, 0, 0, time.UTC)
 			expectedDepVersion := dependency.DepVersion{
 				Version:         "7.4.4",
-				URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
+				URI:             "https://github.com/php/web-php-distributions/raw/master/php-7.4.4.tar.gz",
 				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: &expectedDeprecationDate,
@@ -244,7 +244,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDeprecationDate := time.Date(2022, 11, 10, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "7.4.4",
-					URI:             "https://www.php.net/distributions/php-7.4.4.tar.gz",
+					URI:             "https://github.com/php/web-php-distributions/raw/master/php-7.4.4.tar.gz",
 					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
@@ -254,7 +254,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				assert.Equal(expectedDepVersion, actualDepVersion)
 
 				url, _, _ := fakeWebClient.DownloadArgsForCall(0)
-				assert.Equal("https://www.php.net/distributions/php-7.4.4.tar.gz", url)
+				assert.Equal("https://github.com/php/web-php-distributions/raw/master/php-7.4.4.tar.gz", url)
 
 				url, _ = fakeWebClient.GetArgsForCall(1)
 				assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.*", url)
@@ -289,7 +289,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDeprecationDate := time.Date(2016, 05, 9, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.3.25",
-					URI:             "https://www.php.net/distributions/php-5.3.25.tar.gz",
+					URI:             "https://github.com/php/web-php-distributions/raw/master/php-5.3.25.tar.gz",
 					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
@@ -325,7 +325,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				expectedDeprecationDate := time.Date(2009, 8, 24, 0, 0, 0, 0, time.UTC)
 				expectedDepVersion := dependency.DepVersion{
 					Version:         "5.1.6",
-					URI:             "https://www.php.net/distributions/php-5.1.6.tar.gz",
+					URI:             "https://github.com/php/web-php-distributions/raw/master/php-5.1.6.tar.gz",
 					SHA256:          "some-sha256",
 					ReleaseDate:     &expectedReleaseDate,
 					DeprecationDate: &expectedDeprecationDate,
