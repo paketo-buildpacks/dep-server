@@ -127,6 +127,7 @@ func testComposer(t *testing.T, when spec.G, it spec.S) {
 				SHA256:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 				ReleaseDate:     &expectedReleaseDate,
 				DeprecationDate: nil,
+				CPE:             "cpe:2.3:a:getcomposer:composer:1.0.1:*:*:*:*:*:*:*",
 				PURL:            "pkg:generic/composer@1.0.1?checksum=aaaaaaaa&download_url=https://getcomposer.org",
 				Licenses:        []string{},
 			}

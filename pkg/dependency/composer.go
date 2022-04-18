@@ -85,12 +85,22 @@ func (c Composer) createDependencyVersion(release internal.GithubRelease) (DepVe
 		return DepVersion{}, fmt.Errorf("could not find license metadata: %w", err)
 	}
 
+	v, err := semver.NewVersion(release.TagName)
+	if err != nil {
+		return DepVersion{}, fmt.Errorf("failed to parse version: %w", err)
+	}
+
+	version := *v
+	version, _ = version.SetPrerelease("")
+	version, _ = version.SetMetadata("")
+
 	return DepVersion{
 		Version:         release.TagName,
 		URI:             depURL,
 		SHA256:          sha,
 		ReleaseDate:     &release.PublishedDate,
 		DeprecationDate: nil,
+		CPE:             fmt.Sprintf("cpe:2.3:a:getcomposer:composer:%s:*:*:*:*:*:*:*", version.String()),
 		PURL:            c.purlGenerator.Generate("composer", release.TagName, sha, depURL),
 		Licenses:        licenses,
 	}, nil
