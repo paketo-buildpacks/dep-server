@@ -118,6 +118,9 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 			if p.productName == "pip" {
 				cpe = fmt.Sprintf("cpe:2.3:a:pypa:pip:%s:*:*:*:*:python:*:*", version)
 			}
+			if p.productName == "poetry" {
+				cpe = "cpe:2.3:a:python-poetry:poetry:*:*:*:*:*:*:*:*"
+			}
 
 			licenses, err := p.licenseRetriever.LookupLicenses("pypi", release.URL)
 			if err != nil {
