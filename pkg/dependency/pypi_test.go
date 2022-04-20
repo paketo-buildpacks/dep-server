@@ -147,6 +147,43 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal("https://pypi.org/pypi/pip/json", urlArg)
 		})
 
+		when("the product is pipenv", func() {
+			it.Before(func() {
+				var err error
+				pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("pipenv")
+				require.NoError(err)
+			})
+
+			it("the CPE field is present", func() {
+				fakeWebClient.GetReturns([]byte(`{
+"releases": {
+  "1.0.0": [
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-01-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ],
+  "2.0.0": [
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
+    {
+      "packagetype": "sdist",
+      "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z",
+      "digests": {
+        "md5": "some-md5",
+        "sha256": "some-sha256"
+      },
+      "url": "some-url"
+    }
+  ],
+  "3.0.0": [
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ]
+}}`), nil)
+
+				actualDep, err := pypi.GetDependencyVersion("2.0.0")
+				require.NoError(err)
+
+				assert.Equal("cpe:2.3:a:pypa:pipenv:2.0.0:*:*:*:*:python:*:*", actualDep.CPE)
+			})
+		})
+
 		when("the product is poetry", func() {
 			it.Before(func() {
 				var err error
@@ -180,44 +217,7 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
 				actualDep, err := pypi.GetDependencyVersion("2.0.0")
 				require.NoError(err)
 
-				assert.Equal("cpe:2.3:a:python-poetry:poetry:*:*:*:*:*:*:*:*", actualDep.CPE)
-			})
-		})
-
-		when("the product is not pip or poetry", func() {
-			it.Before(func() {
-				var err error
-				pypi, err = dependency.NewCustomDependencyFactory(fakeChecksummer, fakeFileSystem, fakeGithubClient, fakeWebClient, fakeLicenseRetriever, fakePURLGenerator).NewDependency("pipenv")
-				require.NoError(err)
-			})
-
-			it("the CPE field is empty", func() {
-				fakeWebClient.GetReturns([]byte(`{
-"releases": {
-  "1.0.0": [
-    {"packagetype": "sdist", "upload_time_iso_8601": "2010-01-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
-  ],
-  "2.0.0": [
-    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
-    {
-      "packagetype": "sdist",
-      "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z",
-      "digests": {
-        "md5": "some-md5",
-        "sha256": "some-sha256"
-      },
-      "url": "some-url"
-    }
-  ],
-  "3.0.0": [
-    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
-  ]
-}}`), nil)
-
-				actualDep, err := pypi.GetDependencyVersion("2.0.0")
-				require.NoError(err)
-
-				assert.Equal("", actualDep.CPE)
+				assert.Equal("cpe:2.3:a:python-poetry:poetry:2.0.0:*:*:*:*:python:*:*", actualDep.CPE)
 			})
 		})
 
