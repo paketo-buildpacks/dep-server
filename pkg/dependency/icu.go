@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -91,7 +91,7 @@ func (i ICU) createDependencyVersion(version string, release internal.GithubRele
 
 	icuVersion := versionToICUVersion(version)
 	assetName := fmt.Sprintf("icu4c-%s-src.tgz", icuVersion)
-	assetDir, err := ioutil.TempDir("", "icu")
+	assetDir, err := os.MkdirTemp("", "icu")
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("failed to create temp directory: %w", err)
 	}

@@ -3,7 +3,6 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -274,7 +273,7 @@ func (p Php) parseReleaseDate(date string) (*time.Time, error) {
 }
 
 func (p Php) getSHA256FromReleaseFile(release PhpRawRelease, file PhpSource, version string) (string, error) {
-	tempDir, err := ioutil.TempDir("", "php")
+	tempDir, err := os.MkdirTemp("", "php")
 	if err != nil {
 		return "", fmt.Errorf("could not create temp directory: %w", err)
 	}

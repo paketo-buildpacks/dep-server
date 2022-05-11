@@ -3,7 +3,7 @@ package main_test
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +40,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 			}
 		}))
 
-		tempFile, err := ioutil.TempFile("", "dep-server")
+		tempFile, err := os.CreateTemp("", "dep-server")
 		require.NoError(err)
 
 		serverPath = tempFile.Name()
@@ -74,7 +74,7 @@ func testServer(t *testing.T, when spec.G, it spec.S) {
 			require.NoError(err)
 
 			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			require.NoError(err)
 
 			expectedOutput := `[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`

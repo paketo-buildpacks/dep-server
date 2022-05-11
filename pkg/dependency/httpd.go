@@ -3,7 +3,6 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -202,7 +201,7 @@ func (h Httpd) getDependencySHA256(release HttpdRelease) (string, error) {
 		return strings.Fields(string(checksumContents))[0], nil
 	}
 
-	tempDir, err := ioutil.TempDir("", "httpd")
+	tempDir, err := os.MkdirTemp("", "httpd")
 	if err != nil {
 		return "", fmt.Errorf("could not make temp dir: %w", err)
 	}

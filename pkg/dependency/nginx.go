@@ -2,7 +2,7 @@ package dependency
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -82,7 +82,7 @@ func (n Nginx) getDependencySHA(dependencyURL, version string) (string, error) {
 		return "", fmt.Errorf("could not get dependency signature: %w", err)
 	}
 
-	dependencyOutputDir, err := ioutil.TempDir("", "nginx")
+	dependencyOutputDir, err := os.MkdirTemp("", "nginx")
 	if err != nil {
 		return "", fmt.Errorf("failed to create temp directory: %w", err)
 	}

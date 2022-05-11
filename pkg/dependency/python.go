@@ -3,7 +3,6 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -151,7 +150,7 @@ func (p Python) getReleaseMetadata(version string) (string, *time.Time, []string
 }
 
 func (p Python) getDependencySHA256(sourceURI string, potentialMD5s []string, version string) (string, error) {
-	tempDir, err := ioutil.TempDir("", "python")
+	tempDir, err := os.MkdirTemp("", "python")
 	if err != nil {
 		return "", fmt.Errorf("could not make temp dir: %w", err)
 	}

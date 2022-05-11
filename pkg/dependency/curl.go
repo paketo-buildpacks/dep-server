@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"time"
@@ -143,7 +143,7 @@ func (c Curl) createDependencyVersion(release CurlRelease) (DepVersion, error) {
 
 func (c Curl) getDependencySHA(release CurlRelease) (string, error) {
 	dependencyURL := c.dependencyURL(release)
-	dependencyOutputDir, err := ioutil.TempDir("", "curl")
+	dependencyOutputDir, err := os.MkdirTemp("", "curl")
 	if err != nil {
 		return "", fmt.Errorf("failed to create temp directory: %w", err)
 	}

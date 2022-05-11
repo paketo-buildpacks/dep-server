@@ -2,7 +2,7 @@ package dependency
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -50,7 +50,7 @@ func (p Pecl) GetDependencyVersion(version string) (DepVersion, error) {
 		if currVersion.Version == version {
 			dependencyURL := fmt.Sprintf("https://pecl.php.net/get/%s-%s", currVersion.Name, currVersion.Version)
 
-			dependencyOutputDir, err := ioutil.TempDir("", "pecl")
+			dependencyOutputDir, err := os.MkdirTemp("", "pecl")
 			if err != nil {
 				return DepVersion{}, fmt.Errorf("failed to create temp dir: %w", err)
 			}

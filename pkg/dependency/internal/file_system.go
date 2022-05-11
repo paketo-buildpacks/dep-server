@@ -1,6 +1,6 @@
 package internal
 
-import "io/ioutil"
+import "os"
 
 type FileSystem struct{}
 
@@ -9,5 +9,5 @@ func NewFileSystem() FileSystem {
 }
 
 func (f FileSystem) WriteFile(filename, contents string) error {
-	return ioutil.WriteFile(filename, []byte(contents), 0644)
+	return os.WriteFile(filename, []byte(contents), 0644)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/sclevine/spec/report"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,7 +33,7 @@ func testWebClient(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		testDir, err = ioutil.TempDir("", "external-dependency-resource-web-client")
+		testDir, err = os.MkdirTemp("", "external-dependency-resource-web-client")
 		require.NoError(err)
 
 		server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func testWebClient(t *testing.T, when spec.G, it spec.S) {
 				_, _ = fmt.Fprint(w, r.Header)
 			case "/body":
 				defer r.Body.Close()
-				body, err := ioutil.ReadAll(r.Body)
+				body, err := io.ReadAll(r.Body)
 				require.NoError(err)
 				_, _ = fmt.Fprint(w, string(body))
 			case "/500":
@@ -68,7 +68,7 @@ func testWebClient(t *testing.T, when spec.G, it spec.S) {
 			err := webClient.Download(server.URL+"/file", outputPath)
 			require.NoError(err)
 
-			contents, err := ioutil.ReadFile(outputPath)
+			contents, err := os.ReadFile(outputPath)
 			require.NoError(err)
 			assert.Equal(fileContents, string(contents))
 		})

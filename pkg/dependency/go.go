@@ -3,7 +3,6 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -137,7 +136,7 @@ func (g Go) getDependencySHA(version string, releases []GoReleaseWithFiles) (str
 }
 
 func (g Go) calculateDependencySHA(version string) (string, error) {
-	tempDir, err := ioutil.TempDir("", "httpd")
+	tempDir, err := os.MkdirTemp("", "httpd")
 	if err != nil {
 		return "", fmt.Errorf("could not make temp dir: %w", err)
 	}
