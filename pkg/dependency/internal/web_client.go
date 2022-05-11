@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -55,7 +54,7 @@ func (w WebClient) Get(url string, options ...RequestOption) ([]byte, error) {
 	}
 	defer responseBody.Close()
 
-	body, err := ioutil.ReadAll(responseBody)
+	body, err := io.ReadAll(responseBody)
 	if err != nil {
 		return nil, fmt.Errorf("could not read response: %w", err)
 	}
@@ -69,7 +68,7 @@ func (w WebClient) Post(url string, requestBody []byte, options ...RequestOption
 	}
 	defer responseBody.Close()
 
-	body, err := ioutil.ReadAll(responseBody)
+	body, err := io.ReadAll(responseBody)
 	if err != nil {
 		return nil, fmt.Errorf("could not read response: %w", err)
 	}
@@ -96,7 +95,7 @@ func (w WebClient) makeRequest(method string, url string, body io.Reader, option
 	}
 
 	if response.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		return nil, fmt.Errorf("got unsuccessful response: status code: %d, body: %s", response.StatusCode, body)
 	}
 

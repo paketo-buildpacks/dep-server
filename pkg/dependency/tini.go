@@ -2,7 +2,6 @@ package dependency
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,7 +64,7 @@ func (t Tini) GetReleaseDate(version string) (*time.Time, error) {
 }
 
 func (t Tini) createDependencyVersion(version string, release internal.GithubRelease) (DepVersion, error) {
-	tarballDir, err := ioutil.TempDir("", "tini")
+	tarballDir, err := os.MkdirTemp("", "tini")
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("could not create temp directory: %w", err)
 	}

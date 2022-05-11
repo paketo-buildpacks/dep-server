@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -43,7 +43,7 @@ func testHandler(t *testing.T, when spec.G, it spec.S) {
 		handler.DependencyHandler(w, req)
 
 		resp := w.Result()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		require.NoError(err)
 
 		assert.JSONEq(`[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`, string(body))
@@ -55,7 +55,7 @@ func testHandler(t *testing.T, when spec.G, it spec.S) {
 		handler.DependencyHandler(w, req)
 
 		resp := w.Result()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		require.NoError(err)
 
 		assert.JSONEq(`[{"name": "some-dep","version": "2.0.0"}, {"name": "some-dep","version": "1.0.0"}]`, string(body))

@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
@@ -28,7 +27,7 @@ func testEntrypoint(t *testing.T, when spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		tempFile, err := ioutil.TempFile("", "entrypoint")
+		tempFile, err := os.CreateTemp("", "entrypoint")
 		require.NoError(err)
 		cliPath = tempFile.Name()
 		require.NoError(tempFile.Close())

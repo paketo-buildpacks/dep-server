@@ -1,7 +1,6 @@
 package internal_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -107,11 +106,11 @@ KbtkeGcVHGGJtT8krUQB6f3VPT2vQg==
 
 	it.Before(func() {
 		var err error
-		testDir, err = ioutil.TempDir("", "external-dependency-resource-checksummer")
+		testDir, err = os.MkdirTemp("", "external-dependency-resource-checksummer")
 		require.NoError(err)
 
 		filePath = filepath.Join(testDir, "some-file")
-		err = ioutil.WriteFile(filePath, []byte(fileContents), 0644)
+		err = os.WriteFile(filePath, []byte(fileContents), 0644)
 		require.NoError(err)
 
 		checksummer = internal.NewChecksummer()

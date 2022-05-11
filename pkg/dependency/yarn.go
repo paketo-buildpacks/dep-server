@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,7 +98,7 @@ func (y Yarn) createDependencyVersion(version, tagName string, release internal.
 		return DepVersion{}, fmt.Errorf("could not get yarn GPG key: %w", err)
 	}
 
-	releaseAssetDir, err := ioutil.TempDir("", "yarn")
+	releaseAssetDir, err := os.MkdirTemp("", "yarn")
 	if err != nil {
 		return DepVersion{}, fmt.Errorf("failed to create temp directory: %w", err)
 	}

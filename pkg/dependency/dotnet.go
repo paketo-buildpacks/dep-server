@@ -3,7 +3,6 @@ package dependency
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -290,7 +289,7 @@ func (d dotnet) getReleaseFileSHA(file DotnetChannelReleaseFile) (string, error)
 		return strings.ToLower(file.Hash), nil
 	}
 
-	tempDir, err := ioutil.TempDir("", "nginx")
+	tempDir, err := os.MkdirTemp("", "nginx")
 	if err != nil {
 		return "", fmt.Errorf("could not create temp directory: %w", err)
 	}
