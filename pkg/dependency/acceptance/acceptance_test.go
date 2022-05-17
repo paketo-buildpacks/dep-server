@@ -22,6 +22,10 @@ const githubAccessTokenEnvVar = "GITHUB_ACCESS_TOKEN"
 const versionsToTest = 2
 
 func TestAcceptance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	if _, ok := os.LookupEnv(githubAccessTokenEnvVar); !ok {
 		t.Fatalf("Must set %s", githubAccessTokenEnvVar)
 	}
