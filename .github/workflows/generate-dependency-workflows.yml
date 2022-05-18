@@ -26,7 +26,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo curl -sSLf -o /usr/local/bin/yj https://github.com/sclevine/yj/releases/latest/download/yj-linux
+        sudo curl -sSLf -o /usr/local/bin/yj https://github.com/sclevine/yj/releases/latest/download/yj-linux-amd64
         sudo chmod a+x /usr/local/bin/yj
 
         sudo curl -sSLf -o /usr/local/bin/ytt https://github.com/vmware-tanzu/carvel-ytt/releases/latest/download/ytt-linux-amd64
