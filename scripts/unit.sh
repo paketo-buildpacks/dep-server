@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly DEPSERVERDIR="$(cd "${PROGDIR}/.." && pwd)"
+
+go test -short -v "${DEPSERVERDIR}"/...
