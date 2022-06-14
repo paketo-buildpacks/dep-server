@@ -73,7 +73,10 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 				Date: time.Date(2020, 06, 17, 0, 0, 0, 0, time.UTC),
 			}, nil)
 			fakeWebClient.GetReturnsOnCall(0, []byte("some-gpg-key"), nil)
-			fakeWebClient.GetReturnsOnCall(1, []byte("some-signature"), nil)
+			fakeWebClient.GetReturnsOnCall(1, []byte("other-gpg-key"), nil)
+			fakeWebClient.GetReturnsOnCall(2, []byte("another-gpg-key"), nil)
+			fakeWebClient.GetReturnsOnCall(3, []byte("yet-another-gpg-key"), nil)
+			fakeWebClient.GetReturnsOnCall(4, []byte("some-signature"), nil)
 			fakeChecksummer.GetSHA256Returns("some-source-sha", nil)
 			fakeLicenseRetriever.LookupLicensesReturns([]string{"MIT", "MIT-2"}, nil)
 			fakePURLGenerator.GenerateReturns("pkg:generic/nginx@1.0.0?checksum=some-source-sha&download_url=http://nginx.org")
@@ -98,13 +101,25 @@ func testNginx(t *testing.T, when spec.G, it spec.S) {
 
 			url, _ := fakeWebClient.GetArgsForCall(0)
 			assert.Equal("http://nginx.org/keys/mdounin.key", url)
+			url, _ = fakeWebClient.GetArgsForCall(1)
+			assert.Equal("http://nginx.org/keys/maxim.key", url)
+			url, _ = fakeWebClient.GetArgsForCall(2)
+			assert.Equal("http://nginx.org/keys/sb.key", url)
+			url, _ = fakeWebClient.GetArgsForCall(3)
+			assert.Equal("http://nginx.org/keys/thresh.key", url)
 
 			urlArg, _, _ := fakeWebClient.DownloadArgsForCall(0)
 			assert.Equal("http://nginx.org/download/nginx-1.0.0.tar.gz", urlArg)
 
 			releaseAssetSignatureArg, _, nginxGPGKeyArg := fakeChecksummer.VerifyASCArgsForCall(0)
 			assert.Equal("some-signature", releaseAssetSignatureArg)
-			assert.Equal([]string{"some-gpg-key"}, nginxGPGKeyArg)
+			assert.Equal([]string{
+				"some-gpg-key",
+				"other-gpg-key",
+				"another-gpg-key",
+				"yet-another-gpg-key",
+			},
+				nginxGPGKeyArg)
 		})
 	})
 
