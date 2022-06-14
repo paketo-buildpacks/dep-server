@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/paketo-buildpacks/dep-server/pkg/dependency"
@@ -28,8 +29,7 @@ func main() {
 
 	output, err := getDepVersion(githubToken, name, version)
 	if err != nil {
-		fmt.Printf("Error: %s", err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	fmt.Println(output)

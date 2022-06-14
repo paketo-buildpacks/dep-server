@@ -7,10 +7,12 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/openpgp"
 	"io"
+	"log"
 	"os"
 	"strings"
+
+	"golang.org/x/crypto/openpgp"
 )
 
 type Checksummer struct{}
@@ -20,6 +22,10 @@ func NewChecksummer() Checksummer {
 }
 
 func (c Checksummer) VerifyASC(asc, path string, pgpKeys ...string) error {
+	if len(pgpKeys) == 0 {
+		return errors.New("no pgp keys provided")
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("could not open file: %w", err)
@@ -33,12 +39,15 @@ func (c Checksummer) VerifyASC(asc, path string, pgpKeys ...string) error {
 		}
 
 		_, err = openpgp.CheckArmoredDetachedSignature(keyring, file, strings.NewReader(asc))
-		if err == nil {
-			return nil
+		if err != nil {
+			log.Printf("failed to check signature: %s", err.Error())
+			continue
 		}
+		log.Printf("found valid pgp key")
+		return nil
 	}
 
-	return errors.New("no pgp keys were able to verify the signature")
+	return errors.New("no valid pgp keys provided")
 }
 
 func (c Checksummer) VerifyMD5(path, expectedMD5 string) error {
