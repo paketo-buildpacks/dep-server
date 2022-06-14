@@ -72,9 +72,19 @@ func (n Nginx) GetReleaseDate(version string) (*time.Time, error) {
 }
 
 func (n Nginx) getDependencySHA(dependencyURL, version string) (string, error) {
-	nginxGPGKey, err := n.webClient.Get("http://nginx.org/keys/mdounin.key")
-	if err != nil {
-		return "", fmt.Errorf("could not get nginx GPG key: %w", err)
+	var nginxGPGKeys []string
+	for _, keyURL := range []string{
+		// Key URLs from https://nginx.org/en/pgp_keys.html
+		"http://nginx.org/keys/mdounin.key",
+		"http://nginx.org/keys/maxim.key",
+		"http://nginx.org/keys/sb.key",
+		"http://nginx.org/keys/thresh.key",
+	} {
+		pubKey, err := n.webClient.Get(keyURL)
+		if err != nil {
+			return "", fmt.Errorf("could not get nginx GPG key: %w", err)
+		}
+		nginxGPGKeys = append(nginxGPGKeys, string(pubKey))
 	}
 
 	dependencySignature, err := n.webClient.Get(n.dependencySignatureURL(version))
@@ -93,7 +103,7 @@ func (n Nginx) getDependencySHA(dependencyURL, version string) (string, error) {
 		return "", fmt.Errorf("could not download dependency: %w", err)
 	}
 
-	err = n.checksummer.VerifyASC(string(dependencySignature), dependencyOutputPath, string(nginxGPGKey))
+	err = n.checksummer.VerifyASC(string(dependencySignature), dependencyOutputPath, nginxGPGKeys...)
 	if err != nil {
 		return "", fmt.Errorf("dependency signature verification failed: %w", err)
 	}
