@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
@@ -109,7 +110,7 @@ func (p Php) GetReleaseDate(version string) (*time.Time, error) {
 }
 
 func (p Php) getPhpReleases() ([]PhpRelease, error) {
-	body, err := p.webClient.Get("https://www.php.net/releases/index.php?json")
+	body, err := p.webClient.Get("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/releases.json")
 	if err != nil {
 		return nil, fmt.Errorf("could not hit php.net: %w", err)
 	}
@@ -133,7 +134,7 @@ func (p Php) getPhpReleases() ([]PhpRelease, error) {
 	var allPhpReleases []PhpRelease
 
 	for _, line := range versionLines {
-		body, err = p.webClient.Get(fmt.Sprintf("https://www.php.net/releases/index.php?json&version=%s&max=1000", line))
+		body, err = p.webClient.Get(fmt.Sprintf("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-%s.json", line))
 		if err != nil {
 			return nil, fmt.Errorf("could not hit php.net: %w", err)
 		}
@@ -162,18 +163,37 @@ func (p Php) getPhpReleases() ([]PhpRelease, error) {
 }
 
 func (p Php) getRelease(version string) (PhpRawRelease, error) {
-	body, err := p.webClient.Get(fmt.Sprintf("https://www.php.net/releases/index.php?json&version=%s", version))
+	semverSplit := strings.Split(version, ".")
+
+	searchMajorVersion := semverSplit[0]
+	patchVersion := semverSplit[2]
+
+	// Mirroring what PHP does, it converts the wildcard patch version to the oldest patch version for that line.
+	// Eg:  7.4.x ---- 7.4.0
+	// Note: Assuming that the oldest patch version is always 0.
+	if patchVersion == "*" {
+		version = strings.ReplaceAll(version, "*", "0")
+	}
+
+	body, err := p.webClient.Get(fmt.Sprintf("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-%s.json", searchMajorVersion))
 	if err != nil {
+		fmt.Println(string(body))
 		return PhpRawRelease{}, fmt.Errorf("could not hit php.net: %w", err)
 	}
 
-	var release PhpRawRelease
-	err = json.Unmarshal(body, &release)
+	var phpRawReleases map[string]PhpRawRelease
+	err = json.Unmarshal(body, &phpRawReleases)
 	if err != nil {
-		return PhpRawRelease{}, fmt.Errorf("could not unmarshal version response: %w\n%s", err, body)
+		return PhpRawRelease{}, fmt.Errorf("could not unmarshal version lines response: %w\n%s", err, body)
 	}
 
-	return release, nil
+	for rawPhpVersion, release := range phpRawReleases {
+		if rawPhpVersion == version {
+			return release, nil
+		}
+	}
+
+	return PhpRawRelease{}, nil
 }
 
 func (p Php) getDependencySHA(release PhpRawRelease, version string) (string, error) {
