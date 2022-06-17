@@ -72,3 +72,19 @@ jobs:
       run: |
         echo '${{ steps.get-new-versions.outputs.upstream-versions }}' > known_versions
         gsutil cp known_versions "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json"
+
+   - name: Notify Maintainers of Failures
+     if: ${{ failure() }}
+     uses: paketo-buildpacks/github-config/actions/issue/file@main
+     with:
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        repo: "${{github.repository}}"
+        label: "workflow-failure"
+        comment_if_exists: true
+        issue_title: "Failed to Get New ${{ env.DEP_NAME }} Versions"
+        issue_body: "[Get New Versions
+        workflow](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+        failed to run. Please take a look to ensure new versions are picked
+        up. (cc @paketo-buildpacks/dependencies-maintainers)"
+        comment_body: "Another failure occurred:
+        https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
