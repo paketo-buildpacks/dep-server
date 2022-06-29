@@ -82,3 +82,14 @@ jobs:
             "purl": "${{ steps.upstream.outputs.purl }}",
             "licenses": "${{ steps.flatten-licenses.outputs.licenses }}"
           }
+    - name: Notify Maintainers of Failures
+      if: ${{ failure() }}
+      uses: paketo-buildpacks/github-config/actions/issue/file@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repo: ${{github.repository}}
+        label: workflow-failure
+        comment_if_exists: true
+        issue_title: Failed to Build/Upload ${{ env.DEP_NAME }}
+        issue_body: '[Build and Upload workflow](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) failed to run. Please take a look to ensure the version in the workflow is built and uploaded successfully. (cc @paketo-buildpacks/dependencies-maintainers)'
+        comment_body: 'Another failure occurred: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}'

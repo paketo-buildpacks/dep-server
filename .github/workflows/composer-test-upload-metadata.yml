@@ -41,3 +41,14 @@ jobs:
         cpe: ${{ steps.modify-cpe.outputs.cpe }}
         purl: ${{ github.event.client_payload.purl }}
         licenses: ${{ github.event.client_payload.licenses }}
+    - name: Notify Maintainers of Failures
+      if: ${{ failure() }}
+      uses: paketo-buildpacks/github-config/actions/issue/file@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repo: ${{github.repository}}
+        label: workflow-failure
+        comment_if_exists: true
+        issue_title: Failed to Test and Upload Metadata for ${{ env.DEP_NAME }}
+        issue_body: '[Test and Upload Metadata workflow](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) failed to run. Please take a look to ensure the version in the workflow is tested and metadata is uploaded successfully. (cc @paketo-buildpacks/dependencies-maintainers)'
+        comment_body: 'Another failure occurred: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}'
