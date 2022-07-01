@@ -70,9 +70,9 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			version5UrlArg, _ := fakeWebClient.GetArgsForCall(1)
 			version7UrlArg, _ := fakeWebClient.GetArgsForCall(2)
 
-			assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/releases.json", allVersionsUrlArg)
-			assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-5.json", version5UrlArg)
-			assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-7.json", version7UrlArg)
+			assert.Equal("https://www.php.net/releases/index.php?json", allVersionsUrlArg)
+			assert.Equal("https://www.php.net/releases/index.php?json&version=5&max=1000", version5UrlArg)
+			assert.Equal("https://www.php.net/releases/index.php?json&version=7&max=1000", version7UrlArg)
 		})
 
 		it("does not skip versions with wrong date scheme", func() {
@@ -138,53 +138,41 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 		it("returns the correct php version", func() {
 			fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
-   "7.4.4":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"12 Mar 2020",
-      "source":[
-         {
-            "filename":"php-7.4.4.tar.gz",
-            "name":"PHP 7.4.4 (tar.gz)",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"12 Mar 2020"
-         },
-         {
-            "filename":"php-7.4.4.tar.bz",
-            "name":"PHP 7.4.4 (tar.bz)",
-            "sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "date":"12 Mar 2020"
-         }
-      ]
-   }
+ "date": "12 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "12 Mar 2020"
+  },
+  {
+   "filename": "php-7.4.4.tar.bz",
+   "name": "PHP 7.4.4 (tar.bz)",
+   "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "date": "12 Mar 2020"
+  }
+ ]
 }
 `), nil)
 
 			fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
-   "7.4.0":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"28 Nov 2019",
-      "source":[
-         {
-            "filename":"php-7.4.0.tar.gz",
-            "name":"PHP 7.4.0 (tar.gz)",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"28 Nov 2019"
-         },
-         {
-            "filename":"php-7.4.0.tar.bz",
-            "name":"PHP 7.4.0 (tar.bz)",
-            "sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "date":"29 Nov 2019"
-         }
-      ]
-   }
+ "date": "28 Nov 2019",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "28 Nov 2019"
+  },
+  {
+   "filename": "php-7.4.0.tar.bz",
+   "name": "PHP 7.4.0 (tar.bz)",
+   "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "date": "29 Nov 2019"
+  }
+ ]
 }
 `), nil)
 
@@ -212,9 +200,9 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			assert.Equal(expectedDepVersion, actualDepVersion)
 
 			url, _ := fakeWebClient.GetArgsForCall(0)
-			assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-7.json", url)
+			assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.4", url)
 			url, _ = fakeWebClient.GetArgsForCall(1)
-			assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-7.json", url)
+			assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.*", url)
 			assert.Equal(2, fakeWebClient.GetCallCount())
 		})
 
@@ -222,40 +210,28 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("validates the MD5 and calculates the SHA256", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
-   "7.4.4":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"19 Mar 2020",
-      "source":[
-         {
-            "filename":"php-7.4.4.tar.gz",
-            "name":"PHP 7.4.4 (tar.gz)",
-			"md5":"some-md5",
-            "date":"19 Mar 2020"
-         }
-      ]
-   }
+ "date": "19 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "md5": "some-md5",
+   "date": "19 Mar 2020"
+  }
+ ]
 }
 `), nil)
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
-   "7.4.0":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"10 Nov 2019",
-      "source":[
-         {
-            "filename":"php-7.4.0.tar.gz",
-            "name":"PHP 7.4.0 (tar.gz)",
-			"md5":"some-md5",
-            "date":"10 Nov 2019"
-         }
-      ]
-   }
+ "date": "10 Nov 2019",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "md5": "some-md5",
+   "date": "10 Nov 2019"
+  }
+ ]
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
@@ -281,7 +257,7 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				assert.Equal("https://github.com/php/web-php-distributions/raw/master/php-7.4.4.tar.gz", url)
 
 				url, _ = fakeWebClient.GetArgsForCall(1)
-				assert.Equal("https://raw.githubusercontent.com/brayanhenao/php-releases-information/main/php-7.json", url)
+				assert.Equal("https://www.php.net/releases/index.php?json&version=7.4.*", url)
 
 				_, md5Arg := fakeChecksummer.VerifyMD5ArgsForCall(0)
 				assert.Equal("some-md5", md5Arg)
@@ -290,42 +266,17 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 		when("the dependency version is known to have an incorrect checksum", func() {
 			it("does not try to validate it", func() {
-				fakeWebClient.GetReturnsOnCall(0, []byte(`
+				fakeWebClient.GetReturns([]byte(`
 {
-   "5.3.25":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"09 May 2013",
-      "source":[
-         {
-            "filename":"php-5.3.25.tar.gz",
-            "name":"PHP 5.3.25 (tar.gz)",
-			"md5": "some-incorrect-md5",
-            "date":"09 May 2013"
-         }
-      ]
-   }
-}
-`), nil)
-				fakeWebClient.GetReturnsOnCall(1, []byte(`
-{
-   "5.3.0":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"09 May 2013",
-      "source":[
-         {
-            "filename":"php-5.3.0.tar.gz",
-            "name":"PHP 5.3.0 (tar.gz)",
-			"md5": "some-incorrect-md5",
-            "date":"09 May 2013"
-         }
-      ]
-   }
+ "date": "09 May 2013",
+ "source": [
+  {
+   "filename": "php-5.3.25.tar.gz",
+   "name": "PHP 5.3.25 (tar.gz)",
+   "md5": "some-incorrect-md5",
+   "date": "09 May 2013"
+  }
+ ]
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
@@ -353,40 +304,15 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 		when("the dependency version is known to be missing a checksum", func() {
 			it("does not try to validate it", func() {
-				fakeWebClient.GetReturnsOnCall(0, []byte(`
+				fakeWebClient.GetReturns([]byte(`
 {
-   "5.1.6":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"24 Aug 2006",
-      "source":[
-         {
-            "filename":"php-5.1.6.tar.gz",
-            "name":"PHP 5.1.6 (tar.gz)",
-            "date":"24 Aug 2006"
-         }
-      ]
-   }
-}
-`), nil)
-				fakeWebClient.GetReturnsOnCall(1, []byte(`
-{
-   "5.1.0":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"24 Aug 2006",
-      "source":[
-         {
-            "filename":"php-5.1.0.tar.gz",
-            "name":"PHP 5.1.0 (tar.gz)",
-            "date":"24 Aug 2006"
-         }
-      ]
-   }
+ "date": "24 Aug 2006",
+ "source": [
+  {
+   "filename": "php-5.1.6.tar.gz",
+   "name": "PHP 5.1.6 (tar.gz)"
+  }
+ ]
 }
 `), nil)
 				fakeChecksummer.GetSHA256Returns("some-sha256", nil)
@@ -414,44 +340,18 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 
 		when("the download is in the museum", func() {
 			it("returns the museum URL", func() {
-				fakeWebClient.GetReturnsOnCall(0, []byte(`
+				fakeWebClient.GetReturns([]byte(`
 {
-   "5.2.1":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"08 Feb 2007",
-      "source":[
-         {
-            "filename":"php-5.2.1.tar.gz",
-            "name":"PHP 5.2.1 (tar.gz)",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"08 Feb 2007"
-         }
-      ],
-	  "museum": true
-   }
-}
-`), nil)
-				fakeWebClient.GetReturnsOnCall(1, []byte(`
-{
-   "5.2.0":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"08 Feb 2007",
-      "source":[
-         {
-            "filename":"php-5.2.0.tar.gz",
-            "name":"PHP 5.2.0 (tar.gz)",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"08 Feb 2007"
-         }
-      ],
-	  "museum": true
-   }
+ "date": "08 Feb 2007",
+ "source": [
+  {
+   "filename": "php-5.2.1.tar.gz",
+   "name": "PHP 5.2.1 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "08 Feb 2007"
+  }
+ ],
+ "museum": true
 }
 `), nil)
 
@@ -466,40 +366,29 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
-  "7.4.4": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "1 Mar 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.4.tar.gz",
-	  "name": "PHP 7.4.4 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "1 Mar 2020"
-	 }
-	]
+ "date": "1 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 Mar 2020"
   }
+ ]
 }
 `), nil)
+
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
-  "7.4.0": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "1 Nov 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.0.tar.gz",
-	  "name": "PHP 7.4.0 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "1 Nov 2020"
-	 }
-	]
+ "date": "1 Nov 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 Nov 2020"
   }
+ ]
 }
 `), nil)
 
@@ -515,40 +404,29 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
-  "7.4.4": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "01 March 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.4.tar.gz",
-	  "name": "PHP 7.4.4 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "01 March 2020"
-	 }
-	]
+ "date": "01 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "01 March 2020"
   }
+ ]
 }
 `), nil)
+
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
-  "7.4.0": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "01 November 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.0.tar.gz",
-	  "name": "PHP 7.4.0 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "01 November 2020"
-	 }
-	]
+ "date": "01 November 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "01 November 2020"
   }
+ ]
 }
 `), nil)
 
@@ -564,40 +442,29 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturnsOnCall(0, []byte(`
 {
-  "7.4.4": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "01 March 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.4.tar.gz",
-	  "name": "PHP 7.4.4 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "01 March 2020"
-	 }
-	]
+ "date": "1 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 March 2020"
   }
+ ]
 }
 `), nil)
+
 				fakeWebClient.GetReturnsOnCall(1, []byte(`
 {
-  "7.4.0": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "01 March 2020",
-	"source": [
-	 {
-	  "filename": "php-7.4.0.tar.gz",
-	  "name": "PHP 7.4.0 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "01 March 2020"
-	 }
-	]
+ "date": "1 November 2020",
+ "source": [
+  {
+   "filename": "php-7.4.0.tar.gz",
+   "name": "PHP 7.4.0 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 November 2020"
   }
+ ]
 }
 `), nil)
 
@@ -605,31 +472,13 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 				require.NoError(err)
 
 				assert.Equal("2020-03-01T00:00:00Z", depVersion.ReleaseDate.Format(time.RFC3339))
-				assert.Equal("2023-03-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
+				assert.Equal("2023-11-01T00:00:00Z", depVersion.DeprecationDate.Format(time.RFC3339))
 			})
 		})
 
 		when("the source cannot be found", func() {
 			it("returns an error", func() {
-				fakeWebClient.GetReturns([]byte(`
-{
-  "7.4.0": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "01 March 2020",
-	"source": [
-	 {
-	  "filename": "php-7.0.0.tar.gz",
-	  "name": "PHP 7.0.0 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "01 March 2020"
-	 }
-	]
-  }
-}
-`), nil)
+				fakeWebClient.GetReturns([]byte(`{"error": "Unknown version"}`), nil)
 				_, err := php.GetDependencyVersion("7.4.4")
 				assert.Error(err)
 				assert.Equal("could not find .tar.gz file for 7.4.4", err.Error())
@@ -641,27 +490,21 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 		it("returns the correct php release date", func() {
 			fakeWebClient.GetReturns([]byte(`
 {
-  "7.4.4": {
-    "announcement": true,
-    "tags": [
-      "security"
-    ],
-    "date": "28 Nov 2019",
-	"source": [
-	 {
-	  "filename": "php-7.4.4.tar.gz",
-	  "name": "PHP 7.4.4 (tar.gz)",
-	  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	  "date": "28 Nov 2019"
-	 },
-	 {
-	  "filename": "php-7.4.4.tar.bz",
-	  "name": "PHP 7.4.4 (tar.bz)",
-	  "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-	  "date": "28 Nov 2019"
-	 }
-	]
+ "date": "28 Nov 2019",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "28 Nov 2019"
+  },
+  {
+   "filename": "php-7.4.4.tar.bz",
+   "name": "PHP 7.4.4 (tar.bz)",
+   "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "date": "28 Nov 2019"
   }
+ ]
 }
 `), nil)
 
@@ -675,22 +518,15 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturns([]byte(`
 {
-   "7.4.4":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"1 March 2020",
-      "source":[
-         {
-            "filename":"php-7.4.4.tar.gz",
-            "name":"PHP 7.4.4 (tar.gz)",
-			"md5":"some-md5",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"1 March 2020"
-         }
-      ]
-   }
+ "date": "1 Mar 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 Mar 2020"
+  }
+ ]
 }
 `), nil)
 
@@ -705,22 +541,15 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturns([]byte(`
 {
-   "7.4.4":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"1 March 2020",
-      "source":[
-         {
-            "filename":"php-7.4.4.tar.gz",
-            "name":"PHP 7.4.4 (tar.gz)",
-			"md5":"some-md5",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"1 March 2020"
-         }
-      ]
-   }
+ "date": "01 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "01 March 2020"
+  }
+ ]
 }
 `), nil)
 
@@ -735,22 +564,15 @@ func testPhp(t *testing.T, when spec.G, it spec.S) {
 			it("properly parses the date", func() {
 				fakeWebClient.GetReturns([]byte(`
 {
-   "7.4.4":{
-      "announcement":true,
-      "tags":[
-         "security"
-      ],
-      "date":"1 March 2020",
-      "source":[
-         {
-            "filename":"php-7.4.4.tar.gz",
-            "name":"PHP 7.4.4 (tar.gz)",
-			"md5":"some-md5",
-            "sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "date":"1 March 2020"
-         }
-      ]
-   }
+ "date": "1 March 2020",
+ "source": [
+  {
+   "filename": "php-7.4.4.tar.gz",
+   "name": "PHP 7.4.4 (tar.gz)",
+   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "date": "1 March 2020"
+  }
+ ]
 }
 `), nil)
 
