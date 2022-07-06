@@ -1,0 +1,25 @@
+name: 'Get Stacks Compatible With Version'
+description: |
+  Takes a version and a list of stacks with version constraints and returns a
+  list of stacks that are compatible with the given version
+
+inputs:
+  version:
+    description: dependency version
+    required: true
+  stacks:
+    description: JSON array of stacks with version constraints
+    required: true
+
+outputs:
+  compatible-stacks:
+    description: JSON array of stacks that fulfill the version constraints
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  - "--version"
+  - "${{ inputs.version }}"
+  - "--stacks"
+  - "${{ inputs.stacks }}"
