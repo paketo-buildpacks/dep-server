@@ -13,13 +13,22 @@
   requires: dotnet-sdk
   stacks:
     - id: io.buildpacks.stacks.bionic
+      version-constraint: "*"
+    - id: io.buildpacks.stacks.jammy
+      version-constraint: ">=6.*"
 - name: dotnet-runtime
   requires: dotnet-sdk
   stacks:
     - id: io.buildpacks.stacks.bionic
+      version-constraint: "*"
+    - id: io.buildpacks.stacks.jammy
+      version-constraint: ">=6.*"
 - name: dotnet-sdk
   stacks:
     - id: io.buildpacks.stacks.bionic
+      version-constraint: "*"
+    - id: io.buildpacks.stacks.jammy
+      version-constraint: ">=6.*"
 - name: go
   stacks:
     - id: io.buildpacks.stacks.bionic
