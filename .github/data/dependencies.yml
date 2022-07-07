@@ -42,6 +42,7 @@
 - name: icu
   stacks:
     - id: io.buildpacks.stacks.bionic
+    - id: io.buildpacks.stacks.jammy
 - name: nginx
   stacks:
     - id: io.buildpacks.stacks.bionic
