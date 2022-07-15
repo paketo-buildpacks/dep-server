@@ -37,7 +37,7 @@ jobs:
       uses: paketo-buildpacks/dep-server/actions/get-compatible-stacks@main
       with:
         version: ${{ steps.semantic-version.outputs.sem-version }}
-        stacks: '[{"id":"io.buildpacks.stacks.bionic"},{"id":"io.paketo.stacks.tiny"},{"id":"io.buildpacks.stacks.jammy.tiny"}]'
+        stacks: '[{"id":"io.buildpacks.stacks.bionic"},{"id":"io.paketo.stacks.tiny"},{"id":"io.buildpacks.stacks.jammy"},{"id":"io.buildpacks.stacks.jammy.tiny"}]'
     - name: Upload dependency metadata
       uses: paketo-buildpacks/dep-server/actions/upload-metadata@main
       with:
