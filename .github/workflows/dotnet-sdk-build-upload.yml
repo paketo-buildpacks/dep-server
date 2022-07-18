@@ -33,27 +33,6 @@ jobs:
         name: ${{ env.DEP_NAME }}
         version: ${{ env.VERSION }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build
-      id: build
-      uses: paketo-buildpacks/dep-server/actions/build-dependency@main
-      with:
-        name: ${{ env.DEP_NAME }}
-        version: ${{ env.VERSION }}
-        url: ${{ steps.upstream.outputs.uri }}
-        sha256: ${{ steps.upstream.outputs.sha256 }}
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    - name: Upload
-      id: upload
-      uses: paketo-buildpacks/dep-server/actions/upload-dependency@main
-      with:
-        bucket-name: ${{ secrets.DEPS_BUCKET }}
-        dependency-name: ${{ env.DEP_NAME }}
-        artifact-path: ${{ github.workspace }}/${{ steps.build.outputs.artifact-path }}
     - name: Modify CPE for Dispatch
       id: modify-cpe
       run: |
@@ -73,8 +52,8 @@ jobs:
         payload: |
           {
             "version": "${{ env.VERSION }}",
-            "uri": "${{ steps.upload.outputs.dependency-uri }}",
-            "sha256": "${{ steps.build.outputs.sha256 }}",
+            "uri": "${{ steps.upstream.outputs.uri }}",
+            "sha256": "${{ steps.upstream.outputs.sha256 }}",
             "source_uri": "${{ steps.upstream.outputs.uri }}",
             "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
             "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
