@@ -24,6 +24,7 @@
     - id: io.buildpacks.stacks.jammy
       version-constraint: ">=6.*"
 - name: dotnet-sdk
+  skip_compile: true
   stacks:
     - id: io.buildpacks.stacks.bionic
       version-constraint: "*"

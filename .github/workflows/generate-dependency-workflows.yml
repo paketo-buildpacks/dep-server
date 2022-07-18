@@ -44,6 +44,7 @@ jobs:
           mixins="$(echo "${obj}" | jq -r '.stacks[] | select( .id == "io.buildpacks.stacks.bionic").mixins // empty' -c)"
           requires="$(echo "${obj}" | jq -r '.requires // empty')"
           skip_test="$(echo "${obj}" | jq -r '.skip_test // false')"
+          skip_compile="$(echo "${obj}" | jq -r '.skip_compile // false')"
 
           ytt \
             -f ".github/templates/get-new-versions.yml" \
@@ -55,6 +56,7 @@ jobs:
             -f ".github/templates/build-upload.yml" \
             -f ".github/data/dependency-workflows-config.yml" \
             -v name="${name}" \
+            -v skip_compile="${skip_compile}" \
             > ".github/workflows/${name}-build-upload.yml"
 
           ytt \

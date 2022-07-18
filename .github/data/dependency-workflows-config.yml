@@ -5,3 +5,4 @@ stacks:
 mixins:
 required_dependency:
 skip_test:
+skip_compile:

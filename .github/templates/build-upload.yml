@@ -42,6 +42,7 @@ jobs:
         version: "${{ env.VERSION }}"
         github-token: "${{ secrets.GITHUB_TOKEN }}"
 
+    #@ if data.values.skip_compile != 'true':
     - name: Build
       id: build
       uses: paketo-buildpacks/dep-server/actions/build-dependency@main
@@ -65,6 +66,7 @@ jobs:
         bucket-name: ${{ secrets.DEPS_BUCKET }}
         dependency-name: ${{ env.DEP_NAME }}
         artifact-path: "${{ github.workspace }}/${{ steps.build.outputs.artifact-path }}"
+    #@ end
 
     - name: Modify CPE for Dispatch
       id: modify-cpe
@@ -84,6 +86,7 @@ jobs:
         repos: paketo-buildpacks/dep-server
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
         event: #@ data.values.name + "-test"
+        #@ if data.values.skip_compile != 'true':
         payload: |
           {
             "version": "${{ env.VERSION }}",
@@ -96,6 +99,20 @@ jobs:
             "purl": "${{ steps.upstream.outputs.purl }}",
             "licenses": "${{ steps.flatten-licenses.outputs.licenses }}"
           }
+        #@ else:
+        payload: |
+          {
+            "version": "${{ env.VERSION }}",
+            "uri": "${{ steps.upstream.outputs.uri }}",
+            "sha256": "${{ steps.upstream.outputs.sha256 }}",
+            "source_uri": "${{ steps.upstream.outputs.uri }}",
+            "source_sha256": "${{ steps.upstream.outputs.sha256 }}",
+            "deprecation_date": "${{ steps.upstream.outputs.deprecation-date }}",
+            "cpe": "${{ steps.modify-cpe.outputs.cpe }}",
+            "purl": "${{ steps.upstream.outputs.purl }}",
+            "licenses": "${{ steps.flatten-licenses.outputs.licenses }}"
+          }
+        #@ end
 
     - name: Notify Maintainers of Failures
       if: ${{ failure() }}
