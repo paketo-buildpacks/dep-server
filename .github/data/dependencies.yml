@@ -95,3 +95,4 @@
   requires: node
   stacks:
     - id: io.buildpacks.stacks.bionic
+    - id: io.buildpacks.stacks.jammy
