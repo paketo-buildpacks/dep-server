@@ -44,7 +44,7 @@ jobs:
       uses: paketo-buildpacks/dep-server/actions/get-compatible-stacks@main
       with:
         version: ${{ steps.semantic-version.outputs.sem-version }}
-        stacks: '[{"id":"io.buildpacks.stacks.bionic"}]'
+        stacks: '[{"id":"io.buildpacks.stacks.bionic","version-constraint":"*"},{"id":"io.buildpacks.stacks.jammy","version-constraint":">=2022.7.4"}]'
     - name: Upload dependency metadata
       uses: paketo-buildpacks/dep-server/actions/upload-metadata@main
       with:
