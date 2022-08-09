@@ -5,7 +5,7 @@ set -euo pipefail
 extract_tarball() {
   rm -rf dotnet-sdk
   mkdir dotnet-sdk
-  tar -xf dependency/*.tar.xz -C dotnet-sdk
+  tar -xf dependency/*.tar.* -C dotnet-sdk
 }
 
 check_version() {
