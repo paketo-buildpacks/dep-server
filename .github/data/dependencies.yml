@@ -91,8 +91,6 @@
   stacks:
     - id: io.buildpacks.stacks.bionic
       version-constraint: "*"
-    - id: io.buildpacks.stacks.jammy
-      version-constraint: ">=3.10.5"
 - name: ruby
   stacks:
     - id: io.buildpacks.stacks.bionic
