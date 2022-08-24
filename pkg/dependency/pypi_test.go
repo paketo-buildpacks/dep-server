@@ -70,11 +70,19 @@ func testPyPi(t *testing.T, when spec.G, it spec.S) {
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
   ],
+  "2.0.0rc": [
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
+  ],
   "2.0.0": [
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z"},
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-05-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}}
   ],
   "2.1.0": [
+    {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}},
+    {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z"}
+  ],
+  "2.1.0rc": [
     {"packagetype": "sdist", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z", "digests": {"sha256": "some-sha256"}},
     {"packagetype": "bdist_wheel", "upload_time_iso_8601": "2010-08-01T00:00:00.000000Z"}
   ]

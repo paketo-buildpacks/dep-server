@@ -98,7 +98,7 @@ func (p PyPi) getReleases() ([]DepVersion, error) {
 	var releases []DepVersion
 	for version, releasesForVersion := range productMetadata.Releases {
 		for _, release := range releasesForVersion {
-			if strings.Contains(version, "b") || strings.Contains(version, "dev") {
+			if strings.Contains(version, "b") || strings.Contains(version, "dev") || strings.Contains(version, "rc") {
 				continue
 			}
 			if release.PackageType != "sdist" {
