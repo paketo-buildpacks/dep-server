@@ -176,7 +176,7 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 		log.Printf("Compilation container exited with status code: %#v\n\n", status.StatusCode)
 	}
 
-	artifact, err := filepath.Glob(tmpDir + "/*-" + version + "-" + target + ".tgz")
+	artifact, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz")
 	if err != nil || len(artifact) <= 0 {
 		printError(fmt.Sprintf("Error: no artifact with name *-%s-%s.tgz found at %s", version, target, tmpDir))
 		return "", err
@@ -185,7 +185,7 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 	file := artifact[0]
 	printSuccessful(fmt.Sprintf("✅ compilation has successfully created %s", file))
 
-	shaFile, err := filepath.Glob(tmpDir + "/*-" + version + "-" + target + ".tgz.sha256")
+	shaFile, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz.sha256")
 	if err != nil || len(shaFile) <= 0 {
 		printError(fmt.Sprintf("Error: no artifact with name *-%s-%s.tgz found at %s", version, target, tmpDir))
 		return "", err
