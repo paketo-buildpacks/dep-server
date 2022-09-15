@@ -49,6 +49,8 @@ Usage of ./validate:
          If not provided and compilation runs, compiled tarball will be used for testing.
   -buildpack-dir string
         REQUIRED, Absolute path to buildpack directory
+  -skip-file-cleanup
+        OPTIONAL, skip cleanup of generated files in temporary directory. Useful for debugging failures.
   -version string
         OPTIONAL, version to compile and/or test (if applicable) (default "1.2.3")
 ```
@@ -93,6 +95,17 @@ Example:
 ./validate  --buildpack-dir="/home/workspace/paketo-buildpacks/bundler" --artifact-path="~/Downloads/bundler_2.3.22.tgz" --version="2.3.22"
 ```
 
+### `--skip-file-cleanup`
+The `--skip-file-cleanup` field is an optional boolean flag. If set, it will
+skip the cleanup of generated metadata and compiled dependencies. This setting
+is helpful for debugging issues in metadata or artifacts, so that they can be
+looked at after validation has run.
+
+
+Example:
+```
+./validate  --buildpack-dir="/home/workspace/paketo-buildpacks/bundler" --skip-file-cleanup
+```
 
 ### Context
 Part of https://github.com/paketo-buildpacks/rfcs/issues/236 entails each

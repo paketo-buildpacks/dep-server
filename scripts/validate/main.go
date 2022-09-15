@@ -23,9 +23,10 @@ import (
 )
 
 type Options struct {
-	BuildpackDir string
-	Version      string
-	ArtifactPath string
+	BuildpackDir    string
+	Version         string
+	ArtifactPath    string
+	SkipFileCleanup bool
 }
 
 func main() {
@@ -33,6 +34,7 @@ func main() {
 	flag.StringVar(&options.BuildpackDir, "buildpack-dir", "", "Absolute path to buildpack directory")
 	flag.StringVar(&options.Version, "version", "1.2.3", "OPTIONAL, version to compile and/or test (if applicable)")
 	flag.StringVar(&options.ArtifactPath, "artifact-path", "", "OPTIONAL, absolute path to a local artifact to run `make test` against (if applicable).\n If not provided and compilation runs, compiled tarball will be used for testing.")
+	flag.BoolVar(&options.SkipFileCleanup, "skip-file-cleanup", false, "OPTIONAL, skip cleanup of generated files in temporary directory. Useful for debugging failures.")
 	flag.Parse()
 
 	if options.BuildpackDir == "" {
@@ -65,8 +67,12 @@ func main() {
 
 	testErr := test(options.BuildpackDir, options.Version, artifact)
 
-	fmt.Print("\nCleaning up files\n\n")
-	cleanup(tmpDir)
+	if options.SkipFileCleanup {
+		fmt.Print("\nSkipping file cleanup\n\n")
+	} else {
+		fmt.Print("\nCleaning up files\n\n")
+		cleanup(tmpDir)
+	}
 
 	if retrieveErr != nil && compileErr != nil && testErr != nil {
 		printError("❌ Validation failed")
@@ -155,7 +161,10 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("Running compilation")
+	fmt.Printf("Running compilation for version %s\n", version)
+	if version == "1.2.3" {
+		fmt.Println("version 1.2.3 is the default version. If errors arise, re-run validation with a real dependency version using the `--version` flag.")
+	}
 	if err := cli.ContainerStart(context.Background(), resp2.ID, types.ContainerStartOptions{}); err != nil {
 		printError(err.Error())
 		return "", err
@@ -178,7 +187,7 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 
 	artifact, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz")
 	if err != nil || len(artifact) <= 0 {
-		printError(fmt.Sprintf("Error: no artifact with name *-%s-%s.tgz found at %s", version, target, tmpDir))
+		printError(fmt.Sprintf("Error: no generated artifact found at %s/*.tgz", tmpDir))
 		return "", err
 	}
 
@@ -187,7 +196,7 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 
 	shaFile, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz.sha256")
 	if err != nil || len(shaFile) <= 0 {
-		printError(fmt.Sprintf("Error: no artifact with name *-%s-%s.tgz found at %s", version, target, tmpDir))
+		printError(fmt.Sprintf("Error: no SHA256 artifact found at %s/.tgz.sha256", tmpDir))
 		return "", err
 	}
 
