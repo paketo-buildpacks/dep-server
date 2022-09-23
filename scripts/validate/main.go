@@ -194,13 +194,13 @@ func compile(buildpackDir, tmpDir, version string) (string, error) {
 	file := artifact[0]
 	printSuccessful(fmt.Sprintf("✅ compilation has successfully created %s", file))
 
-	shaFile, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz.sha256")
-	if err != nil || len(shaFile) <= 0 {
-		printError(fmt.Sprintf("Error: no SHA256 artifact found at %s/.tgz.sha256", tmpDir))
+	checksumFile, err := filepath.Glob(tmpDir + "/" + "*" + ".tgz.checksum")
+	if err != nil || len(checksumFile) <= 0 {
+		printError(fmt.Sprintf("Error: no checksum artifact found at %s/.tgz.checksum", tmpDir))
 		return "", err
 	}
 
-	for _, file := range shaFile {
+	for _, file := range checksumFile {
 		printSuccessful(fmt.Sprintf("✅ compilation has successfully created %s", file))
 	}
 
@@ -247,19 +247,19 @@ func retrieve(buildpackDir, tmpDir string) error {
 
 	printSuccessful("✅ retrieve has successfully created a metadata.json")
 
-	// if there is a compilation action, the SHA256 and URI fields in the metadata should be empty.
-	includeSHAandURI := false
+	// if there is a compilation action, the checksum and URI fields in the metadata should be empty.
+	includeChecksumAndURI := false
 
 	compilationDir := filepath.Join(buildpackDir, "dependency", "actions", "compile")
 	if _, err := os.Stat(compilationDir); os.IsNotExist(err) {
-		includeSHAandURI = true
+		includeChecksumAndURI = true
 	}
 
-	validate := validateMetadata(filepath.Join(tmpDir, "metadata.json"), includeSHAandURI)
+	validate := validateMetadata(filepath.Join(tmpDir, "metadata.json"), includeChecksumAndURI)
 	return validate
 }
 
-func validateMetadata(metadataFile string, includeSHAandURI bool) error {
+func validateMetadata(metadataFile string, includeChecksumAndURI bool) error {
 	type configStruct struct {
 		CPE             *string        `json:"cpe,omitempty"`
 		PURL            *string        `json:"purl,omitempty"`
@@ -267,8 +267,10 @@ func validateMetadata(metadataFile string, includeSHAandURI bool) error {
 		ID              *string        `json:"id,omitempty"`
 		Licenses        *[]interface{} `json:"licenses,omitempty"`
 		Name            *string        `json:"name,omitempty"`
+		Checksum        *string        `json:"checksum,omitempty"`
 		SHA256          *string        `json:"sha256,omitempty"`
 		Source          *string        `json:"source,omitempty"`
+		SourceChecksum  *string        `json:"source-checksum,omitempty"`
 		SourceSHA256    *string        `json:"source_sha256,omitempty"`
 		Stacks          *[]string      `json:"stacks,omitempty"`
 		URI             *string        `json:"uri,omitempty"`
@@ -312,8 +314,11 @@ func validateMetadata(metadataFile string, includeSHAandURI bool) error {
 		if config[0].Source == nil {
 			fmt.Println(" ⚠️  Warning: metadata missing Source field")
 		}
-		if config[0].SourceSHA256 == nil {
-			fmt.Println(" ⚠️  Warning: metadata missing SourceSHA256 field")
+		if config[0].SourceSHA256 != nil {
+			fmt.Println(" ⚠️  Warning: metadata contains SourceSHA256, it should be SourceChecksum")
+		}
+		if config[0].SourceChecksum == nil {
+			fmt.Println(" ⚠️  Warning: metadata missing SourceChecksum field")
 		}
 		if config[0].Stacks == nil {
 			fmt.Println(" ⚠️  Warning: metadata missing Stacks field")
@@ -324,21 +329,24 @@ func validateMetadata(metadataFile string, includeSHAandURI bool) error {
 		if config[0].Version == nil {
 			fmt.Println(" ⚠️  Warning: metadata missing Version field")
 		}
-		if config[0].URI == nil && includeSHAandURI {
+		if config[0].URI == nil && includeChecksumAndURI {
 			fmt.Println(" ⚠️  Warning: metadata missing URI field")
 		}
-		if config[0].SHA256 == nil && includeSHAandURI {
-			fmt.Println(" ⚠️  Warning: metadata missing SHA256 field")
+		if config[0].SHA256 != nil {
+			fmt.Println(" ⚠️  Warning: metadata contains SHA256, it should be Checksum")
+		}
+		if config[0].Checksum == nil && includeChecksumAndURI {
+			fmt.Println(" ⚠️  Warning: metadata missing Checksum field")
 		}
 	} else {
 		fmt.Println(" ⚠️  Warning: generated metadata is blank. You may want to remove a version from the buildpack.toml and re-run validation so metadata can be checked.")
 	}
 
-	if includeSHAandURI == false {
+	if includeChecksumAndURI == false {
 		if len(config) > 0 {
 			for _, entry := range config {
-				if entry.SHA256 != nil || entry.URI != nil {
-					printError("Error: there is compilation code available, but the SHA256 and/or URI metadata field is populated. If the dependency is to be compiled, these fields should both be blank.")
+				if entry.Checksum != nil || entry.URI != nil {
+					printError("Error: there is compilation code available, but the Checksum and/or URI metadata field is populated. If the dependency is to be compiled, these fields should both be blank.")
 					return err
 				}
 			}
