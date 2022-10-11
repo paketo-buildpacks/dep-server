@@ -34,7 +34,6 @@ dependency metadata.
 * php
 * pip
 * pipenv
-* poetry
 * python
 * ruby
 * rust
