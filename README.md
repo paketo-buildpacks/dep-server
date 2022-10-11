@@ -33,7 +33,6 @@ dependency metadata.
 * node
 * php
 * pip
-* pipenv
 * python
 * ruby
 * rust
