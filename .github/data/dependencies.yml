@@ -66,13 +66,6 @@
         - libxml2
         - libxslt1-dev
         - libyaml-0-2
-- name: pip
-  requires: python
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-      version-constraint: "*"
-    - id: io.buildpacks.stacks.jammy
-      version-constraint: ">=22.1.2"
 - name: python
   stacks:
     - id: io.buildpacks.stacks.bionic

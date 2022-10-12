@@ -32,7 +32,6 @@ dependency metadata.
 * nginx
 * node
 * php
-* pip
 * python
 * ruby
 * rust
