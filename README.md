@@ -27,9 +27,7 @@ dependency metadata.
 * dotnet-runtime
 * dotnet-sdk
 * go
-* httpd
 * icu
-* nginx
 * node
 * php
 * python

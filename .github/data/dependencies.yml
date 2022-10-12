@@ -36,15 +36,7 @@
     - id: io.paketo.stacks.tiny
     - id: io.buildpacks.stacks.jammy
     - id: io.buildpacks.stacks.jammy.tiny
-- name: httpd
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-    - id: io.buildpacks.stacks.jammy
 - name: icu
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-    - id: io.buildpacks.stacks.jammy
-- name: nginx
   stacks:
     - id: io.buildpacks.stacks.bionic
     - id: io.buildpacks.stacks.jammy
