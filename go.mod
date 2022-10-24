@@ -12,7 +12,7 @@ require (
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/paketo-buildpacks/packit v1.3.1
 	github.com/sclevine/spec v1.4.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	gopkg.in/yaml.v2 v2.4.0
 )
