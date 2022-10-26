@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/docker/docker v20.10.20+incompatible
+	github.com/docker/docker v20.10.21+incompatible
 	github.com/go-enry/go-license-detector/v4 v4.3.0
 	github.com/mmcdole/gofeed v1.1.3
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
