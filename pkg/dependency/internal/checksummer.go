@@ -34,8 +34,9 @@ func (c Checksummer) VerifyASC(asc, path string, pgpKeys ...string) error {
 
 	for _, pgpKey := range pgpKeys {
 		keyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(pgpKey))
-		if err != nil {
-			return fmt.Errorf("could not read armored key ring: %w", err)
+		if err != nil {			
+			log.Printf("could not read armored key ring: %s", err.Error())
+			continue
 		}
 
 		_, err = openpgp.CheckArmoredDetachedSignature(keyring, file, strings.NewReader(asc))
