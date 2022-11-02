@@ -6,9 +6,6 @@
   skip_test: true
   stacks:
     - id: io.buildpacks.stacks.bionic
-- name: curl
-  stacks:
-    - id: io.buildpacks.stacks.bionic
 - name: dotnet-aspnetcore
   requires: dotnet-sdk
   stacks:
