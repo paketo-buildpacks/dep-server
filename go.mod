@@ -8,7 +8,7 @@ require (
 	github.com/go-enry/go-license-detector/v4 v4.3.0
 	github.com/mmcdole/gofeed v1.1.3
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/gomega v1.24.0
 	github.com/package-url/packageurl-go v0.1.0
 	github.com/paketo-buildpacks/packit v1.3.1
 	github.com/sclevine/spec v1.4.0
