@@ -21,7 +21,6 @@ dependency metadata.
 
 ## Supported Dependencies
 * bundler
-* composer
 * dotnet-aspnetcore
 * dotnet-runtime
 * dotnet-sdk
