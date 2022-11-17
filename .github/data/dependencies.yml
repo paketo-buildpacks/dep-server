@@ -51,9 +51,6 @@
         - libxml2
         - libxslt1-dev
         - libyaml-0-2
-- name: ruby
-  stacks:
-    - id: io.buildpacks.stacks.bionic
 - name: rust
   stacks:
     - id: io.buildpacks.stacks.bionic

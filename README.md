@@ -28,7 +28,6 @@ dependency metadata.
 * icu
 * node
 * php
-* ruby
 * rust
 * tini
 * yarn
