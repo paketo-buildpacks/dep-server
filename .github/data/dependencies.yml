@@ -1,7 +1,3 @@
-- name: bundler
-  requires: ruby
-  stacks:
-    - id: io.buildpacks.stacks.bionic
 - name: dotnet-aspnetcore
   requires: dotnet-sdk
   stacks:

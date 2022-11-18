@@ -20,7 +20,6 @@ repository.
 dependency metadata.
 
 ## Supported Dependencies
-* bundler
 * dotnet-aspnetcore
 * dotnet-runtime
 * dotnet-sdk
