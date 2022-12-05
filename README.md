@@ -23,8 +23,6 @@ dependency metadata.
 * dotnet-aspnetcore
 * dotnet-runtime
 * dotnet-sdk
-* go
-* icu
 * node
 * php
 * rust
