@@ -24,7 +24,6 @@ dependency metadata.
 * dotnet-runtime
 * dotnet-sdk
 * node
-* php
 * rust
 * tini
 * yarn
