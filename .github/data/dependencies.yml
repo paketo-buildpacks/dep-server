@@ -19,10 +19,6 @@
       version-constraint: "*"
     - id: io.buildpacks.stacks.jammy
       version-constraint: ">=6.*"
-- name: node
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-    - id: io.buildpacks.stacks.jammy
 - name: rust
   stacks:
     - id: io.buildpacks.stacks.bionic
@@ -30,8 +26,3 @@
 - name: tini
   stacks:
     - id: io.buildpacks.stacks.bionic
-- name: yarn
-  requires: node
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-    - id: io.buildpacks.stacks.jammy
