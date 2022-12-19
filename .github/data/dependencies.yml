@@ -19,10 +19,3 @@
       version-constraint: "*"
     - id: io.buildpacks.stacks.jammy
       version-constraint: ">=6.*"
-- name: rust
-  stacks:
-    - id: io.buildpacks.stacks.bionic
-    - id: io.paketo.stacks.tiny
-- name: tini
-  stacks:
-    - id: io.buildpacks.stacks.bionic
