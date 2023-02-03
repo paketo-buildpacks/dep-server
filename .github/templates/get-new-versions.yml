@@ -39,7 +39,7 @@ jobs:
       - name: Get Known Versions
         id: known-versions
         run: |
-          echo "::set-output name=known-versions::"$(gsutil cat "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json")""
+          echo "known-versions="$(gsutil cat "gs://${{ env.GCP_BUCKET }}/known-versions/${{ env.DEP_NAME }}.json")"" >> "$GITHUB_OUTPUT"
 
       - name: Get New Versions
         id: get-new-versions

@@ -43,15 +43,8 @@ runs:
         new_versions="$(jq -n --argjson upstream_versions "${upstream_versions}" \
           --argjson known_versions '${{ inputs.known-versions }}' '$upstream_versions-$known_versions')"
 
-        upstream_versions="${upstream_versions//'%'/'%25'}"
-        upstream_versions="${upstream_versions//$'\n'/'%0A'}"
-        upstream_versions="${upstream_versions//$'\r'/'%0D'}"
-
-        new_versions="${new_versions//'%'/'%25'}"
-        new_versions="${new_versions//$'\n'/'%0A'}"
-        new_versions="${new_versions//$'\r'/'%0D'}"
-
-        echo "::set-output name=upstream-versions::${upstream_versions}"
-        echo "::set-output name=new-versions::${new_versions}"
+        delimiter=$(openssl rand -hex 16) # roughly the same entropy as uuid v4 used in https://github.com/actions/toolkit/blob/b36e70495fbee083eb20f600eafa9091d832577d/packages/core/src/file-command.ts#L28
+        printf "upstream-versions<<%s\n%s\n%s\n" "${delimiter}" "${upstream_versions}" "${delimiter}" >> "${GITHUB_OUTPUT}" # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+        printf "new-versions<<%s\n%s\n%s\n" "${delimiter}" "${new_versions}" "${delimiter}" >> "${GITHUB_OUTPUT}" # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
 
         rm -f ./entrypoint

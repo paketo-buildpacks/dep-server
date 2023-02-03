@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 
 	"github.com/Masterminds/semver"
+	"github.com/paketo-buildpacks/pipeline-builder/actions"
 )
 
 type Stack struct {
@@ -75,5 +75,7 @@ func main() {
 	}
 
 	log.Println("Output: ", string(output))
-	fmt.Printf("::set-output name=compatible-stacks::%s\n", string(output))
+	actions.Outputs{
+		"compatible-stacks": string(output),
+	}.Write()
 }

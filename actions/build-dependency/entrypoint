@@ -60,7 +60,7 @@ STACK="bionic" SKIP_COMMIT=true \
   ./buildpacks-ci/tasks/build-binary-new/build.rb
 
 sha256="$(cat dep-metadata/*.json | jq -r .sha256)"
-echo "::set-output name=sha256::${sha256}"
+echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
 
 artifact_path="$(ls artifacts/*)"
-echo "::set-output name=artifact-path::${artifact_path}"
+echo "artifact-path=${artifact_path}" >> "$GITHUB_OUTPUT"

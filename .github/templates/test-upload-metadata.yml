@@ -24,7 +24,7 @@ jobs:
       id: required-dependency
       run: |
         uri="$(curl -sL "https://api.deps.paketo.io/v1/dependency?name=${{ env.REQUIRED_DEP }}" | jq -r '. |= sort_by(.version) | reverse[0].uri')"
-        echo "::set-output name=uri::${uri}"
+        echo "uri=${uri}" >> "$GITHUB_OUTPUT"
     #@ end
 
     - name: Test
@@ -52,7 +52,7 @@ jobs:
       id: modify-cpe
       run: |
         cpe="$(echo '${{ github.event.client_payload.cpe }}' | sed 's|\\|\\\\|g')"
-        echo "::set-output name=cpe::${cpe}"
+        echo "cpe=${cpe}" >> "$GITHUB_OUTPUT"
 
     - name: Convert Version to Semantic Version
       id: semantic-version
