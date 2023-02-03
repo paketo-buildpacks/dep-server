@@ -55,12 +55,12 @@ runs:
           --version "${{ inputs.version }}"
         )"
 
-        echo "::set-output name=uri::$(jq -r .uri <<< "${metadata}")"
-        echo "::set-output name=sha256::$(jq -r .sha256 <<< "${metadata}")"
-        echo "::set-output name=release-date::$(jq -r '.release_date // empty' <<< "${metadata}")"
-        echo "::set-output name=deprecation-date::$(jq -r '.deprecation_date // empty' <<< "${metadata}")"
-        echo "::set-output name=cpe::$(jq -r .cpe <<< "${metadata}")"
-        echo "::set-output name=purl::$(jq -r .purl <<< "${metadata}")"
-        echo "::set-output name=licenses::$(jq -c .licenses <<< "${metadata}")"
+        echo "uri=$(jq -r .uri <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "sha256=$(jq -r .sha256 <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "release-date=$(jq -r '.release_date // empty' <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "deprecation-date=$(jq -r '.deprecation_date // empty' <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "cpe=$(jq -r .cpe <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "purl=$(jq -r .purl <<< "${metadata}")" >> "$GITHUB_OUTPUT"
+        echo "licenses=$(jq -c .licenses <<< "${metadata}")" >> "$GITHUB_OUTPUT"
 
         rm -f ./entrypoint

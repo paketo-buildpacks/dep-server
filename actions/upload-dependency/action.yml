@@ -32,4 +32,4 @@ runs:
         aws s3 cp '${{ inputs.artifact-path }}' "s3://${{ inputs.bucket-name }}/deps/${{ inputs.dependency-name }}/${filename}"
 
         uri="https://deps.paketo.io/${{ inputs.dependency-name }}/${filename}"
-        echo "::set-output name=uri::${uri}"
+        echo "uri=${uri}" >> "$GITHUB_OUTPUT"

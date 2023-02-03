@@ -29,6 +29,6 @@ runs:
           --version "${{ inputs.version }}"
         )"
 
-        echo "::set-output name=sem-version::"${metadata}""
+        echo "sem-version="${metadata}"" >> "$GITHUB_OUTPUT"
 
         rm -f ./entrypoint

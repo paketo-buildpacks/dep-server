@@ -72,13 +72,13 @@ jobs:
       id: modify-cpe
       run: |
         cpe="$(echo '${{ steps.upstream.outputs.cpe }}' | sed 's|\\|\\\\|g')"
-        echo "::set-output name=cpe::${cpe}"
+        echo "cpe=${cpe}" >> "$GITHUB_OUTPUT"
 
     - name: Flatten Licenses
       id: flatten-licenses
       run: |
         licenses="$(echo '${{ steps.upstream.outputs.licenses }}' | sed -e 's/"//g' -e 's/[][]//g')"
-        echo "::set-output name=licenses::${licenses}"
+        echo "licenses=${licenses}" >> "$GITHUB_OUTPUT"
 
     - name: Trigger Tests
       uses: paketo-buildpacks/github-config/actions/dispatch@main

@@ -1,2 +1,6 @@
 github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3QEww=
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
+github.com/Masterminds/semver/v3 v3.2.0 h1:3MEsd0SM6jqZojhjLWWeBY+Kcjy9i6MQAeY7YgDP83g=
+github.com/Masterminds/semver/v3 v3.2.0/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=
+github.com/paketo-buildpacks/pipeline-builder v1.30.0 h1:rGo0pbuSCuFmogmQOnAKX2WQVg66uZqt9lcs4tQ+2G8=
+github.com/paketo-buildpacks/pipeline-builder v1.30.0/go.mod h1:7cnVFDnlk5q7kBQPtkd7De8LCxKRlhEmJHrlpHPG6tc=
