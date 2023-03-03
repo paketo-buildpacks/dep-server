@@ -1,3 +1,12 @@
+# This repository has been archived
+
+As of March 3, 2023 this repository has been archived since the Paketo
+Buildpacks project no longer uses the dep-server to receive dependency updates
+and to generate dependency metadata.
+
+For details check out the [dependency management
+RFC](https://github.com/paketo-buildpacks/rfcs/blob/main/text/dependencies/rfcs/0003-dependency-management-overview.md).
+
 # Dep Server
 
 ## Summary
